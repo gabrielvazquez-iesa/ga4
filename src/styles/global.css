@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* Esto asegura que el fondo sea oscuro incluso antes de que carguen los estilos */
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #020617; /* El equivalente a slate-950 */
+  color: white;
+}
