@@ -1,10 +1,23 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AnalyticsData from '../components/AnalyticsData.astro';
+import CopyButton from '../components/CopyButton';
 ---
 
-<Layout title="Dashboard | Home">
-  <div class="p-10">
-    <h1 class="text-4xl font-bold">¡Bienvenida al Dashboard!</h1>
-    <p class="text-slate-400 mt-4">Aquí empezaremos a pintar las gráficas de GA4.</p>
-  </div>
+<Layout title="GA4 Dashboard MVP">
+  <main class="min-h-screen bg-[#0a0a0a] p-8 font-sans">
+    <div class="max-w-6xl mx-auto">
+      <header class="flex justify-between items-center mb-12">
+        <div>
+          <h1 class="text-4xl font-black text-white tracking-tighter">Métricas de Equipo</h1>
+          <p class="text-gray-500">Datos extraídos de la propiedad 222282363</p>
+        </div>
+        
+        {/* Aquí la Isla: Cargamos el JS solo para este botón */}
+        <CopyButton client:load dataToCopy="Datos del dashboard..." />
+      </header>
+
+      <AnalyticsData />
+    </div>
+  </main>
 </Layout>

@@ -1,0 +1,42 @@
+---
+import { getDashboardData } from '../lib/ga4';
+
+const data = await getDashboardData();
+// Extraemos las filas de Google Analytics
+const rows = data.rows || [];
+
+// Formateamos la fecha para que sea legible (YYYYMMDD -> DD/MM)
+const formatDate = (dateStr: string) => {
+  return `${dateStr.slice(6, 8)}/${dateStr.slice(4, 6)}`;
+};
+---
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  {/* Cards de Resumen */}
+  <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl shadow-xl">
+    <p class="text-gray-400 text-sm">Usuarios Activos</p>
+    <h3 class="text-3xl font-bold text-white">{rows.reduce((acc, row) => acc + Number(row.metricValues[0].value), 0)}</h3>
+  </div>
+  {/* Agrega más cards aquí para Sesiones y Vistas */}
+</div>
+
+<div class="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl overflow-hidden">
+  <table class="w-full text-left">
+    <thead class="bg-white/10 text-gray-300 uppercase text-xs">
+      <tr>
+        <th class="px-6 py-4">Fecha</th>
+        <th class="px-6 py-4">Usuarios</th>
+        <th class="px-6 py-4">Vistas de Página</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-white/10 text-gray-300">
+      {rows.map((row) => (
+        <tr class="hover:bg-white/5 transition-colors">
+          <td class="px-6 py-4 font-mono">{formatDate(row.dimensionValues[0].value)}</td>
+          <td class="px-6 py-4">{row.metricValues[0].value}</td>
+          <td class="px-6 py-4">{row.metricValues[2].value}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
