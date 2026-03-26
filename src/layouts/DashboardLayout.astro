@@ -1,0 +1,96 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+import Sidebar from '../components/Sidebar';
+import Topbar from '../components/Topbar';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+
+// Obtener la ruta actual para pasarla al Sidebar y que marque el element activo
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<title>{title}</title>
+		<ClientRouter />
+    <script is:inline>
+      const getTheme = () => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      };
+
+      const applyTheme = () => {
+        const theme = getTheme();
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      };
+
+      applyTheme();
+      document.addEventListener('astro:after-swap', applyTheme);
+    </script>
+	</head>
+	<body class="bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased min-h-screen opacity-0 transition-opacity duration-500" id="dashboard-body">
+		<!-- Sidebar for Desktop -->
+		<Sidebar client:load currentPath={currentPath} />
+
+		<!-- Main Content Wrapper -->
+		<div class="md:pl-64 flex flex-col min-h-screen">
+			<Topbar client:load />
+			
+			<main class="flex-1 p-8">
+				<slot />
+			</main>
+		</div>
+
+    <!-- Script to protect routes (Redirect if not logged in) -->
+    <script>
+      import { supabase } from '../lib/supabase';
+      
+      document.addEventListener('astro:page-load', async () => {
+        // Check session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          window.location.replace('/login');
+        } else {
+          const email = session.user?.email || '';
+          const isAdmin = ['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email.toLowerCase());
+
+          // 1. Validación de dominio
+          if (!email.toLowerCase().endsWith('@iesa.edu.ve') && !isAdmin) {
+            await supabase.auth.signOut();
+            window.location.replace('/login?error=unauthorized_domain');
+          } else {
+            // 2. Validación de Ban (Desincorporado)
+            const { data: profile } = await supabase
+              .from('user_profiles')
+              .select('is_banned')
+              .eq('user_id', session.user.id)
+              .maybeSingle();
+
+            if (profile?.is_banned && !isAdmin) {
+              await supabase.auth.signOut();
+              window.location.replace('/login?error=banned');
+            } else {
+              // Mostrar contenido si todo está correcto
+              document.getElementById('dashboard-body')?.classList.remove('opacity-0');
+            }
+          }
+        }
+      });
+    </script>
+	</body>
+</html>

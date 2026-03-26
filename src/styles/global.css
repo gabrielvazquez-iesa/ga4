@@ -1,11 +1,10 @@
 @import "tailwindcss";
+@custom-variant dark (&:is(.dark *), &:is(.dark));
 
-/* Esto asegura que el fondo sea oscuro incluso antes de que carguen los estilos */
 :root {
-  color-scheme: dark;
+  color-scheme: light dark;
 }
 
 body {
-  background-color: #020617; /* El equivalente a slate-950 */
-  color: white;
+  @apply bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300;
 }

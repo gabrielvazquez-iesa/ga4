@@ -1,23 +1,17 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import AnalyticsData from '../components/AnalyticsData.astro';
-import CopyButton from '../components/CopyButton';
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import DashboardVisual from '../components/DashboardVisual';
 ---
 
-<Layout title="GA4 Dashboard MVP">
-  <main class="min-h-screen bg-[#0a0a0a] p-8 font-sans">
-    <div class="max-w-6xl mx-auto">
-      <header class="flex justify-between items-center mb-12">
-        <div>
-          <h1 class="text-4xl font-black text-white tracking-tighter">Métricas de Equipo</h1>
-          <p class="text-gray-500">Datos extraídos de la propiedad 222282363</p>
-        </div>
-        
-        {/* Aquí la Isla: Cargamos el JS solo para este botón */}
-        <CopyButton client:load dataToCopy="Datos del dashboard..." />
-      </header>
+<DashboardLayout title="Dashboard Principal | GA4">
+  <div class="max-w-7xl mx-auto space-y-8">
+    <header class="mb-4">
+      <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Visión General</h1>
+      <p class="text-slate-500 dark:text-slate-400 text-sm">Resumen gerencial del rendimiento de tu sitio web.</p>
+    </header>
 
-      <AnalyticsData />
-    </div>
-  </main>
-</Layout>
+    {/* The visual react dashboard */}
+    <DashboardVisual client:load />
+    
+  </div>
+</DashboardLayout>

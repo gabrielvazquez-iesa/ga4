@@ -1,47 +1,25 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AuthForm from '../components/AuthForm';
 ---
 
-<Layout title="Login | GA4 Dashboard">
-  <main class="min-h-screen flex items-center justify-center bg-slate-950 text-white">
-    <div class="w-full max-w-md p-8 space-y-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
-      <div class="text-center space-y-2">
-        <h1 class="text-3xl font-bold tracking-tight">Bienvenida</h1>
-        <p class="text-slate-400">Ingresa para ver el reporte de GA4</p>
-      </div>
-
-      <div class="space-y-4">
-        <button id="google-login" class="w-full flex items-center justify-center gap-2 bg-white text-black py-2 rounded-lg font-medium hover:bg-slate-200 transition-colors">
-          <span>Entrar con Google</span>
-        </button>
-        
-        <div class="relative py-4">
-          <div class="absolute inset-0 flex items-center"><span class="w-full border-t border-white/10"></span></div>
-          <div class="relative flex justify-center text-xs uppercase"><span class="bg-slate-950 px-2 text-slate-500">O con email</span></div>
-        </div>
-
-        <input type="email" placeholder="email@iesas.edu.ve" class="w-full bg-white/5 border border-white/10 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <button class="w-full bg-blue-600 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">Iniciar Sesión</button>
-      </div>
+<Layout title="Acceso | GA4 Dashboard">
+  <main class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#050B14] text-slate-900 dark:text-white relative overflow-hidden">
+    <!-- Ambient Background -->
+    <div class="absolute inset-0 z-0">
+      <div class="absolute top-0 left-1/4 w-full h-[500px] bg-blue-900/10 rounded-full blur-[120px]"></div>
+      <div class="absolute bottom-0 right-1/4 w-full h-[500px] bg-purple-900/10 rounded-full blur-[120px]"></div>
+      <div class="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] mix-blend-overlay"></div>
     </div>
+
+    <!-- Go Back Link -->
+    <a href="/" class="absolute top-8 left-8 z-20 flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors text-sm font-medium">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      Volver al inicio
+    </a>
+
+    <!-- Auth Form Island -->
+    <AuthForm client:load />
+
   </main>
 </Layout>
-
-<script>
-  import { supabase } from '../lib/supabase';
-
-  const googleBtn = document.getElementById('google-login');
-
-  googleBtn?.addEventListener('click', async () => {
-    console.log("Iniciando login con Google..."); // Para que veas en la consola que hace algo
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        // Asegúrate de que esta URL sea donde está corriendo tu proyecto local
-        redirectTo: 'http://localhost:4321/dashboard', 
-      },
-    });
-
-    if (error) console.error('Error:', error.message);
-  });
-</script>

@@ -1,0 +1,247 @@
+import { useState } from 'react';
+import { supabase } from '../lib/supabase';
+import { Mail, Lock, LogIn, UserPlus, KeyRound, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Toaster, toast } from 'sonner';
+
+export default function AuthForm() {
+  const [mode, setMode] = useState<'login' | 'register' | 'recovery'>('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [department, setDepartment] = useState('Comunicaciones');
+  const [loading, setLoading] = useState(false);
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast.error('Por favor ingresa tu correo electrónico.');
+      return;
+    }
+
+    // Validación de dominio
+    if (!email.toLowerCase().endsWith('@iesa.edu.ve') && !['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email.toLowerCase())) {
+      toast.error('Solo se permiten correos institucionales de @iesa.edu.ve');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      if (mode === 'login') {
+        if (!password) {
+          toast.error('Por favor ingresa tu contraseña.');
+          setLoading(false);
+          return;
+        }
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        toast.success('Inicio de sesión exitoso. Redirigiendo...');
+        window.location.href = '/dashboard';
+      } else if (mode === 'register') {
+        if (!password || password.length < 6) {
+          toast.error('La contraseña debe tener al menos 6 caracteres.');
+          setLoading(false);
+          return;
+        }
+
+        const { data, error } = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            data: { department }
+          }
+        });
+        
+        if (error) throw error;
+
+        if (data.user) {
+          // Registrar perfil
+          await supabase.from('user_profiles').upsert({
+            user_id: data.user.id,
+            display_name: email.split('@')[0],
+            department: department
+          });
+
+          // Enviar notificación a los admins
+          await supabase.from('system_notifications').insert([{
+            title: 'Nuevo Registro',
+            message: `El usuario ${email} se ha registrado bajo el área de ${department}.`,
+            is_read: false
+          }]);
+        }
+
+        toast.success(
+          '¡Registro exitoso! Por favor, revisa la bandeja de entrada de tu correo institucional para verificar la cuenta.', 
+          { duration: 8000 }
+        );
+        setMode('login');
+        setPassword('');
+      } else if (mode === 'recovery') {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast.success('Se han enviado las instrucciones a tu correo.', {
+          duration: 5000,
+        });
+        setMode('login');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Ha ocurrido un error durante la autenticación.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+          queryParams: {
+            hd: 'iesa.edu.ve',
+          }
+        },
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message || 'Error al conectar con Google.');
+    }
+  };
+
+  return (
+    <div className="w-full max-w-md p-8 md:p-10 space-y-8 bg-white dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2rem] shadow-xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] relative overflow-hidden">
+      <Toaster position="top-center" richColors />
+      
+      {/* Decorative gradients */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl"></div>
+      
+      <div className="text-center space-y-2 relative z-10">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-1">
+          {mode === 'login' ? 'Bienvenido de vuelta' : mode === 'register' ? 'Crea una cuenta' : 'Recuperar acceso'}
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400 text-sm">
+          {mode === 'login' 
+            ? 'Ingresa tus credenciales para continuar' 
+            : mode === 'register' 
+            ? 'Únete para gestionar tus analíticas' 
+            : 'Te enviaremos un enlace de recuperación'}
+        </p>
+      </div>
+
+      <form onSubmit={handleAuth} className="space-y-5 relative z-10">
+        <div className="space-y-4">
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 dark:text-slate-400" />
+            <input 
+              type="email" 
+              placeholder="correo@ejemplo.com" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 py-3 pl-11 pr-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium" 
+            />
+          </div>
+
+          {mode !== 'recovery' && (
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 dark:text-slate-400" />
+              <input 
+                type="password" 
+                placeholder="Tu contraseña" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 py-3 pl-11 pr-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium" 
+              />
+            </div>
+          )}
+
+          {mode === 'register' && (
+            <div className="space-y-4 mb-4 mt-4">
+              <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-1">Área de la Empresa</label>
+              <div className="relative group">
+                <select 
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-white dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-900 dark:text-white transition-all font-medium appearance-none cursor-pointer"
+                >
+                  <option value="Comunicaciones">Comunicaciones</option>
+                  <option value="Mercadeo">Mercadeo</option>
+                  <option value="Ventas">Ventas</option>
+                  <option value="RRHH">Recursos Humanos (RRHH)</option>
+                  <option value="Operaciones">Operaciones</option>
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-xs">
+                  ▼
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {mode === 'login' && (
+          <div className="flex justify-end">
+            <button 
+              type="button" 
+              onClick={() => setMode('recovery')}
+              className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
+        )}
+
+        <button 
+          type="submit" 
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-slate-900 dark:text-white py-3 rounded-xl font-bold transition-all disabled:opacity-50 hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] disabled:hover:shadow-none"
+        >
+          {loading ? (
+            <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+          ) : (
+            <>
+              {mode === 'login' ? <LogIn className="w-5 h-5" /> : mode === 'register' ? <UserPlus className="w-5 h-5" /> : <KeyRound className="w-5 h-5" />}
+              {mode === 'login' ? 'Iniciar Sesión' : mode === 'register' ? 'Crear Cuenta' : 'Enviar Enlace'}
+            </>
+          )}
+        </button>
+      </form>
+
+      {mode !== 'recovery' && (
+        <div className="relative py-2 z-10">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-slate-200 dark:border-white/10"></span>
+          </div>
+          <div className="relative flex justify-center text-xs uppercase font-semibold">
+            <span className="bg-white dark:bg-[#0a0f1c] px-3 text-slate-500 tracking-wider">O continúa con</span>
+          </div>
+        </div>
+      )}
+
+      {mode !== 'recovery' && (
+        <button 
+          type="button"
+          onClick={handleGoogleLogin} 
+          className="w-full relative z-10 flex items-center justify-center gap-3 bg-slate-50 dark:bg-white hover:bg-slate-100 dark:hover:bg-slate-100 text-slate-900 dark:text-black py-3 rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] border border-slate-200 dark:border-transparent"
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+            <path fill="#34A853" d="M12 24c2.87 0 5.28-.95 7.04-2.58l-3.57-2.77c-.95.64-2.17 1.02-3.47 1.02-2.67 0-4.93-1.8-5.74-4.22H2.5v2.85C4.26 21.8 7.82 24 12 24z" />
+            <path fill="#FBBC05" d="M6.26 15.45c-.21-.64-.32-1.31-.32-2.02s.11-1.38.32-2.02V8.56H2.5C1.8 9.95 1.4 11.45 1.4 13.06c0 1.61.4 3.11 1.1 4.5l3.76-2.11z" />
+            <path fill="#EA4335" d="M12 4.41c1.55 0 2.94.53 4.04 1.58l3.03-3.03C17.27 1.11 14.86 0 12 0 7.82 0 4.26 2.2 2.5 5.68l3.76 2.85c.81-2.42 3.07-4.12 5.74-4.12z" />
+          </svg>
+          Google
+        </button>
+      )}
+
+      <div className="text-center relative z-10 pt-2">
+        <button 
+          onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
+          className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
+        >
+          {mode === 'login' ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
+        </button>
+      </div>
+    </div>
+  );
+}

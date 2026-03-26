@@ -1,17 +1,81 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="GA4 Dashboard | Control total de tus analíticas">
+  <main class="relative min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white overflow-hidden flex flex-col justify-center">
+    
+    <!-- Background decorations -->
+    <div class="absolute inset-0 z-0">
+      <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px]"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px]"></div>
+      <div class="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay"></div>
+    </div>
+
+    <!-- Navigation (Simple) -->
+    <nav class="absolute top-0 w-full z-20 flex justify-between items-center py-6 px-8 lg:px-16">
+      <div class="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+        GA4<span class="text-blue-500">Dash</span>
+      </div>
+      <div>
+        <a href="/login" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white transition-colors mr-6">Ingresar</a>
+        <a href="/login" class="px-5 py-2.5 text-sm font-semibold bg-white text-black rounded-full hover:bg-slate-200 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+          Comenzar ahora
+        </a>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative z-10 max-w-7xl mx-auto px-8 lg:px-16 flex flex-col items-center text-center mt-20">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-600 dark:text-slate-300 mb-8 backdrop-blur-md">
+        <span class="flex h-2 w-2 rounded-full bg-blue-500"></span>
+        <span>Plataforma de Analíticas MVP</span>
+      </div>
+      
+      <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1]">
+        Tus datos de Google Analytics <br class="hidden lg:block"/> 
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">en un solo lugar</span>
+      </h1>
+      
+      <p class="text-lg lg:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mb-12">
+        Accede a reportes detallados, visualiza métricas de equipo y gestiona el rendimiento de tu propiedad de GA4 de forma rápida, segura y centralizada.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/login" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-slate-900 dark:text-white rounded-full font-bold text-lg transition-all hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] hover:-translate-y-1">
+          Ir al Panel de Control
+        </a>
+        <a href="#features" class="px-8 py-4 bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-full font-bold text-lg backdrop-blur-md transition-all">
+          Conocer más
+        </a>
+      </div>
+    </div>
+
+    <!-- Preview / Mockup (Floating UI effect) -->
+    <div class="relative z-10 w-full max-w-5xl mx-auto mt-20 px-4">
+      <div class="relative rounded-2xl md:rounded-[2rem] border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white dark:bg-slate-900/50 backdrop-blur-2xl shadow-2xl overflow-hidden aspect-[16/9] flex items-center justify-center p-8">
+        <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+        
+        {/* Decorative mockup lines/bars */}
+        <div class="w-full h-full flex flex-col gap-6 opacity-30">
+          <div class="flex gap-4 items-center mb-4">
+            <div class="w-12 h-12 rounded-full bg-slate-700"></div>
+            <div class="h-8 w-48 rounded-lg bg-slate-700"></div>
+          </div>
+          <div class="grid grid-cols-3 gap-6">
+            <div class="h-32 rounded-xl border border-slate-200 dark:border-white/10 bg-white/5"></div>
+            <div class="h-32 rounded-xl border border-slate-200 dark:border-white/10 bg-white/5"></div>
+            <div class="h-32 rounded-xl border border-slate-200 dark:border-white/10 bg-white/5"></div>
+          </div>
+          <div class="flex-1 rounded-xl border border-slate-200 dark:border-white/10 bg-white/5"></div>
+        </div>
+
+        {/* Hover overlay text */}
+        <div class="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-950/40 backdrop-blur-sm opacity-0 hover:opacity-100 transition-opacity duration-300">
+           <a href="/login" class="px-6 py-3 bg-white text-black font-semibold rounded-full shadow-lg">Inicia sesión para ver tus datos</a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</Layout>
