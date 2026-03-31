@@ -18,6 +18,20 @@ export default function Topbar() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [onDuty, setOnDuty] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
+  const searchableRoutes = [
+    { name: 'Dashboard Principal', path: '/dashboard', keywords: ['inicio', 'home', 'principal', 'general'] },
+    { name: 'Analítica GA4 (Web)', path: '/analytics', keywords: ['reportes', 'analitica', 'google', 'visitas', 'trafico', 'estadisticas'] },
+    { name: 'Redes Sociales', path: '/social-reports', keywords: ['instagram', 'metricas', 'social', 'seguidores', 'engagement'] },
+    { name: 'Bóveda de Accesos', path: '/vault', keywords: ['claves', 'passwords', 'accesos', 'boveda', 'secretos'] },
+    { name: 'Planificador de Guardias', path: '/duty', keywords: ['guardias', 'calendario', 'planificador', 'turnos', 'fechas'] },
+    { name: 'Gestión de Usuarios', path: '/users', keywords: ['usuarios', 'admin', 'cuentas', 'permisos', 'roster'] },
+    { name: 'Mi Perfil', path: '/profile', keywords: ['perfil', 'avatar', 'configuracion', 'ajustes', 'contraseña'] },
+    { name: 'Centro de Notificaciones', path: '/notifications', keywords: ['notificaciones', 'alertas', 'mensajes', 'avisos'] }
+  ];
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
@@ -61,10 +75,18 @@ export default function Topbar() {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowNotifications(false);
       }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearchResults(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const searchResults = searchQuery.trim() === '' ? [] : searchableRoutes.filter(route => 
+    route.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    route.keywords.some(k => k.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
@@ -83,14 +105,53 @@ export default function Topbar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between px-8 py-4 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
-      <div className="flex bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-full items-center px-4 py-2 w-full max-w-sm focus-within:ring-1 focus-within:ring-blue-500/50 focus-within:border-blue-500/50 transition-all">
-        <Search className="w-4 h-4 text-slate-500 shrink-0" />
-        <input 
-          type="text" 
-          placeholder="Buscar..." 
-          className="bg-transparent border-none outline-none text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 ml-2 w-full"
-        />
+    <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 md:px-8 md:py-4 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
+      <div className="relative w-full max-w-sm" ref={searchRef}>
+        <div className="flex bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-full items-center px-4 py-2 w-full focus-within:ring-1 focus-within:ring-blue-500/50 focus-within:border-blue-500/50 transition-all">
+          <Search className="w-4 h-4 text-slate-500 shrink-0" />
+          <input 
+            type="text" 
+            placeholder="Buscar en el sistema..." 
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowSearchResults(true);
+            }}
+            onFocus={() => setShowSearchResults(true)}
+            className="bg-transparent border-none outline-none text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 ml-2 w-full"
+          />
+          {searchQuery && (
+            <button onClick={() => { setSearchQuery(''); setShowSearchResults(false); }} className="text-slate-400 hover:text-slate-600">
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Search Results Dropdown */}
+        {showSearchResults && searchQuery.trim() !== '' && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 z-50">
+            {searchResults.length > 0 ? (
+              <div className="max-h-64 overflow-y-auto py-2">
+                {searchResults.map((result, idx) => (
+                  <a 
+                    key={idx} 
+                    href={result.path}
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                  >
+                    <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">{result.name}</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <div className="p-4 text-center text-sm text-slate-500 dark:text-slate-400">
+                No se encontraron resultados para "{searchQuery}"
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-4 md:gap-6">
@@ -153,6 +214,11 @@ export default function Topbar() {
                     ))}
                   </div>
                 )}
+              </div>
+              <div className="p-2 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-900">
+                <a href="/notifications" className="block w-full text-center text-xs font-bold text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 py-2">
+                  VER TODAS LAS NOTIFICACIONES
+                </a>
               </div>
             </div>
           )}
