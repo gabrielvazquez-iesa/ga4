@@ -185,8 +185,6 @@ export default function Sidebar({ currentPath }: SidebarProps) {
           <LogOut className="w-5 h-5 shrink-0" />
         </button>
       </nav>
-      {/* Spacer to prevent content cut off by the dock in mobile */}
-      <div className="md:hidden h-24 w-full"></div>
     </>
   );
 }
