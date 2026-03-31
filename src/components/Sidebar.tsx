@@ -68,6 +68,21 @@ export default function Sidebar({ currentPath }: SidebarProps) {
     <>
       {/* Desktop Sidebar */}
       <aside className={`fixed inset-y-0 left-0 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-white/5 hidden md:flex flex-col text-slate-600 dark:text-slate-300 z-40 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}>
+        
+        {/* Floating Toggle Button */}
+        <button
+          onClick={toggleSidebar}
+          className="absolute -right-3.5 top-24 w-7 h-7 flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-slate-500 hover:text-slate-900 dark:hover:text-white shadow-md z-50 transition-colors group"
+        >
+          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          
+          {/* Tooltip for toggle */}
+          <div className="absolute left-full ml-4 px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-semibold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap shadow-xl border border-white/10 flex items-center pointer-events-none">
+            <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 border-l border-b border-white/10"></div>
+            {isCollapsed ? 'Desplegar panel' : 'Contraer panel'}
+          </div>
+        </button>
+
         <div className={`p-6 flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
           <div 
             className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white shadow-lg overflow-hidden shrink-0 transition-colors"
@@ -82,7 +97,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
           )}
         </div>
 
-        <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto hide-scrollbar">
+        <nav className="flex-1 px-4 py-8 space-y-2 overflow-visible">
           {menuItems.map((item) => {
             const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
             return (
@@ -112,14 +127,6 @@ export default function Sidebar({ currentPath }: SidebarProps) {
         </nav>
 
         <div className="p-4 border-t border-slate-200 dark:border-white/5 space-y-2 flex flex-col items-center">
-          <button 
-            onClick={toggleSidebar}
-            className={`flex items-center justify-center w-full py-2.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800 transition-colors ${isCollapsed ? 'px-0' : 'px-4 gap-2'}`}
-            title={isCollapsed ? "Expandir Panel" : "Colapsar Panel"}
-          >
-            {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <><ChevronLeft className="w-5 h-5" /> <span className="text-sm font-semibold truncate">Contraer Menu</span></>}
-          </button>
-
           <button 
             onClick={handleLogout}
             className={`group relative flex items-center w-full rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-colors font-medium py-3 ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-4'}`}
