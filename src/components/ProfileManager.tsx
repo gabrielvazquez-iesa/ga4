@@ -136,7 +136,7 @@ export default function ProfileManager() {
 
   return (
     <div className="space-y-8">
-      <Toaster theme="dark" position="top-right" />
+      <Toaster theme="system" richColors position="top-right" />
 
       {/* Header Profile Card */}
       <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl p-8 backdrop-blur-sm shadow-xl flex flex-col md:flex-row gap-8 items-center md:items-start relative overflow-hidden">

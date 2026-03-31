@@ -129,7 +129,7 @@ export default function Topbar() {
 
         {/* Search Results Dropdown */}
         {showSearchResults && searchQuery.trim() !== '' && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 z-50">
+          <div className="fixed inset-x-4 top-[72px] md:absolute md:inset-auto md:top-full md:left-0 md:right-0 md:mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 z-50">
             {searchResults.length > 0 ? (
               <div className="max-h-64 overflow-y-auto py-2">
                 {searchResults.map((result, idx) => (
@@ -183,7 +183,7 @@ export default function Topbar() {
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-200 z-50">
+            <div className="fixed inset-x-4 top-[72px] md:absolute md:inset-auto md:right-0 md:mt-2 md:w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-200 z-[100]">
               <div className="p-4 border-b border-slate-200 dark:border-white/5 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
                 <h3 className="font-bold text-slate-900 dark:text-white">Notificaciones</h3>
                 {unreadCount > 0 && (

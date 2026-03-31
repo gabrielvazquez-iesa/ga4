@@ -10,18 +10,18 @@ export default function AuthForm() {
   const [department, setDepartment] = useState('Comunicaciones');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleAuth = async (e: React.FormEvent) => {
-    setErrorMsg(null);
+    e.preventDefault();
+    
     if (!email) {
-      setErrorMsg('Por favor ingresa tu correo electrónico.');
+      toast.error('Por favor ingresa tu correo electrónico.');
       return;
     }
 
     // Validación de dominio
     if (!email.toLowerCase().endsWith('@iesa.edu.ve') && !['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email.toLowerCase())) {
-      setErrorMsg('Solo se permiten correos institucionales de @iesa.edu.ve');
+      toast.error('Solo se permiten correos institucionales de @iesa.edu.ve');
       return;
     }
 
@@ -30,7 +30,7 @@ export default function AuthForm() {
     try {
       if (mode === 'login') {
         if (!password) {
-          setErrorMsg('Por favor ingresa tu contraseña.');
+          toast.error('Por favor ingresa tu contraseña.');
           setLoading(false);
           return;
         }
@@ -43,7 +43,7 @@ export default function AuthForm() {
         const hasNumber = /[0-9]/.test(password);
         
         if (password.length < 8 || !hasUpperCase || !hasNumber) {
-          setErrorMsg('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.');
+          toast.error('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.');
           setLoading(false);
           return;
         }
@@ -91,7 +91,7 @@ export default function AuthForm() {
         setMode('login');
       }
     } catch (error: any) {
-      setErrorMsg(error.message || 'Ha ocurrido un error durante la autenticación.');
+      toast.error(error.message || 'Ha ocurrido un error durante la autenticación.');
     } finally {
       setLoading(false);
     }
@@ -116,17 +116,7 @@ export default function AuthForm() {
 
   return (
     <div className="w-full max-w-md p-8 md:p-10 space-y-8 bg-white dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2rem] shadow-xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] relative overflow-hidden">
-      <Toaster position="top-right" richColors />
-      
-      {errorMsg && (
-        <div className="absolute top-4 left-0 right-0 px-8 z-20 animate-in slide-in-from-top-4 duration-300">
-          <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl flex items-center gap-3 text-sm italic shadow-lg backdrop-blur-md">
-            <AlertCircle className="w-5 h-5 shrink-0" />
-            <span>{errorMsg}</span>
-            <button onClick={() => setErrorMsg(null)} className="ml-auto hover:text-red-400">✕</button>
-          </div>
-        </div>
-      )}
+      <Toaster position="top-right" richColors theme="system" />
       
       {/* Decorative gradients */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>

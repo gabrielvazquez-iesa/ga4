@@ -147,7 +147,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
 
       {/* Mobile Floating Dock */}
       <nav className="md:hidden fixed bottom-6 left-4 right-4 bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-xl border border-slate-700 dark:border-white/10 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] rounded-[2rem] p-2 flex items-center justify-between z-50">
-        {menuItems.slice(0, 5).map((item) => {
+        {menuItems.filter(item => item.name !== 'Notificaciones').slice(0, 5).map((item) => {
           const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
           return (
             <a
