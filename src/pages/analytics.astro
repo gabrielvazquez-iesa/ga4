@@ -1,6 +1,6 @@
 ---
 import DashboardLayout from '../layouts/DashboardLayout.astro';
-import ReporteJefa from '../components/ReporteJefa';
+import AnalyticsDashboard from '../components/AnalyticsDashboard';
 ---
 
 <DashboardLayout title="Reportes y Analíticas | GA4">
@@ -10,7 +10,7 @@ import ReporteJefa from '../components/ReporteJefa';
       <p class="text-slate-500 dark:text-slate-400 text-sm">Visualización detallada y exportación con formato exacto para gerencia.</p>
     </header>
 
-    <ReporteJefa client:load />
+    <AnalyticsDashboard client:idle />
     
   </div>
 </DashboardLayout>

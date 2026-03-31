@@ -20,7 +20,17 @@ const currentPath = Astro.url.pathname;
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<title>{title}</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#3b82f6" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
 		<ClientRouter />
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => console.error('SW Error', err));
+        });
+      }
+    </script>
     <script is:inline>
       const getTheme = () => {
         if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
@@ -47,7 +57,7 @@ const currentPath = Astro.url.pathname;
 		<Sidebar client:load currentPath={currentPath} />
 
 		<!-- Main Content Wrapper -->
-		<div class="md:pl-64 flex flex-col min-h-screen">
+		<div id="main-content" class="md:pl-64 flex flex-col min-h-screen transition-all duration-300 ease-in-out">
 			<Topbar client:load />
 			
 			<main class="flex-1 p-8">

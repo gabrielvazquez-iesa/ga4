@@ -74,8 +74,8 @@ export default function DashboardVisual() {
               onClick={() => setTimeRange(range)}
               className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                 timeRange === range 
-                  ? 'bg-blue-600 shadow-lg shadow-blue-500/20 text-slate-900 dark:text-white' 
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  ? 'bg-blue-600 shadow-lg shadow-blue-500/20 text-white' 
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
               }`}
             >
               {range === 'day' ? 'Hoy' : range === 'week' ? 'Esta Semana' : 'Este Mes'}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Mail, Lock, LogIn, UserPlus, KeyRound, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, LogIn, UserPlus, KeyRound, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
 export default function AuthForm() {
@@ -9,17 +9,19 @@ export default function AuthForm() {
   const [password, setPassword] = useState('');
   const [department, setDepartment] = useState('Comunicaciones');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
+    setErrorMsg(null);
     if (!email) {
-      toast.error('Por favor ingresa tu correo electrónico.');
+      setErrorMsg('Por favor ingresa tu correo electrónico.');
       return;
     }
 
     // Validación de dominio
     if (!email.toLowerCase().endsWith('@iesa.edu.ve') && !['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email.toLowerCase())) {
-      toast.error('Solo se permiten correos institucionales de @iesa.edu.ve');
+      setErrorMsg('Solo se permiten correos institucionales de @iesa.edu.ve');
       return;
     }
 
@@ -28,7 +30,7 @@ export default function AuthForm() {
     try {
       if (mode === 'login') {
         if (!password) {
-          toast.error('Por favor ingresa tu contraseña.');
+          setErrorMsg('Por favor ingresa tu contraseña.');
           setLoading(false);
           return;
         }
@@ -37,8 +39,11 @@ export default function AuthForm() {
         toast.success('Inicio de sesión exitoso. Redirigiendo...');
         window.location.href = '/dashboard';
       } else if (mode === 'register') {
-        if (!password || password.length < 6) {
-          toast.error('La contraseña debe tener al menos 6 caracteres.');
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        
+        if (password.length < 8 || !hasUpperCase || !hasNumber) {
+          setErrorMsg('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.');
           setLoading(false);
           return;
         }
@@ -86,7 +91,7 @@ export default function AuthForm() {
         setMode('login');
       }
     } catch (error: any) {
-      toast.error(error.message || 'Ha ocurrido un error durante la autenticación.');
+      setErrorMsg(error.message || 'Ha ocurrido un error durante la autenticación.');
     } finally {
       setLoading(false);
     }
@@ -111,7 +116,17 @@ export default function AuthForm() {
 
   return (
     <div className="w-full max-w-md p-8 md:p-10 space-y-8 bg-white dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2rem] shadow-xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] relative overflow-hidden">
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-right" richColors />
+      
+      {errorMsg && (
+        <div className="absolute top-4 left-0 right-0 px-8 z-20 animate-in slide-in-from-top-4 duration-300">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl flex items-center gap-3 text-sm italic shadow-lg backdrop-blur-md">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <span>{errorMsg}</span>
+            <button onClick={() => setErrorMsg(null)} className="ml-auto hover:text-red-400">✕</button>
+          </div>
+        </div>
+      )}
       
       {/* Decorative gradients */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
@@ -147,12 +162,20 @@ export default function AuthForm() {
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 dark:text-slate-400" />
               <input 
-                type="password" 
+                type={showPassword ? "text" : "password"} 
                 placeholder="Tu contraseña" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 py-3 pl-11 pr-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium" 
+                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 py-3 pl-11 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium" 
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
           )}
 
@@ -163,7 +186,7 @@ export default function AuthForm() {
                 <select 
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-white dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-900 dark:text-white transition-all font-medium appearance-none cursor-pointer"
+                  className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-900 dark:text-white transition-all font-medium appearance-none cursor-pointer"
                 >
                   <option value="Comunicaciones">Comunicaciones</option>
                   <option value="Mercadeo">Mercadeo</option>
@@ -194,7 +217,7 @@ export default function AuthForm() {
         <button 
           type="submit" 
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-slate-900 dark:text-white py-3 rounded-xl font-bold transition-all disabled:opacity-50 hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] disabled:hover:shadow-none"
+          className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold transition-all disabled:opacity-50 hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] disabled:hover:shadow-none"
         >
           {loading ? (
             <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
@@ -237,7 +260,7 @@ export default function AuthForm() {
       <div className="text-center relative z-10 pt-2">
         <button 
           onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-          className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
+          className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
         >
           {mode === 'login' ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
         </button>

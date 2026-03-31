@@ -1,4 +1,4 @@
-import { Bell, Search, User, Check, Trash2, X } from 'lucide-react';
+import { Bell, Search, User, Check, Trash2, X, Calendar, ShieldCheck } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import ThemeToggle from './ThemeToggle';
@@ -16,36 +16,45 @@ export default function Topbar() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [onDuty, setOnDuty] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
-      const email = data.session?.user?.email || 'Usuario';
-      setUserEmail(email);
+      const user = data.session?.user;
+      if (!user) return;
       
-      if (data.session?.user) {
-        // Fetch avatar if exists
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('avatar_url')
-          .eq('user_id', data.session.user.id)
-          .maybeSingle();
-        
-        if (profile?.avatar_url) setAvatarUrl(profile.avatar_url);
+      setUserEmail(user.email || 'Usuario');
+      
+      // Fetch profile
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('avatar_url')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (profile?.avatar_url) setAvatarUrl(profile.avatar_url);
 
-        // Fetch real notifications (only relevant for admins in this MVP, but we fetch for simplicity)
-        const { data: notifs } = await supabase
-          .from('system_notifications')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(10);
+      // Check if user is on duty
+      const now = new Date().toISOString();
+      const { data: activeShift } = await supabase
+        .from('duty_shifts')
+        .select('id')
+        .eq('user_id', user.id)
+        .lte('start_date', now)
+        .gte('end_date', now)
+        .maybeSingle();
+      
+      setOnDuty(!!activeShift);
+
+      // Fetch notifications
+      const { data: notifs } = await supabase
+        .from('system_notifications')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10);
           
-        if (notifs) {
-          setNotifications(notifs);
-        } else {
-          setNotifications([]);
-        }
-      }
+      if (notifs) setNotifications(notifs);
     });
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -60,9 +69,7 @@ export default function Topbar() {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   const markAllAsRead = async () => {
-    // Optimistic UI
     setNotifications(notifications.map(n => ({ ...n, is_read: true })));
-    // Update DB
     const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id);
     if (unreadIds.length > 0) {
       await supabase.from('system_notifications').update({ is_read: true }).in('id', unreadIds);
@@ -77,17 +84,32 @@ export default function Topbar() {
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between px-8 py-4 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
-      <div className="flex bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-full items-center px-4 py-2 w-full max-w-md focus-within:ring-1 focus-within:ring-blue-500/50 focus-within:border-blue-500/50 transition-all">
+      <div className="flex bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-full items-center px-4 py-2 w-full max-w-sm focus-within:ring-1 focus-within:ring-blue-500/50 focus-within:border-blue-500/50 transition-all">
         <Search className="w-4 h-4 text-slate-500 shrink-0" />
         <input 
           type="text" 
-          placeholder="Buscar métricas, reportes..." 
+          placeholder="Buscar..." 
           className="bg-transparent border-none outline-none text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 ml-2 w-full"
         />
       </div>
 
       <div className="flex items-center gap-4 md:gap-6">
+        {onDuty && (
+          <a href="/duty" className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full group hover:bg-green-500/20 transition-all">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span className="text-[10px] font-bold text-green-500 uppercase tracking-widest">En Guardia</span>
+          </a>
+        )}
+        
+        <a href="/duty" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800" title="Planificador de Guardias">
+          <Calendar className="w-5 h-5" />
+        </a>
+
         <ThemeToggle />
+
         <div className="relative" ref={dropdownRef}>
           <button 
             onClick={() => setShowNotifications(!showNotifications)}
