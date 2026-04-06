@@ -1,7 +1,7 @@
-import { c as createComponent } from './astro-component_CCwRo9GX.mjs';
+import { c as createComponent } from './astro-component_Bi-3AwRB.mjs';
 import 'piccolore';
-import { r as renderTemplate, n as renderSlot, o as renderHead, l as renderComponent } from './entrypoint_Bgf5ToQF.mjs';
-import { $ as $$ClientRouter } from './global_BnZ_ka1z.mjs';
+import { r as renderTemplate, n as renderSlot, o as renderHead, l as renderComponent } from './entrypoint_BbtgLamP.mjs';
+import { $ as $$ClientRouter } from './global_Dj8FxnUX.mjs';
 
 var __freeze = Object.freeze;
 var __defProp = Object.defineProperty;

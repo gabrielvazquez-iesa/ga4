@@ -1,7 +1,7 @@
-import { c as createComponent } from './astro-component_CCwRo9GX.mjs';
+import { c as createComponent } from './astro-component_Bi-3AwRB.mjs';
 import 'piccolore';
-import { l as renderComponent, r as renderTemplate, m as maybeRenderHead } from './entrypoint_Bgf5ToQF.mjs';
-import { $ as $$Layout } from './Layout_BSXN1F7x.mjs';
+import { l as renderComponent, r as renderTemplate, m as maybeRenderHead } from './entrypoint_BbtgLamP.mjs';
+import { $ as $$Layout } from './Layout_BNKHee3F.mjs';
 
 const $$About = createComponent(($$result, $$props, $$slots) => {
   return renderTemplate`${renderComponent($$result, "Layout", $$Layout, { "title": "Conocer más | Utilidades y Seguridad GA4Dash" }, { "default": ($$result2) => renderTemplate` ${maybeRenderHead()}<main class="relative min-h-screen bg-white dark:bg-[#050B14] text-slate-900 dark:text-white overflow-x-hidden selection:bg-blue-500/30"> <!-- Background decorations --> <div class="fixed inset-0 z-0 pointer-events-none"> <div class="absolute top-0 right-0 w-[50vw] h-[50vh] bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-[150px]"></div> <div class="absolute bottom-0 left-0 w-[50vw] h-[50vh] bg-purple-500/5 dark:bg-purple-500/10 rounded-full blur-[150px]"></div> <div class="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay"></div> </div> <!-- Simple Nav --> <nav class="relative z-20 w-full flex justify-between items-center py-6 px-6 lg:px-16 border-b border-slate-200 dark:border-white/5"> <a href="/" class="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 flex items-center gap-2"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><path d="m15 18-6-6 6-6"></path></svg>

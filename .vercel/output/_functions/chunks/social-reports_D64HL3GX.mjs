@@ -1,7 +1,7 @@
-import { c as createComponent } from './astro-component_CCwRo9GX.mjs';
+import { c as createComponent } from './astro-component_Bi-3AwRB.mjs';
 import 'piccolore';
-import { l as renderComponent, r as renderTemplate, m as maybeRenderHead } from './entrypoint_Bgf5ToQF.mjs';
-import { $ as $$DashboardLayout } from './DashboardLayout_B4a3eXfo.mjs';
+import { l as renderComponent, r as renderTemplate, m as maybeRenderHead } from './entrypoint_BbtgLamP.mjs';
+import { $ as $$DashboardLayout } from './DashboardLayout_jfAd883J.mjs';
 
 const $$SocialReports = createComponent(($$result, $$props, $$slots) => {
   return renderTemplate`${renderComponent($$result, "DashboardLayout", $$DashboardLayout, { "title": "Reportes de Redes Sociales | GA4" }, { "default": ($$result2) => renderTemplate` ${maybeRenderHead()}<div class="max-w-7xl mx-auto space-y-6"> <header class="mb-2"> <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-1">Redes Sociales</h1> <p class="text-slate-500 dark:text-slate-400 text-sm">Reportes de métricas y engagement para todas las plataformas.</p> </header> ${renderComponent($$result2, "SocialReports", null, { "client:only": "react", "client:component-hydration": "only", "client:component-path": "C:/Users/gabriel.vazquez/Desktop/Proyectos/proyecto-dashboard/ga4-dashboard/src/components/SocialReports", "client:component-export": "default" })} </div> ` })}`;

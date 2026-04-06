@@ -1,26 +1,18 @@
 import type { APIRoute } from 'astro';
-import { BetaAnalyticsDataClient } from '@google-analytics/data';
-
-const client = new BetaAnalyticsDataClient({
-  credentials: {
-    client_email: import.meta.env.GA4_CLIENT_EMAIL,
-    private_key: import.meta.env.GA4_PRIVATE_KEY?.split(String.raw`\n`).join('\n'),
-  },
-});
-
+import { getGa4Client, propertyId } from '../../lib/ga4-client';
 import { verifyApiAuth } from '../../lib/api-auth-server';
 
 export const GET: APIRoute = async ({ request }) => {
   if (!(await verifyApiAuth(request))) return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
 
+  const client = getGa4Client();
+  if (!client || !propertyId) {
+    return new Response(JSON.stringify({ error: 'Configuración de Google Analytics faltante o inválida.' }), { status: 500 });
+  }
+
   const url = new URL(request.url);
   const days = parseInt(url.searchParams.get('days') || '30', 10);
   const pathFilter = url.searchParams.get('pathFilter');
-  const propertyId = import.meta.env.GA4_PROPERTY_ID;
-
-  if (!propertyId) {
-    return new Response(JSON.stringify({ error: 'Configuración GA4 faltante' }), { status: 500 });
-  }
 
   try {
     // Current period vs Previous period

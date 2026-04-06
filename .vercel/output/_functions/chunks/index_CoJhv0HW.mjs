@@ -1,7 +1,7 @@
-import { c as createComponent } from './astro-component_CCwRo9GX.mjs';
+import { c as createComponent } from './astro-component_Bi-3AwRB.mjs';
 import 'piccolore';
-import { l as renderComponent, r as renderTemplate, m as maybeRenderHead } from './entrypoint_Bgf5ToQF.mjs';
-import { $ as $$Layout } from './Layout_BSXN1F7x.mjs';
+import { l as renderComponent, r as renderTemplate, m as maybeRenderHead } from './entrypoint_BbtgLamP.mjs';
+import { $ as $$Layout } from './Layout_BNKHee3F.mjs';
 
 const $$Index = createComponent(($$result, $$props, $$slots) => {
   return renderTemplate`${renderComponent($$result, "Layout", $$Layout, { "title": "GA4 Dashboard | Control total de tus analíticas" }, { "default": ($$result2) => renderTemplate` ${maybeRenderHead()}<main class="relative min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white overflow-hidden flex flex-col justify-center"> <!-- Background decorations --> <div class="absolute inset-0 z-0"> <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px]"></div> <div class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px]"></div> <div class="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay"></div> </div> <!-- Navigation (Simple) --> <nav class="absolute top-0 w-full z-20 flex justify-between items-center py-4 px-4 md:py-6 md:px-8 lg:px-16"> <div class="text-xl md:text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400">

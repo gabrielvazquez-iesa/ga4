@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
-import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import { google } from 'googleapis';
-
+import { getGa4Client, propertyId, clientEmail, privateKey } from '../../lib/ga4-client';
 import { verifyApiAuth } from '../../lib/api-auth-server';
 
 export const GET: APIRoute = async ({ request }) => {
@@ -12,7 +11,12 @@ export const GET: APIRoute = async ({ request }) => {
   const gscUrl = url.searchParams.get('gscUrl') || 'sc-domain:iesa.edu.ve';
 
   if (!month) {
-    return new Response(JSON.stringify({ error: `Falta parámetro month (formato YYYY-MM). URL entrante: ${request.url}` }), { status: 400 });
+    return new Response(JSON.stringify({ error: `Falta parámetro month (formato YYYY-MM).` }), { status: 400 });
+  }
+
+  const gaClient = getGa4Client();
+  if (!gaClient || !propertyId || !clientEmail || !privateKey) {
+    return new Response(JSON.stringify({ error: 'Configuración de GA4/GSC faltante o inválida en el servidor' }), { status: 500 });
   }
 
   // Calcular inicio y fin de mes
@@ -20,18 +24,6 @@ export const GET: APIRoute = async ({ request }) => {
   const startDate = `${yearStr}-${monthStr}-01`;
   const lastDay = new Date(parseInt(yearStr), parseInt(monthStr), 0).getDate();
   const endDate = `${yearStr}-${monthStr}-${String(lastDay).padStart(2, '0')}`;
-
-  const clientEmail = import.meta.env.GA4_CLIENT_EMAIL;
-  const privateKey = import.meta.env.GA4_PRIVATE_KEY?.split(String.raw`\n`).join('\n');
-  const propertyId = import.meta.env.GA4_PROPERTY_ID;
-
-  if (!propertyId || !clientEmail) {
-    return new Response(JSON.stringify({ error: 'Configuración de GA4 faltante en el entorno' }), { status: 500 });
-  }
-
-  const gaClient = new BetaAnalyticsDataClient({
-    credentials: { client_email: clientEmail, private_key: privateKey },
-  });
 
   try {
     // 1. Métricas Globales GA4
