@@ -1,0 +1,1 @@
+import{s as n}from"./supabase.zazMEywi.js";async function r(s,a={}){const{data:t}=await n.auth.getSession(),e=t.session?.access_token;return fetch(s,{...a,headers:{...a.headers,...e?{Authorization:`Bearer ${e}`}:{}}})}export{r as a};

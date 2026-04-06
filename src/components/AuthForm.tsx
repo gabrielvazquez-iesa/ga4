@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Mail, Lock, LogIn, UserPlus, KeyRound, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, LogIn, UserPlus, KeyRound, AlertCircle, CheckCircle2, Eye, EyeOff, Fingerprint } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
 export default function AuthForm() {
@@ -101,6 +101,60 @@ export default function AuthForm() {
       }
     } catch (error: any) {
       toast.error(error.message || 'Ha ocurrido un error durante la autenticación.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasskeyLogin = async () => {
+    if (!email) {
+      toast.error('Por favor ingresa tu correo institucional para usar la huella.');
+      return;
+    }
+
+    // Validación de dominio (igual que el login normal)
+    if (!email.toLowerCase().endsWith('@iesa.edu.ve') && !['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email.toLowerCase())) {
+      toast.error('Solo se permiten correos @iesa.edu.ve');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // 1. Obtener los factores del usuario primero (requiere email)
+      // En un flujo MFA real de Supabase, esto suele requerir un login parcial 
+      // o un desafío de factor. Para simplificar y usar la biometría como acceso rápido:
+      
+      const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+      
+      if (factorsError) throw factorsError;
+      
+      const webAuthnFactor = factors?.all.find(f => f.factor_type === 'webauthn' && f.status === 'verified');
+      
+      if (!webAuthnFactor) {
+        throw new Error("No se encontró una huella registrada para este dispositivo. Inicia sesión normalmente y regístrala.");
+      }
+
+      // 2. Iniciar el desafío (Challenge)
+      const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
+        factorId: webAuthnFactor.id
+      });
+
+      if (challengeError) throw challengeError;
+
+      // 3. Verificar con la huella
+      const { data: verifyData, error: verifyError } = await supabase.auth.mfa.verify({
+        factorId: webAuthnFactor.id,
+        challengeId: challenge.id,
+      });
+
+      if (verifyError) throw verifyError;
+
+      if (verifyData) {
+        toast.success('¡Acceso concedido con biometría!');
+        window.location.href = '/dashboard';
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Error en la autenticación biométrica.');
     } finally {
       setLoading(false);
     }
@@ -241,19 +295,31 @@ export default function AuthForm() {
       )}
 
       {mode !== 'recovery' && (
-        <button 
-          type="button"
-          onClick={handleGoogleLogin} 
-          className="w-full relative z-10 flex items-center justify-center gap-3 bg-slate-50 dark:bg-white hover:bg-slate-100 dark:hover:bg-slate-100 text-slate-900 dark:text-black py-3 rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] border border-slate-200 dark:border-transparent"
-        >
-          <svg className="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-            <path fill="#34A853" d="M12 24c2.87 0 5.28-.95 7.04-2.58l-3.57-2.77c-.95.64-2.17 1.02-3.47 1.02-2.67 0-4.93-1.8-5.74-4.22H2.5v2.85C4.26 21.8 7.82 24 12 24z" />
-            <path fill="#FBBC05" d="M6.26 15.45c-.21-.64-.32-1.31-.32-2.02s.11-1.38.32-2.02V8.56H2.5C1.8 9.95 1.4 11.45 1.4 13.06c0 1.61.4 3.11 1.1 4.5l3.76-2.11z" />
-            <path fill="#EA4335" d="M12 4.41c1.55 0 2.94.53 4.04 1.58l3.03-3.03C17.27 1.11 14.86 0 12 0 7.82 0 4.26 2.2 2.5 5.68l3.76 2.85c.81-2.42 3.07-4.12 5.74-4.12z" />
-          </svg>
-          Google
-        </button>
+        <div className="grid grid-cols-2 gap-4 relative z-10">
+          <button 
+            type="button"
+            onClick={handleGoogleLogin} 
+            className="flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-900 py-3 rounded-xl font-bold transition-all hover:scale-[1.02] border border-slate-200"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 24c2.87 0 5.28-.95 7.04-2.58l-3.57-2.77c-.95.64-2.17 1.02-3.47 1.02-2.67 0-4.93-1.8-5.74-4.22H2.5v2.85C4.26 21.8 7.82 24 12 24z" />
+              <path fill="#FBBC05" d="M6.26 15.45c-.21-.64-.32-1.31-.32-2.02s.11-1.38.32-2.02V8.56H2.5C1.8 9.95 1.4 11.45 1.4 13.06c0 1.61.4 3.11 1.1 4.5l3.76-2.11z" />
+              <path fill="#EA4335" d="M12 4.41c1.55 0 2.94.53 4.04 1.58l3.03-3.03C17.27 1.11 14.86 0 12 0 7.82 0 4.26 2.2 2.5 5.68l3.76 2.85c.81-2.42 3.07-4.12 5.74-4.12z" />
+            </svg>
+            Google
+          </button>
+
+          <button 
+            type="button"
+            onClick={handlePasskeyLogin} 
+            disabled={loading}
+            className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl font-bold transition-all hover:scale-[1.02] border border-white/10"
+          >
+            <Fingerprint className="w-5 h-5 text-blue-400" />
+            Huella
+          </button>
+        </div>
       )}
 
       <div className="text-center relative z-10 pt-2">

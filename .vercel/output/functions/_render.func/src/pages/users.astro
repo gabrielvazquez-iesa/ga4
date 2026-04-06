@@ -1,0 +1,15 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import UsersManager from '../components/UsersManager';
+---
+
+<DashboardLayout title="Gestión de Usuarios | GA4">
+  <div class="max-w-7xl mx-auto space-y-6">
+    <header>
+      <h1 class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-1">Directorio de Usuarios</h1>
+      <p class="text-slate-500 dark:text-slate-400 text-sm">Gestiona el acceso y visualiza a todos los miembros registrados en la plataforma.</p>
+    </header>
+
+    <UsersManager client:idle />
+  </div>
+</DashboardLayout>

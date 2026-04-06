@@ -1,0 +1,15 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import VaultManager from '../components/VaultManager';
+---
+
+<DashboardLayout title="Bóveda de Contraseñas | GA4">
+  <div class="max-w-7xl mx-auto space-y-6">
+    <header>
+      <h1 class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-1">Bóveda de Credenciales</h1>
+      <p class="text-slate-500 dark:text-slate-400 text-sm">Gestiona de forma segura los accesos a los distintos servicios relacionados al proyecto.</p>
+    </header>
+
+    <VaultManager client:idle />
+  </div>
+</DashboardLayout>
