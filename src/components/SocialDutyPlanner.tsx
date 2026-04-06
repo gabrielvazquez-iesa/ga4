@@ -91,8 +91,9 @@ export default function SocialDutyPlanner() {
     end_date: string;
     shift_type: 'day' | 'week' | 'weekend';
     notes: string;
+    tag: string;
   }>({
-    user_id: '', start_date: '', end_date: '', shift_type: 'day', notes: ''
+    user_id: '', start_date: '', end_date: '', shift_type: 'day', notes: '', tag: 'Redes Sociales'
   });
 
   useEffect(() => { fetchData(); }, []);
@@ -146,15 +147,20 @@ export default function SocialDutyPlanner() {
     e.preventDefault();
     try {
       if (!formData.user_id) { toast.error('Selecciona un responsable.'); return; }
+      
+      const { tag, notes, ...rest } = formData;
+      const combinedNotes = `[${tag}] ${notes}`;
+      const payload = { ...rest, notes: combinedNotes };
+
       if (editingShift) {
-        const { error } = await supabase.from('duty_shifts').update(formData).eq('id', editingShift.id);
+        const { error } = await supabase.from('duty_shifts').update(payload).eq('id', editingShift.id);
         if (error) throw error;
-        await supabase.from('duty_audit_logs').insert({ shift_id: editingShift.id, user_id: currentUser?.id, action: 'update', new_value: formData });
+        await supabase.from('duty_audit_logs').insert({ shift_id: editingShift.id, user_id: currentUser?.id, action: 'update', new_value: payload });
         toast.success('Guardia actualizada.');
       } else {
-        const { data, error } = await supabase.from('duty_shifts').insert([formData]).select().single();
+        const { data, error } = await supabase.from('duty_shifts').insert([payload]).select().single();
         if (error) throw error;
-        await supabase.from('duty_audit_logs').insert({ shift_id: data.id, user_id: currentUser?.id, action: 'create', new_value: formData });
+        await supabase.from('duty_audit_logs').insert({ shift_id: data.id, user_id: currentUser?.id, action: 'create', new_value: payload });
         toast.success('Guardia programada.');
       }
       setShowModal(false);
@@ -209,7 +215,7 @@ export default function SocialDutyPlanner() {
             <p className="text-indigo-100/80">Visualiza y gestiona los turnos de Mercadeo y Comunicaciones.</p>
           </div>
           <button
-            onClick={() => { setEditingShift(null); setFormData({ user_id: '', start_date: '', end_date: '', shift_type: 'day', notes: '' }); setShowModal(true); }}
+            onClick={() => { setEditingShift(null); setFormData({ user_id: '', start_date: '', end_date: '', shift_type: 'day', notes: '', tag: 'Redes Sociales' }); setShowModal(true); }}
             className="flex items-center gap-2 px-6 py-3 bg-white text-indigo-700 font-bold rounded-2xl hover:bg-indigo-50 transition-all shadow-xl"
           >
             <Plus className="w-5 h-5" /> Programar Guardia
@@ -306,7 +312,9 @@ export default function SocialDutyPlanner() {
                   <User className="w-6 h-6" style={{ color: userColorMap[activeShift.user_id]?.customColorHex || userColorMap[activeShift.user_id]?.dot || '#3b82f6' }} />
                 </div>
                 <div>
-                  <p className="text-xs text-green-500 font-bold uppercase">De Guardia</p>
+                  <p className="text-xs text-green-500 font-bold uppercase">
+                    De Guardia {activeShift.notes?.startsWith('[Eventos]') ? ' (Eventos)' : ' (Redes)'}
+                  </p>
                   <p className="font-bold dark:text-white">{activeShift.user_profiles?.display_name}</p>
                   <p className="text-xs text-slate-500">{activeShift.user_profiles?.department}</p>
                 </div>
@@ -345,15 +353,37 @@ export default function SocialDutyPlanner() {
                       <div key={shift.id} className="flex items-start gap-3 group">
                         <div className="w-3 h-3 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: color?.dot || '#3b82f6' }} />
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm dark:text-white truncate">{shift.user_profiles?.display_name}</p>
+                          <p className="font-semibold text-sm dark:text-white flex items-center gap-2 truncate">
+                            {shift.user_profiles?.display_name}
+                            {shift.notes?.startsWith('[Eventos]') && <span className="px-1.5 py-0.5 text-[9px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded uppercase font-bold shrink-0">Eventos</span>}
+                            {shift.notes?.startsWith('[Redes Sociales]') && <span className="px-1.5 py-0.5 text-[9px] bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded uppercase font-bold shrink-0">Redes</span>}
+                          </p>
                           <p className="text-xs text-indigo-400 font-semibold">
                             {new Date(shift.start_date).toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' })} — {new Date(shift.end_date).toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' })}
                           </p>
                           <p className="text-xs text-slate-400">{shift.user_profiles?.department} · {shift.shift_type === 'day' ? 'Diario' : shift.shift_type === 'week' ? 'Semanal' : 'Fin de Semana'}</p>
-                          {shift.notes && <p className="text-xs text-slate-500 mt-1 italic">"{shift.notes}"</p>}
+                          {(() => {
+                            let cleanNotes = shift.notes || '';
+                            if (cleanNotes.startsWith('[Eventos] ')) cleanNotes = cleanNotes.replace('[Eventos] ', '');
+                            else if (cleanNotes.startsWith('[Redes Sociales] ')) cleanNotes = cleanNotes.replace('[Redes Sociales] ', '');
+                            return cleanNotes ? <p className="text-xs text-slate-500 mt-1 italic">"{cleanNotes}"</p> : null;
+                          })()}
                         </div>
                         <div className="opacity-0 group-hover:opacity-100 flex gap-1 transition-opacity">
-                          <button onClick={() => { setEditingShift(shift); setFormData({ user_id: shift.user_id, start_date: shift.start_date, end_date: shift.end_date, shift_type: shift.shift_type, notes: shift.notes }); setShowModal(true); }} className="p-1 text-slate-400 hover:text-blue-500 rounded-lg hover:bg-blue-500/10 transition-all">
+                          <button onClick={() => { 
+                            let parsedTag = 'Redes Sociales';
+                            let parsedNotes = shift.notes || '';
+                            if (parsedNotes.startsWith('[Eventos] ')) {
+                              parsedTag = 'Eventos';
+                              parsedNotes = parsedNotes.replace('[Eventos] ', '');
+                            } else if (parsedNotes.startsWith('[Redes Sociales] ')) {
+                              parsedTag = 'Redes Sociales';
+                              parsedNotes = parsedNotes.replace('[Redes Sociales] ', '');
+                            }
+                            setEditingShift(shift); 
+                            setFormData({ user_id: shift.user_id, start_date: shift.start_date, end_date: shift.end_date, shift_type: shift.shift_type, notes: parsedNotes, tag: parsedTag }); 
+                            setShowModal(true); 
+                          }} className="p-1 text-slate-400 hover:text-blue-500 rounded-lg hover:bg-blue-500/10 transition-all">
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button onClick={() => handleDelete(shift.id)} className="p-1 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-500/10 transition-all">
@@ -448,6 +478,19 @@ export default function SocialDutyPlanner() {
                     onChange={e => setFormData({...formData, end_date: e.target.value})}
                     className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 pl-9 pr-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm dark:text-white [color-scheme:dark]" />
                 </div>
+              </div>
+
+              {/* Etiqueta / Rol */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Etiqueta</label>
+                <CustomSelect
+                  value={formData.tag}
+                  onChange={v => setFormData({...formData, tag: v})}
+                  options={[
+                    { value: 'Redes Sociales', label: 'Redes Sociales' },
+                    { value: 'Eventos', label: 'Cubrir Eventos' }
+                  ]}
+                />
               </div>
             </div>
 

@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
+import { apiFetch } from '../lib/api-fetch';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, LineChart, Line } from 'recharts';
 import { Eye, Users, MousePointerClick, Clock, ArrowUpRight, ArrowDownRight, RefreshCw, BarChart2, TrendingUp, Calendar, Download, ChevronDown } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 import MoMModule from './MoMModule';
 import EngagementModule from './EngagementModule';
 import PerformanceModule from './PerformanceModule';
+import ContentListModule from './ContentListModule';
 
 const RANGES = [
   { label: '7 días', days: 7 },
@@ -13,7 +15,7 @@ const RANGES = [
   { label: 'Este año', days: 365 },
 ];
 
-export default function AnalyticsDashboard() {
+export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráfico y Audiencia (GA4)' }: { filterPath?: string; mainTitle?: string }) {
   const [range, setRange] = useState(RANGES[1]);
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function AnalyticsDashboard() {
   const fetchData = async (days: number) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/ga4?days=${days}`);
+      const res = await apiFetch(`/api/ga4?days=${days}${filterPath ? `&pathFilter=${filterPath}` : ''}`);
       const json = await res.json();
       if (json.error) throw new Error(json.error);
       
@@ -98,29 +100,52 @@ export default function AnalyticsDashboard() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <Toaster position="top-right" theme="dark" />
       
-      {/* Hero */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 rounded-3xl p-8 text-white shadow-2xl">
-        <div className="relative z-10 flex flex-col md:flex-row justify-between gap-6 items-start md:items-center">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <BarChart2 className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-3xl font-extrabold tracking-tight">Tráfico y Audiencia (GA4)</h1>
-            </div>
-            <p className="text-blue-100/80">Estadísticas en tiempo real obtenidas mediante la API oficial de Google Analytics 4.</p>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <button onClick={handleExport} disabled={data.length === 0} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition-colors border border-white/10 disabled:opacity-50">
-              <Download className="w-4 h-4" /> Exportar CSV
-            </button>
-            <button onClick={() => fetchData(range.days)} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-white text-indigo-700 font-bold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg disabled:opacity-50">
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Actualizar
-            </button>
-          </div>
-        </div>
-        <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-2 mb-2 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl w-fit">
+        <a href="/analytics" className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${!filterPath ? 'bg-white dark:bg-slate-800 shadow text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>Resumen General</a>
+        <a href="/analytics/blog" className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${filterPath === '/iesa-al-dia' ? 'bg-white dark:bg-slate-800 shadow text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>Blog (IESA al Día)</a>
+        <a href="/analytics/courses" className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${filterPath === '/cursos-y-programas' ? 'bg-white dark:bg-slate-800 shadow text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>Cursos y Programas</a>
       </div>
+
+      {/* Hero - Solo mostrar si no hay filtro de ruta (Resumen General) o si el usuario quiere verlo */}
+       {/* Pero el usuario pidió explícitamente "SOLO LA TABLA" para blog y cursos */}
+      {!filterPath && (
+        <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 rounded-3xl p-8 text-white shadow-2xl transition-all duration-500">
+          <div className="relative z-10 flex flex-col md:flex-row justify-between gap-6 items-start md:items-center">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <BarChart2 className="w-5 h-5 text-white" />
+                </div>
+                <h1 className="text-3xl font-extrabold tracking-tight">{mainTitle}</h1>
+              </div>
+              <p className="text-blue-100/80">Estadísticas en tiempo real obtenidas mediante la API oficial de Google Analytics 4.</p>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <button onClick={handleExport} disabled={data.length === 0} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition-colors border border-white/10 disabled:opacity-50">
+                <Download className="w-4 h-4" /> Exportar CSV
+              </button>
+              <button onClick={() => fetchData(range.days)} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-white text-indigo-700 font-bold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg disabled:opacity-50">
+                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Actualizar
+              </button>
+            </div>
+          </div>
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+        </div>
+      )}
+
+      {/* Título simple para Blog/Cursos */}
+      {filterPath && (
+        <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{mainTitle}</h1>
+            <p className="text-sm text-slate-500">Listado detallado de comportamiento por página.</p>
+          </div>
+          <button onClick={() => fetchData(range.days)} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-lg disabled:opacity-50">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
+      )}
 
       {/* Range selector */}
       <div className="flex flex-wrap gap-2 items-center">
@@ -140,91 +165,103 @@ export default function AnalyticsDashboard() {
         ))}
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {kpis.map(kpi => (
-          <div key={kpi.label} className={`bg-white/80 dark:bg-slate-900/60 border ${kpi.bg} rounded-2xl p-5 backdrop-blur-sm shadow-sm relative overflow-hidden group`}>
-            <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity ${kpi.bg.split(' ')[0]}`} />
-            <div className="relative z-10">
-              <div className="flex justify-between items-start mb-3">
-                <div className={`w-10 h-10 rounded-xl ${kpi.bg.split(' ')[0]} flex items-center justify-center`}>
-                  <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
+      {/* KPI Cards - Solo mostrar si NO es blog/cursos */}
+      {!filterPath && (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {kpis.map(kpi => (
+            <div key={kpi.label} className={`bg-white/80 dark:bg-slate-900/60 border ${kpi.bg} rounded-2xl p-5 backdrop-blur-sm shadow-sm relative overflow-hidden group`}>
+              <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity ${kpi.bg.split(' ')[0]}`} />
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-3">
+                  <div className={`w-10 h-10 rounded-xl ${kpi.bg.split(' ')[0]} flex items-center justify-center`}>
+                    <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
+                  </div>
                 </div>
+                <p className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tighter">
+                  {loading ? <span className="animate-pulse bg-slate-200 dark:bg-slate-800 text-transparent rounded">000000</span> : kpi.value}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{kpi.label}</p>
               </div>
-              <p className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tighter">
-                {loading ? <span className="animate-pulse bg-slate-200 dark:bg-slate-800 text-transparent rounded">000000</span> : kpi.value}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{kpi.label}</p>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Charts row */}
-      {loading ? (
-        <div className="h-64 flex items-center justify-center border border-slate-200 dark:border-white/10 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
-          <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Vistas vs Usuarios */}
-          <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
-            <h3 className="font-bold text-slate-900 dark:text-white mb-1">Vistas vs Usuarios</h3>
-            <p className="text-xs text-slate-500 mb-4">Páginas vistas frente a la cantidad de usuarios activos</p>
-            <ResponsiveContainer width="100%" height={250}>
-              <AreaChart data={data}>
-                <defs>
-                  <linearGradient id="colViews" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
-                <RechartsTooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="views" name="Vistas" stroke="#3b82f6" fill="url(#colViews)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
-                <Area type="monotone" dataKey="users" name="Usuarios" stroke="#8b5cf6" fill="url(#colUsers)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Sesiones y Rebote */}
-          <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
-            <h3 className="font-bold text-slate-900 dark:text-white mb-1">Sesiones vs Tasa de Rebote</h3>
-            <p className="text-xs text-slate-500 mb-4">Cantidad de sesiones y el porcentaje de abandono</p>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
-                <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
-                <RechartsTooltip content={<CustomTooltip />} />
-                <Line yAxisId="left" type="monotone" dataKey="sessions" name="Sesiones" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
-                <Line yAxisId="right" type="step" dataKey="bounceRate" name="Tasa de Rebote (%)" stroke="#f43f5e" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          ))}
         </div>
       )}
 
+      {/* Charts row - Solo mostrar si NO es blog/cursos */}
+      {!filterPath && (
+        <>
+          {loading ? (
+            <div className="h-64 flex items-center justify-center border border-slate-200 dark:border-white/10 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+              <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Vistas vs Usuarios */}
+              <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Vistas vs Usuarios</h3>
+                <p className="text-xs text-slate-500 mb-4">Páginas vistas frente a la cantidad de usuarios activos</p>
+                <ResponsiveContainer width="100%" height={250}>
+                  <AreaChart data={data}>
+                    <defs>
+                      <linearGradient id="colViews" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="colUsers" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
+                    <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
+                    <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
+                    <RechartsTooltip content={<CustomTooltip />} />
+                    <Area type="monotone" dataKey="views" name="Vistas" stroke="#3b82f6" fill="url(#colViews)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                    <Area type="monotone" dataKey="users" name="Usuarios" stroke="#8b5cf6" fill="url(#colUsers)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Sesiones y Rebote */}
+              <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Sesiones vs Tasa de Rebote</h3>
+                <p className="text-xs text-slate-500 mb-4">Cantidad de sesiones y el porcentaje de abandono</p>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
+                    <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
+                    <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
+                    <YAxis yAxisId="right" orientation="right" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
+                    <RechartsTooltip content={<CustomTooltip />} />
+                    <Line yAxisId="left" type="monotone" dataKey="sessions" name="Sesiones" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                    <Line yAxisId="right" type="step" dataKey="bounceRate" name="Tasa de Rebote (%)" stroke="#f43f5e" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
       {/* Nuevos Módulos GA4 */}
-      <div className="pt-6 border-t border-slate-200 dark:border-white/10 mt-8 space-y-6">
-        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-          Métricas Avanzadas
-        </h2>
-        
-        <MoMModule days={range.days} />
-        
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <PerformanceModule days={range.days} />
-          <EngagementModule days={range.days} />
+      {filterPath ? (
+        <div className="pt-6 mt-8 space-y-6">
+          <ContentListModule days={range.days} filterPath={filterPath} />
         </div>
-      </div>
+      ) : (
+        <div className="pt-6 border-t border-slate-200 dark:border-white/10 mt-8 space-y-6">
+          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            Métricas Avanzadas
+          </h2>
+          
+          <MoMModule days={range.days} filterPath={filterPath} />
+          
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <PerformanceModule days={range.days} filterPath={filterPath} />
+            <EngagementModule days={range.days} filterPath={filterPath} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

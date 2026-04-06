@@ -8,9 +8,14 @@ const client = new BetaAnalyticsDataClient({
   },
 });
 
+import { verifyApiAuth } from '../../lib/api-auth-server';
+
 export const GET: APIRoute = async ({ request }) => {
+  if (!(await verifyApiAuth(request))) return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
+
   const url = new URL(request.url);
   const days = parseInt(url.searchParams.get('days') || '30', 10);
+  const pathFilter = url.searchParams.get('pathFilter');
   const propertyId = import.meta.env.GA4_PROPERTY_ID;
 
   if (!propertyId) {
@@ -24,6 +29,15 @@ export const GET: APIRoute = async ({ request }) => {
       property: `properties/${propertyId}`,
       dateRanges: [{ startDate: `${days}daysAgo`, endDate: 'today' }],
       dimensions: [{ name: 'date' }],
+      dimensionFilter: pathFilter ? {
+        filter: {
+          fieldName: 'pagePathPlusQueryString',
+          stringFilter: {
+            matchType: 'CONTAINS',
+            value: pathFilter
+          }
+        }
+      } : undefined,
       metrics: [
         { name: 'screenPageViews' },
         // Aproximamos el rendimiento técnico contando errores JS, excepciones o eventos de performance si existen

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../lib/api-fetch';
 import { Target, Clock, MousePointerClick } from 'lucide-react';
 
-export default function EngagementModule({ days }: { days: number }) {
+export default function EngagementModule({ days, filterPath }: { days: number; filterPath?: string }) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -9,7 +10,7 @@ export default function EngagementModule({ days }: { days: number }) {
     const fetchEngagement = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/ga4-engagement?days=${days}`);
+        const res = await apiFetch(`/api/ga4-engagement?days=${days}${filterPath ? `&pathFilter=${filterPath}` : ''}`);
         const json = await res.json();
         if (json.data) setData(json.data);
       } catch (err) {

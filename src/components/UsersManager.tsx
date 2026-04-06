@@ -17,6 +17,10 @@ export default function UsersManager() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [search, setSearch] = useState('');
+  
+  // Edit logic
+  const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
+  const [newDept, setNewDept] = useState('');
 
   useEffect(() => { checkAdminAndFetch(); }, []);
 
@@ -41,15 +45,33 @@ export default function UsersManager() {
   };
 
   const toggleBanStatus = async (userId: string, current: boolean | undefined) => {
+    const action = !current ? 'desincorporar' : 'reactivar';
+    if (!window.confirm(`¿Estás seguro de que deseas ${action} a este usuario?`)) return;
+
     const { error } = await supabase.from('user_profiles').update({ is_banned: !current }).eq('user_id', userId);
     if (error) toast.error('Error: ' + error.message);
-    else { toast.success(`Usuario ${!current ? 'desincorporado' : 'reactivado'}.`); fetchUsers(); }
+    else { toast.success(`Usuario ${!current ? 'desincorporado' : 'reactivado'} con éxito.`); fetchUsers(); }
   };
 
   const toggleVaultAccess = async (userId: string, current: boolean) => {
+    const action = !current ? 'conceder' : 'revocar';
+    if (!window.confirm(`¿Deseas ${action} el acceso a la bóveda para este usuario?`)) return;
+
     const { error } = await supabase.from('user_profiles').update({ has_vault_access: !current }).eq('user_id', userId);
     if (error) toast.error('Error: ' + error.message);
-    else { toast.success(`Acceso a bóveda ${!current ? 'concedido' : 'revocado'}.`); fetchUsers(); }
+    else { toast.success(`Acceso a bóveda ${!current ? 'concedido' : 'revocado'} correctamente.`); fetchUsers(); }
+  };
+
+  const handleUpdateDept = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    const { error } = await supabase.from('user_profiles').update({ department: newDept }).eq('user_id', editingUser.user_id);
+    if (error) toast.error('Error: ' + error.message);
+    else {
+      toast.success('Departamento actualizado con éxito.');
+      setEditingUser(null);
+      fetchUsers();
+    }
   };
 
   const filteredUsers = users.filter(u =>
@@ -125,9 +147,12 @@ export default function UsersManager() {
 
                   {/* Department */}
                   <td className="py-4 px-6">
-                    <span className="px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300">
-                      {user.department || 'N/A'}
-                    </span>
+                    <button 
+                      onClick={() => { setEditingUser(user); setNewDept(user.department || ''); }}
+                      className="px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 transition-colors"
+                    >
+                      {user.department || 'Sin Dept.'}
+                    </button>
                   </td>
 
                   {/* Vault */}
@@ -164,8 +189,40 @@ export default function UsersManager() {
           </table>
 
           <div className="px-6 py-3 bg-slate-50 dark:bg-slate-950/30 border-t border-slate-200 dark:border-white/5 text-xs text-slate-500">
-            {filteredUsers.length} usuario{filteredUsers.length !== 1 ? 's' : ''} registrado{filteredUsers.length !== 1 ? 's' : ''}
+             {filteredUsers.length} usuario{filteredUsers.length !== 1 ? 's' : ''} registrado{filteredUsers.length !== 1 ? 's' : ''}
           </div>
+        </div>
+      )}
+
+      {/* Modal Edición Departamento */}
+      {editingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+          <form onSubmit={handleUpdateDept} className="bg-white dark:bg-slate-950 border dark:border-white/10 w-full max-w-sm rounded-[2rem] p-8 shadow-2xl relative">
+            <button type="button" onClick={() => setEditingUser(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 dark:hover:text-white bg-slate-100 dark:bg-white/5 w-8 h-8 rounded-full flex items-center justify-center">✕</button>
+            <h2 className="text-xl font-bold mb-6 text-slate-900 dark:text-white text-center">Editar Departamento</h2>
+            <p className="text-sm text-slate-500 mb-6 text-center">Asignar área para: <b>{editingUser.display_name}</b></p>
+            
+            <select 
+              required
+              value={newDept} 
+              onChange={e => setNewDept(e.target.value)} 
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-xl outline-none focus:ring-2 focus:ring-blue-500/50 mb-6 font-medium appearance-none cursor-pointer"
+            >
+              <option value="" disabled>Seleccionar departamento...</option>
+              {['Mercadeo', 'Comunicaciones', 'Tecnología', 'Ventas', 'Innovación', 'Incompany', 'RRHH'].map(d => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+
+            <div className="flex gap-3">
+              <button type="button" onClick={() => setEditingUser(null)} className="flex-1 py-3.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-500 font-bold hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
+                Cancelar
+              </button>
+              <button type="submit" className="flex-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-blue-500/20">
+                Guardar
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

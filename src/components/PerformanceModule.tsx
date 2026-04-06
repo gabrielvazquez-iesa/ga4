@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../lib/api-fetch';
 import { ResponsiveContainer, ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Gauge } from 'lucide-react';
 
-export default function PerformanceModule({ days }: { days: number }) {
+export default function PerformanceModule({ days, filterPath }: { days: number; filterPath?: string }) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -10,7 +11,7 @@ export default function PerformanceModule({ days }: { days: number }) {
     const fetchPerf = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/ga4-performance?days=${days}`);
+        const res = await apiFetch(`/api/ga4-performance?days=${days}${filterPath ? `&pathFilter=${filterPath}` : ''}`);
         const json = await res.json();
         
         if (json.data) {

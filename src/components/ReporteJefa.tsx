@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../lib/api-fetch';
 import { Copy, Check, Download, Calendar, RefreshCw, AlertTriangle } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
@@ -38,7 +39,7 @@ export default function ReporteJefa() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/ga4');
+      const res = await apiFetch('/api/ga4');
       const result = await res.json();
       
       if (result.success && result.data?.rows?.[0]?.metricValues) {

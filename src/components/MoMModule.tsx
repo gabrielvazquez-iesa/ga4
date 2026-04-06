@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../lib/api-fetch';
 import { ArrowUpRight, ArrowDownRight, Activity, Users, Percent } from 'lucide-react';
 
-export default function MoMModule({ days }: { days: number }) {
+export default function MoMModule({ days, filterPath }: { days: number; filterPath?: string }) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -9,7 +10,7 @@ export default function MoMModule({ days }: { days: number }) {
     const fetchMoM = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/ga4-mom?days=${days}`);
+        const res = await apiFetch(`/api/ga4-mom?days=${days}${filterPath ? `&pathFilter=${filterPath}` : ''}`);
         const json = await res.json();
         if (json.data) setData(json.data);
       } catch (err) {

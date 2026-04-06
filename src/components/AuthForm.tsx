@@ -34,8 +34,17 @@ export default function AuthForm() {
           setLoading(false);
           return;
         }
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+
+        if (data?.user) {
+          await supabase.from('user_profiles').upsert({
+            user_id: data.user.id,
+            display_name: data.user.user_metadata?.name || email.split('@')[0],
+            department: data.user.user_metadata?.department || 'Comunicaciones'
+          }, { onConflict: 'user_id' });
+        }
+
         toast.success('Inicio de sesión exitoso. Redirigiendo...');
         window.location.href = '/dashboard';
       } else if (mode === 'register') {
