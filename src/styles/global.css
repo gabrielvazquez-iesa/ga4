@@ -48,7 +48,7 @@ body {
 }
 .dark .react-datepicker__time-box,
 .dark .react-datepicker__time-list {
-  @apply bg-[#0f172a] !important;
+  @apply !bg-[#0f172a];
 }
 .dark .react-datepicker__time-list-item {
   @apply hover:bg-slate-800 transition-colors py-2 text-sm;
