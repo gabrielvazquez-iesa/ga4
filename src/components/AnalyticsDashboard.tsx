@@ -19,8 +19,6 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
   const [range, setRange] = useState(RANGES[1]);
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [showBanner, setShowBanner] = useState(true);
 
   const fetchData = async (days: number) => {
     setLoading(true);
@@ -49,24 +47,6 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
     fetchData(range.days);
   }, [range, filterPath]);
 
-  useEffect(() => {
-    const handler = (e: any) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, []);
-
-  const handleInstall = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null);
-      setShowBanner(false);
-    }
-  };
 
   const totals = useMemo(() => {
     if (!data.length) return { views: 0, users: 0, sessions: 0, bounceRate: 0, avgSession: 0 };
@@ -119,52 +99,24 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
     <div className="space-y-6 animate-in fade-in duration-500">
       <Toaster position="top-right" theme="dark" />
       
-      {/* Tabs Menu */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="inline-flex gap-1 p-1.5 bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl backdrop-blur-sm shadow-sm transition-all duration-300">
-          <a href="/analytics" className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 ${!filterPath ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'}`}>
-            <BarChart2 className="w-4 h-4" />
-            Resumen General
-          </a>
-          <a href="/analytics/blog" className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 ${filterPath === '/iesa-al-dia' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'}`}>
-            <BookOpen className="w-4 h-4" />
-            Blog (IESA al Día)
-          </a>
-          <a href="/analytics/courses" className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 ${filterPath === '/cursos-y-programas' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'}`}>
-            <GraduationCap className="w-4 h-4" />
-            Cursos y Programas
-          </a>
+        <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
+          <div className="inline-flex gap-1 p-1.5 bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl backdrop-blur-sm shadow-sm transition-all duration-300 min-w-max">
+            <a href="/analytics" className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 ${!filterPath ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'}`}>
+              <BarChart2 className="w-4 h-4" />
+              Resumen General
+            </a>
+            <a href="/analytics/blog" className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 ${filterPath === '/iesa-al-dia' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'}`}>
+              <BookOpen className="w-4 h-4" />
+              Blog (IESA al Día)
+            </a>
+            <a href="/analytics/courses" className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 ${filterPath === '/cursos-y-programas' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'}`}>
+              <GraduationCap className="w-4 h-4" />
+              Cursos y Programas
+            </a>
+          </div>
         </div>
       </div>
-
-      {/* PWA Banner */}
-      {deferredPrompt && showBanner && (
-        <div className="bg-gradient-to-r from-blue-600/90 to-indigo-700/90 backdrop-blur-md border border-white/20 p-4 rounded-2xl flex items-center justify-between text-white shadow-xl animate-in slide-in-from-top-4 duration-500 group">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
-              <Download className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="font-bold text-sm">GA4 Dashboard en tu escritorio</p>
-              <p className="text-xs text-blue-100 opacity-80">Instala la aplicación para un acceso rápido.</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={handleInstall}
-              className="px-4 py-2 bg-white text-blue-700 text-xs font-bold rounded-lg hover:bg-blue-50 transition-all active:scale-95 shadow-md"
-            >
-              Instalar Ahora
-            </button>
-            <button 
-              onClick={() => setShowBanner(false)}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
 
       {!filterPath && (
         <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 rounded-3xl p-8 text-white shadow-2xl transition-all duration-500">
@@ -308,9 +260,9 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
           
           <MoMModule days={range.days} filterPath={filterPath} />
           
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <PerformanceModule days={range.days} filterPath={filterPath} />
+          <div className="flex flex-col gap-8">
             <EngagementModule days={range.days} filterPath={filterPath} />
+            <PerformanceModule days={range.days} filterPath={filterPath} />
           </div>
         </div>
       )}

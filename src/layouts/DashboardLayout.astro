@@ -3,6 +3,7 @@ import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
+import PresenceManager from '../components/PresenceManager';
 
 interface Props {
   title: string;
@@ -58,6 +59,7 @@ const currentPath = Astro.url.pathname;
 
 		<!-- Main Content Wrapper -->
 		<div id="main-content" class="md:pl-64 flex flex-col min-h-screen transition-all duration-300 ease-in-out">
+			<PresenceManager client:load />
 			<Topbar client:load />
 			
 			<main class="flex-1 p-4 pb-32 md:p-8 md:pb-8">

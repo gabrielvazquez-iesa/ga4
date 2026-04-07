@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Users, MousePointerClick, Clock, ArrowUpRight, ArrowDownRight, Eye } from 'lucide-react';
+import { Users, MousePointerClick, Clock, ArrowUpRight, ArrowDownRight, Eye, Download, X, RefreshCw } from 'lucide-react';
+import { useEffect } from 'react';
 
 const mockData = {
   day: [
@@ -37,8 +38,30 @@ const kpiData = {
 
 export default function DashboardVisual() {
   const [timeRange, setTimeRange] = useState<'day' | 'week' | 'month'>('month');
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showBanner, setShowBanner] = useState(true);
+
   const data = mockData[timeRange];
   const kpis = kpiData[timeRange];
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+      setShowBanner(false);
+    }
+  };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -60,6 +83,35 @@ export default function DashboardVisual() {
 
   return (
     <div className="space-y-6">
+      {/* PWA Banner */}
+      {deferredPrompt && showBanner && (
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 backdrop-blur-md border border-white/20 p-5 rounded-3xl flex flex-col md:flex-row items-center justify-between text-white shadow-2xl animate-in slide-in-from-top-4 duration-500 group gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
+              <Download className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="font-extrabold text-lg leading-tight uppercase tracking-tight">GA4Dash en tu Escritorio</p>
+              <p className="text-sm text-blue-100/80 font-medium">Instala la aplicación nativa para un acceso instantáneo a tus reportes.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <button 
+              onClick={handleInstall}
+              className="flex-1 md:flex-none px-8 py-3 bg-white text-blue-700 font-black rounded-xl hover:bg-blue-50 transition-all active:scale-95 shadow-xl shadow-blue-900/20 uppercase text-xs tracking-widest"
+            >
+              Instalar Ahora
+            </button>
+            <button 
+              onClick={() => setShowBanner(false)}
+              className="p-3 hover:bg-white/10 rounded-xl transition-colors shrink-0"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header & Controls */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/80 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-200 dark:border-white/5 backdrop-blur-sm">
         <div>

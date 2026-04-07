@@ -12,6 +12,9 @@ export default function ManualsDirectory() {
   const [selectedCat, setSelectedCat] = useState('');
   const [uploading, setUploading] = useState(false);
 
+  // Feedback Modal
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
+
   // Upload modal
   const [showModal, setShowModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -70,14 +73,14 @@ export default function ManualsDirectory() {
       });
       if (dbError) throw new Error('Error guardando registro. ¿Corriste el Script SQL?: ' + dbError.message);
 
-      toast.success('Manual subido y listado exitosamente');
+      setFeedback({ type: 'success', message: '¡Manual publicado con éxito! Ya puedes verlo en el directorio oficial.' });
       setShowModal(false);
       setNewTitle('');
       setNewCategory('');
       setFile(null);
       fetchManuals();
     } catch (err: any) {
-      toast.error(err.message);
+      setFeedback({ type: 'error', message: err.message });
     } finally {
       setUploading(false);
     }
@@ -107,11 +110,11 @@ export default function ManualsDirectory() {
       
       if (error) throw new Error('Error al actualizar: ' + error.message);
       
-      toast.success('Manual modificado.');
+      setFeedback({ type: 'success', message: 'Los cambios se han guardado correctamente.' });
       setEditId(null);
       fetchManuals();
     } catch (err: any) {
-      toast.error(err.message);
+      setFeedback({ type: 'error', message: err.message });
     } finally {
       setUploading(false);
     }
@@ -269,6 +272,37 @@ export default function ManualsDirectory() {
                 )}
              </button>
           </form>
+        </div>
+      )}
+      {/* Feedback Modal */}
+      {feedback.type && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in zoom-in duration-300">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl text-center relative overflow-hidden">
+            <div className={`absolute top-0 inset-x-0 h-2 ${feedback.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`} />
+            
+            <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6 ${feedback.type === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+              {feedback.type === 'success' ? (
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+              ) : (
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+              )}
+            </div>
+
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-3">
+              {feedback.type === 'success' ? '¡Excelente!' : 'Hubo un problema'}
+            </h2>
+            
+            <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-8">
+              {feedback.message}
+            </p>
+
+            <button 
+              onClick={() => setFeedback({ type: null, message: '' })}
+              className={`w-full py-4 rounded-2xl font-bold text-white transition-all shadow-lg active:scale-95 ${feedback.type === 'success' ? 'bg-green-600 hover:bg-green-500 shadow-green-500/20' : 'bg-red-600 hover:bg-red-500 shadow-red-500/20'}`}
+            >
+              Entendido
+            </button>
+          </div>
         </div>
       )}
     </div>

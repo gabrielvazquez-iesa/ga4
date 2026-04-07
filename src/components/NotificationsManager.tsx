@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { Bell, Search, Filter, Calendar, Send, Info, AlertTriangle, CheckCircle, XCircle, Users, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Bell, Search, Filter, Calendar, Send, Info, AlertTriangle, CheckCircle, XCircle, Users, ChevronLeft, ChevronRight, Trash2, RefreshCw } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
 interface Notification {
@@ -111,6 +111,19 @@ export default function NotificationsManager() {
       fetchData(); // Refresh list
     }
     setSending(false);
+  };
+
+  const handleDeleteNotification = async (id: string) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar esta notificación?')) return;
+    
+    const { error } = await supabase.from('system_notifications').delete().eq('id', id);
+    
+    if (error) {
+      toast.error('Error al borrar la notificación.');
+    } else {
+      toast.success('Notificación eliminada.');
+      setNotifications(notifications.filter(n => n.id !== id));
+    }
   };
 
   const getIconForType = (type?: string) => {
@@ -301,6 +314,15 @@ export default function NotificationsManager() {
                         </div>
                         <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{n.message}</p>
                       </div>
+                      {isAdmin && (
+                        <button 
+                          onClick={() => handleDeleteNotification(n.id)}
+                          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                          title="Eliminar notificación"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

@@ -10,6 +10,7 @@ interface UserProfile {
   has_vault_access: boolean;
   avatar_url?: string;
   is_banned?: boolean;
+  last_seen?: string;
 }
 
 export default function UsersManager() {
@@ -17,6 +18,7 @@ export default function UsersManager() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<'active' | 'banned'>('active');
   
   // Edit logic
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
@@ -37,7 +39,7 @@ export default function UsersManager() {
     setLoading(true);
     const { data, error } = await supabase
       .from('user_profiles')
-      .select('user_id, display_name, department, has_vault_access, avatar_url, is_banned')
+      .select('user_id, display_name, department, has_vault_access, avatar_url, is_banned, last_seen')
       .order('display_name');
     if (error) toast.error('Error al cargar los usuarios.');
     else setUsers(data || []);
@@ -74,10 +76,20 @@ export default function UsersManager() {
     }
   };
 
-  const filteredUsers = users.filter(u =>
-    (u.display_name || '').toLowerCase().includes(search.toLowerCase()) ||
-    (u.department || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = (u.display_name || '').toLowerCase().includes(search.toLowerCase()) ||
+                          (u.department || '').toLowerCase().includes(search.toLowerCase());
+    const matchesTab = activeTab === 'active' ? !u.is_banned : u.is_banned;
+    return matchesSearch && matchesTab;
+  });
+
+  const isOnline = (lastSeen?: string) => {
+    if (!lastSeen) return false;
+    const lastSeenDate = new Date(lastSeen);
+    const now = new Date();
+    const diffMinutes = (now.getTime() - lastSeenDate.getTime()) / (1000 * 60);
+    return diffMinutes < 5; // Verde si estuvo activo en los últimos 5 mins
+  };
 
   if (!loading && !isAdmin) {
     return (
@@ -95,16 +107,33 @@ export default function UsersManager() {
     <div className="space-y-6">
       <Toaster theme="dark" position="top-right" />
 
-      {/* Search */}
-      <div className="flex bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-xl items-center px-4 py-2 w-full max-w-md shadow-sm">
-        <Search className="w-4 h-4 text-slate-400 shrink-0 mr-3" />
-        <input
-          type="text"
-          placeholder="Buscar por nombre o departamento..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="bg-transparent outline-none text-sm text-slate-900 dark:text-white placeholder-slate-500 w-full"
-        />
+      {/* Tabs and Search */}
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="flex bg-white/80 dark:bg-slate-900/60 p-1 border border-slate-200 dark:border-white/10 rounded-2xl w-full md:w-auto">
+          <button 
+            onClick={() => setActiveTab('active')}
+            className={`flex-1 md:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'active' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 hover:text-slate-700 dark:hover:text-white'}`}
+          >
+            Usuarios Activos
+          </button>
+          <button 
+            onClick={() => setActiveTab('banned')}
+            className={`flex-1 md:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'banned' ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'text-slate-500 hover:text-slate-700 dark:hover:text-white'}`}
+          >
+            Desincorporados
+          </button>
+        </div>
+
+        <div className="flex bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-xl items-center px-4 py-2 w-full max-w-md shadow-sm">
+          <Search className="w-4 h-4 text-slate-400 shrink-0 mr-3" />
+          <input
+            type="text"
+            placeholder="Buscar por nombre o departamento..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="bg-transparent outline-none text-sm text-slate-900 dark:text-white placeholder-slate-500 w-full"
+          />
+        </div>
       </div>
 
       {loading ? (
@@ -133,14 +162,20 @@ export default function UsersManager() {
                   {/* Avatar + Name */}
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 overflow-hidden">
-                        {user.avatar_url
-                          ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
-                          : <User className="w-4 h-4 text-blue-400" />}
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
+                          {user.avatar_url
+                            ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                            : <User className="w-5 h-5 text-blue-400" />}
+                        </div>
+                        {/* Status Dot */}
+                        <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white dark:border-slate-900 rounded-full ${isOnline(user.last_seen) ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-slate-400 dark:bg-slate-600'}`} />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900 dark:text-white text-sm">{user.display_name || 'Sin nombre'}</p>
-                        {user.is_banned && <span className="text-[10px] text-red-400 font-bold uppercase">Desincorporado</span>}
+                        <p className="font-bold text-slate-900 dark:text-white text-sm leading-tight">{user.display_name || 'Sin nombre'}</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider mt-0.5">
+                          {isOnline(user.last_seen) ? 'En Línea' : 'Desconectado'}
+                        </p>
                       </div>
                     </div>
                   </td>

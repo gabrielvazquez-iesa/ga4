@@ -150,35 +150,35 @@ export default function Sidebar({ currentPath }: SidebarProps) {
       </aside>
 
       {/* Mobile Floating Dock */}
-      <nav className="md:hidden fixed bottom-4 left-4 right-4 bg-white/40 dark:bg-slate-900/50 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-[2rem] px-3 py-2 flex items-center justify-between z-50 transition-all duration-300">
+      <nav className="md:hidden fixed bottom-4 left-4 right-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-full px-4 py-2 flex items-center justify-between z-50">
         
         {/* Atajos Rápidos Izquierda */}
-        <div className="flex items-center gap-0.5">
-          <a href="/analytics" className={`p-2.5 rounded-2xl transition-colors ${currentPath === '/analytics' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
-            <BarChart3 className="w-[22px] h-[22px]" />
+        <div className="flex items-center gap-1 flex-1 justify-start">
+          <a href="/analytics" className={`p-3 rounded-2xl transition-all active:scale-90 ${currentPath === '/analytics' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
+            <BarChart3 className="w-6 h-6" />
           </a>
-          <a href="/social-reports" className={`p-2.5 rounded-2xl transition-colors ${currentPath === '/social-reports' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
-            <Instagram className="w-[22px] h-[22px]" />
+          <a href="/social-reports" className={`p-3 rounded-2xl transition-all active:scale-90 ${currentPath === '/social-reports' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
+            <Instagram className="w-6 h-6" />
           </a>
         </div>
 
         {/* Central Menu Button */}
-        <button 
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="relative mx-1 flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full shadow-lg shadow-blue-500/40 transform transition-all active:scale-95 hover:shadow-blue-500/60"
-        >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <LayoutGrid className="w-6 h-6" />}
-        </button>
+        <div className="mx-2 shrink-0">
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="relative flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-lg shadow-blue-500/40 transform transition-all active:scale-95 hover:shadow-blue-500/60"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <LayoutGrid className="w-6 h-6" />}
+          </button>
+        </div>
 
         {/* Atajos Rápidos Derecha */}
-        <div className="flex items-center gap-0.5">
-          <a href="/vault" className={`p-2.5 rounded-2xl transition-colors ${currentPath === '/vault' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
-            <KeyRound className="w-[22px] h-[22px]" />
+        <div className="flex items-center gap-1 flex-1 justify-end">
+          <a href="/vault" className={`p-3 rounded-2xl transition-all active:scale-90 ${currentPath === '/vault' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
+            <KeyRound className="w-6 h-6" />
           </a>
-          {/* Separator */}
-          <div className="w-px h-6 bg-slate-300 dark:bg-white/15 mx-1 rounded-full" />
-          <button onClick={handleLogout} className="p-2.5 text-slate-400 dark:text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-colors">
-            <LogOut className="w-[22px] h-[22px]" />
+          <button onClick={handleLogout} className="p-3 text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all active:scale-90">
+            <LogOut className="w-6 h-6" />
           </button>
         </div>
       </nav>
