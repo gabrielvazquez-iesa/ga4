@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, Mail, Lock, Camera, Link as LinkIcon, Save, RefreshCw, ShieldCheck } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
+import SecuritySettings from './SecuritySettings';
 
 interface ProfileData {
   id?: string;
@@ -265,18 +266,9 @@ export default function ProfileManager() {
                 </button>
               </div>
             </form>
-
-            {/* PWA Passkey Placeholder */}
-            <div className="mt-8 pt-6 border-t border-slate-200 dark:border-white/10">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-green-500" /> Inicio Rápido (Biometría)</h4>
-              <p className="text-xs text-slate-500 mb-4">Configura FaceID, TouchID o PIN de tu dispositivo para iniciar sin contraseña en futuras sesiones.</p>
-              <button type="button" onClick={() => toast.success('Preparado para arquitectura WebAuthn en próxima fase.')} className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 font-medium transition-colors text-sm">
-                Activar Passkey en este dispositivo
-              </button>
-            </div>
           </div>
 
-          {/* Preferences */}
+          {/* Preferencias */}
           <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-xl">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Preferencias</h3>
             <div className="p-4 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-950/50 flex justify-between items-center">
@@ -290,6 +282,9 @@ export default function ProfileManager() {
               </label>
             </div>
           </div>
+
+          {/* Configuración Biométrica Nativa Avanzada */}
+          <SecuritySettings />
         </div>
 
       </div>

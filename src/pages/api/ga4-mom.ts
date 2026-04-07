@@ -27,6 +27,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     const [response] = await client.runReport({
       property: `properties/${propertyId}`,
+      dimensions: [{ name: 'dateRange' }],
       dateRanges: [
         { startDate: currentStartDate, endDate: currentEndDate, name: 'current' },
         { startDate: previousStartDate, endDate: previousEndDate, name: 'previous' }
@@ -47,16 +48,21 @@ export const GET: APIRoute = async ({ request }) => {
       ],
     });
 
-    // Parse the 2 rows (one for current dateRange, one for previous)
+    // Parse the rows
     let currentData = { sessions: 0, activeUsers: 0, conversionRate: 0 };
     let previousData = { sessions: 0, activeUsers: 0, conversionRate: 0 };
 
     (response.rows || []).forEach(row => {
-      const rangeName = row.dimensionValues?.[0]?.value || ''; // dateRange is usually returned implicitly or as first dimensions if requested.
-      // Actually runReport returns the date_range as a dimension if multiple date ranges are provided.
-      // Wait, date range name is reported in dimension values if we requested `dateRange` as dimension? 
-      // Nope, but let's be safe. By default, date_range isn't returned unless requested? Let me fix the query.
-      // We didn't add the `dateRange` dimension. Let's fix that below.
+      const rangeName = row.dimensionValues?.[0]?.value || ''; 
+      const sessions = parseInt(row.metricValues?.[0]?.value || '0', 10);
+      const activeUsers = parseInt(row.metricValues?.[1]?.value || '0', 10);
+      const conversionRate = parseFloat(row.metricValues?.[2]?.value || '0');
+
+      if (rangeName === 'current') {
+        currentData = { sessions, activeUsers, conversionRate };
+      } else if (rangeName === 'previous') {
+        previousData = { sessions, activeUsers, conversionRate };
+      }
     });
 
     return new Response(JSON.stringify({ data: { current: currentData, previous: previousData } }), { 

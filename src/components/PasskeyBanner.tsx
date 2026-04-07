@@ -48,19 +48,26 @@ export default function PasskeyBanner() {
     setLoading(true);
     try {
       // 1. Iniciar enrolamiento MFA
-      const { data, error } = await supabase.auth.mfa.enroll({
+      const enrollRes = await supabase.auth.mfa.enroll({
         factorType: 'webauthn',
       });
 
-      if (error) throw error;
+      if (enrollRes.error) throw enrollRes.error;
 
-      // Supabase lanza el prompt nativo automáticamente si está configurado el cliente
-      if (data?.id) {
+      // 2. Ejecutar "Challenge" para que el navegador o sistema pida la huella/FaceID.
+      if (enrollRes.data?.id) {
+        const challengeRes = await supabase.auth.mfa.challengeAndVerify({
+          factorId: enrollRes.data.id,
+          code: '' // Vacío, ya que WebAuthn procesa el token por detrás automáticamente.
+        });
+
+        if (challengeRes.error) throw challengeRes.error;
+
         toast.success("¡Dispositivo vinculado con éxito!");
         setIsVisible(false);
       }
     } catch (err: any) {
-      toast.error(err.message || "Error al registrar biometría. Asegúrate de estar en HTTPS.");
+      toast.error(err.message || "Error al registrar biometría. Verifica Windows Hello o Touch ID.");
     } finally {
       setLoading(false);
     }

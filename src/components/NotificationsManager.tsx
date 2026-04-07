@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Bell, Search, Filter, Calendar, Send, Info, AlertTriangle, CheckCircle, XCircle, Users } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
@@ -80,8 +80,9 @@ export default function NotificationsManager() {
 
     // If Admin, fetch users for the dropdown
     if (adminStatus) {
-      const { data: profiles } = await supabase.from('user_profiles').select('user_id, display_name, email');
-      if (profiles) setUsers(profiles);
+      const { data: profiles, error } = await supabase.from('user_profiles').select('user_id, display_name');
+      if (profiles) setUsers(profiles as UserProfile[]);
+      if (error) console.error("Error fetching users for notifications:", error);
     }
 
     setLoading(false);
@@ -252,16 +253,14 @@ export default function NotificationsManager() {
                 <label className="block text-sm font-bold text-slate-900 dark:text-white mb-2">Destinatario</label>
                 <div className="relative">
                   <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <select
+                  <CustomSelect
                     value={targetUser}
-                    onChange={(e) => setTargetUser(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none"
-                  >
-                    <option value="all">🌐 Todos los usuarios (Aviso Global)</option>
-                    {users.map(u => (
-                      <option key={u.user_id} value={u.user_id}>👤 {u.display_name || u.email}</option>
-                    ))}
-                  </select>
+                    onChange={setTargetUser}
+                    options={[
+                      { value: 'all', label: '🌐 Todos los usuarios (Aviso Global)' },
+                      ...users.map(u => ({ value: u.user_id, label: `👤 ${u.display_name || 'Usuario ' + u.user_id.substring(0,6)}` }))
+                    ]}
+                  />
                 </div>
               </div>
 
@@ -319,6 +318,54 @@ export default function NotificationsManager() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+interface SelectOption { value: string; label: string; }
+function CustomSelect({ value, onChange, options }: {
+  value: string;
+  onChange: (v: string) => void;
+  options: SelectOption[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = options.find(o => o.value === value);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative w-full">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-semibold"
+      >
+        <span className="truncate">{selected?.label || 'Seleccionar...'}</span>
+        <svg className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+      </button>
+      {open && (
+        <div className="absolute z-[100] w-full mt-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700/50 [&::-webkit-scrollbar-thumb]:rounded-full">
+          {options.map(o => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => { onChange(o.value); setOpen(false); }}
+              className={`w-full text-left px-4 py-3 text-sm transition-colors cursor-pointer ${
+                o.value === value
+                  ? 'bg-blue-600/10 text-blue-500 font-bold border-l-2 border-blue-500'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 font-medium border-l-2 border-transparent'
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

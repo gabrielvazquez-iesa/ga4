@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Mail, Lock, LogIn, UserPlus, KeyRound, AlertCircle, CheckCircle2, Eye, EyeOff, Fingerprint } from 'lucide-react';
+import { Mail, Lock, LogIn, UserPlus, KeyRound, AlertCircle, CheckCircle2, Eye, EyeOff, Fingerprint, ShieldCheck } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
 export default function AuthForm() {
@@ -186,17 +186,61 @@ export default function AuthForm() {
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl"></div>
       
       <div className="text-center space-y-2 relative z-10">
+        <div className="flex justify-center mb-6">
+          <div className="p-4 bg-blue-500/10 rounded-2xl">
+            <ShieldCheck className="w-10 h-10 text-blue-500" />
+          </div>
+        </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-1">
-          {mode === 'login' ? 'Bienvenido de vuelta' : mode === 'register' ? 'Crea una cuenta' : 'Recuperar acceso'}
+          {mode === 'login' ? 'Bienvenido' : mode === 'register' ? 'Crea una cuenta' : 'Recuperar acceso'}
         </h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm">
           {mode === 'login' 
-            ? 'Ingresa tus credenciales para continuar' 
+            ? <>Solo personal autorizado <span className="font-bold text-blue-500">@iesa.edu.ve</span></> 
             : mode === 'register' 
             ? 'Únete para gestionar tus analíticas' 
             : 'Te enviaremos un enlace de recuperación'}
         </p>
       </div>
+
+      {mode !== 'recovery' && (
+        <div className="space-y-4 relative z-10 pt-4">
+          <button 
+            type="button"
+            onClick={handleGoogleLogin} 
+            className="w-full flex items-center justify-center gap-3 bg-[#0a0f1c] hover:bg-black text-white py-3.5 rounded-xl font-bold transition-all hover:scale-[1.02] border border-white/5"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 24c2.87 0 5.28-.95 7.04-2.58l-3.57-2.77c-.95.64-2.17 1.02-3.47 1.02-2.67 0-4.93-1.8-5.74-4.22H2.5v2.85C4.26 21.8 7.82 24 12 24z" />
+              <path fill="#FBBC05" d="M6.26 15.45c-.21-.64-.32-1.31-.32-2.02s.11-1.38.32-2.02V8.56H2.5C1.8 9.95 1.4 11.45 1.4 13.06c0 1.61.4 3.11 1.1 4.5l3.76-2.11z" />
+              <path fill="#EA4335" d="M12 4.41c1.55 0 2.94.53 4.04 1.58l3.03-3.03C17.27 1.11 14.86 0 12 0 7.82 0 4.26 2.2 2.5 5.68l3.76 2.85c.81-2.42 3.07-4.12 5.74-4.12z" />
+            </svg>
+            Continuar con Google
+          </button>
+
+          <button 
+            type="button"
+            onClick={handlePasskeyLogin} 
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-3 bg-blue-600/10 hover:bg-blue-600/20 text-blue-500 py-3.5 rounded-xl font-bold transition-all hover:scale-[1.02] border border-blue-500/20"
+          >
+            <Fingerprint className="w-5 h-5" />
+            Entrar con Huella / FaceID
+          </button>
+        </div>
+      )}
+
+      {mode !== 'recovery' && (
+        <div className="relative py-2 z-10">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-slate-200 dark:border-white/5"></span>
+          </div>
+          <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest">
+            <span className="bg-white dark:bg-[#0a0f1c] px-4 text-slate-400">O CREDENCIALES</span>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleAuth} className="space-y-5 relative z-10">
         <div className="space-y-4">
@@ -204,10 +248,10 @@ export default function AuthForm() {
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 dark:text-slate-400" />
             <input 
               type="email" 
-              placeholder="correo@ejemplo.com" 
+              placeholder="usuario@iesa.edu.ve" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 py-3 pl-11 pr-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium" 
+              className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 py-3.5 pl-11 pr-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium" 
             />
           </div>
 
@@ -216,10 +260,10 @@ export default function AuthForm() {
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 dark:text-slate-400" />
               <input 
                 type={showPassword ? "text" : "password"} 
-                placeholder="Tu contraseña" 
+                placeholder="Contraseña" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 py-3 pl-11 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium" 
+                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 py-3.5 pl-11 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium" 
               />
               <button
                 type="button"
@@ -255,72 +299,21 @@ export default function AuthForm() {
           )}
         </div>
 
-        {mode === 'login' && (
-          <div className="flex justify-end">
-            <button 
-              type="button" 
-              onClick={() => setMode('recovery')}
-              className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
-            >
-              ¿Olvidaste tu contraseña?
-            </button>
-          </div>
-        )}
-
         <button 
           type="submit" 
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold transition-all disabled:opacity-50 hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] disabled:hover:shadow-none"
+          className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-400 text-white py-3.5 rounded-xl font-bold transition-all disabled:opacity-50 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] disabled:hover:shadow-none"
         >
           {loading ? (
             <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
           ) : (
             <>
-              {mode === 'login' ? <LogIn className="w-5 h-5" /> : mode === 'register' ? <UserPlus className="w-5 h-5" /> : <KeyRound className="w-5 h-5" />}
-              {mode === 'login' ? 'Iniciar Sesión' : mode === 'register' ? 'Crear Cuenta' : 'Enviar Enlace'}
+              {mode === 'login' ? 'Entrar al Dashboard' : mode === 'register' ? 'Crear Cuenta' : 'Enviar Enlace'}
+              {mode === 'login' && <span className="ml-1">→</span>}
             </>
           )}
         </button>
       </form>
-
-      {mode !== 'recovery' && (
-        <div className="relative py-2 z-10">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-slate-200 dark:border-white/10"></span>
-          </div>
-          <div className="relative flex justify-center text-xs uppercase font-semibold">
-            <span className="bg-white dark:bg-[#0a0f1c] px-3 text-slate-500 tracking-wider">O continúa con</span>
-          </div>
-        </div>
-      )}
-
-      {mode !== 'recovery' && (
-        <div className="grid grid-cols-2 gap-4 relative z-10">
-          <button 
-            type="button"
-            onClick={handleGoogleLogin} 
-            className="flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-900 py-3 rounded-xl font-bold transition-all hover:scale-[1.02] border border-slate-200"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-              <path fill="#34A853" d="M12 24c2.87 0 5.28-.95 7.04-2.58l-3.57-2.77c-.95.64-2.17 1.02-3.47 1.02-2.67 0-4.93-1.8-5.74-4.22H2.5v2.85C4.26 21.8 7.82 24 12 24z" />
-              <path fill="#FBBC05" d="M6.26 15.45c-.21-.64-.32-1.31-.32-2.02s.11-1.38.32-2.02V8.56H2.5C1.8 9.95 1.4 11.45 1.4 13.06c0 1.61.4 3.11 1.1 4.5l3.76-2.11z" />
-              <path fill="#EA4335" d="M12 4.41c1.55 0 2.94.53 4.04 1.58l3.03-3.03C17.27 1.11 14.86 0 12 0 7.82 0 4.26 2.2 2.5 5.68l3.76 2.85c.81-2.42 3.07-4.12 5.74-4.12z" />
-            </svg>
-            Google
-          </button>
-
-          <button 
-            type="button"
-            onClick={handlePasskeyLogin} 
-            disabled={loading}
-            className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl font-bold transition-all hover:scale-[1.02] border border-white/10"
-          >
-            <Fingerprint className="w-5 h-5 text-blue-400" />
-            Huella
-          </button>
-        </div>
-      )}
 
       <div className="text-center relative z-10 pt-2">
         <button 

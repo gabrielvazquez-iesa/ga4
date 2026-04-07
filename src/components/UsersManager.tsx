@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, UserX, ShieldCheck, Search, KeyRound } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
@@ -202,17 +202,14 @@ export default function UsersManager() {
             <h2 className="text-xl font-bold mb-6 text-slate-900 dark:text-white text-center">Editar Departamento</h2>
             <p className="text-sm text-slate-500 mb-6 text-center">Asignar área para: <b>{editingUser.display_name}</b></p>
             
-            <select 
-              required
-              value={newDept} 
-              onChange={e => setNewDept(e.target.value)} 
-              className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-xl outline-none focus:ring-2 focus:ring-blue-500/50 mb-6 font-medium appearance-none cursor-pointer"
-            >
-              <option value="" disabled>Seleccionar departamento...</option>
-              {['Mercadeo', 'Comunicaciones', 'Tecnología', 'Ventas', 'Innovación', 'Incompany', 'RRHH'].map(d => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
+            <div className="mb-6">
+              <CustomSelect
+                value={newDept}
+                onChange={v => setNewDept(v)}
+                placeholder="Seleccionar departamento..."
+                options={['Mercadeo', 'Comunicaciones', 'Tecnología', 'Ventas', 'Innovación', 'Incompany', 'RRHH'].map(d => ({ value: d, label: d }))}
+              />
+            </div>
 
             <div className="flex gap-3">
               <button type="button" onClick={() => setEditingUser(null)} className="flex-1 py-3.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-500 font-bold hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
@@ -223,6 +220,62 @@ export default function UsersManager() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Custom styled dropdown ────────────────────────
+interface SelectOption { value: string; label: string; }
+function CustomSelect({ value, onChange, options, placeholder }: {
+  value: string;
+  onChange: (v: string) => void;
+  options: SelectOption[];
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = options.find(o => o.value === value);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 py-3 px-4 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all cursor-pointer"
+      >
+        <span className={selected ? '' : 'text-slate-400'}>{selected?.label || placeholder || 'Seleccionar...'}</span>
+        <svg className={`w-4 h-4 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+      </button>
+      {open && (
+        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-56 overflow-y-auto">
+          {placeholder && (
+            <button type="button" onClick={() => { onChange(''); setOpen(false); }}
+              className="w-full text-left px-4 py-2.5 text-sm text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+              {placeholder}
+            </button>
+          )}
+          {options.map(o => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => { onChange(o.value); setOpen(false); }}
+              className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer ${
+                o.value === value
+                  ? 'bg-blue-600/10 text-blue-500 font-semibold cursor-default'
+                  : 'text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5'
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
         </div>
       )}
     </div>

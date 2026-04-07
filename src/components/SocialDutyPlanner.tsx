@@ -4,6 +4,10 @@ import { Calendar, Clock, User, Plus, Trash2, Edit2, ChevronLeft, ChevronRight, 
 import { Toaster, toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { es } from 'date-fns/locale/es';
+registerLocale('es', es);
 
 // =============================================
 // VENEZUELAN HOLIDAYS (static list, updatable)
@@ -459,24 +463,55 @@ export default function SocialDutyPlanner() {
               </div>
 
               {/* Inicio */}
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 flex flex-col">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Inicio *</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                  <input required type="datetime-local" value={formData.start_date.substring(0, 16)}
-                    onChange={e => setFormData({...formData, start_date: e.target.value})}
-                    className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 pl-9 pr-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm dark:text-white [color-scheme:dark]" />
+                <div className="relative w-full">
+                  <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none z-10" />
+                  <DatePicker
+                    selected={formData.start_date ? new Date(formData.start_date) : null}
+                    onChange={(date: Date | null) => {
+                      if (date) {
+                        // Keep local timezone selection
+                        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                        setFormData({...formData, start_date: localDate.toISOString().substring(0, 16)});
+                      }
+                    }}
+                    showTimeSelect
+                    timeFormat="HH:mm"
+                    timeIntervals={30}
+                    timeCaption="Hora"
+                    dateFormat="d 'de' MMMM yyyy, h:mm aa"
+                    locale="es"
+                    placeholderText="Selecciona la fecha y hora"
+                    className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 py-3 pl-10 pr-4 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm font-medium text-slate-900 dark:text-white transition-all cursor-pointer"
+                    wrapperClassName="w-full"
+                  />
                 </div>
               </div>
 
               {/* Fin */}
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 flex flex-col">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Fin *</label>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                  <input required type="datetime-local" value={formData.end_date.substring(0, 16)}
-                    onChange={e => setFormData({...formData, end_date: e.target.value})}
-                    className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 pl-9 pr-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm dark:text-white [color-scheme:dark]" />
+                <div className="relative w-full">
+                  <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none z-10" />
+                  <DatePicker
+                    selected={formData.end_date ? new Date(formData.end_date) : null}
+                    onChange={(date: Date | null) => {
+                      if (date) {
+                        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                        setFormData({...formData, end_date: localDate.toISOString().substring(0, 16)});
+                      }
+                    }}
+                    showTimeSelect
+                    timeFormat="HH:mm"
+                    timeIntervals={30}
+                    timeCaption="Hora"
+                    dateFormat="d 'de' MMMM yyyy, h:mm aa"
+                    locale="es"
+                    placeholderText="Selecciona la fecha y hora"
+                    className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 py-3 pl-10 pr-4 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm font-medium text-slate-900 dark:text-white transition-all cursor-pointer"
+                    wrapperClassName="w-full"
+                  />
                 </div>
               </div>
 
@@ -537,20 +572,20 @@ function CustomSelect({ value, onChange, options, placeholder }: {
   }, []);
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative w-full">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 py-3 px-3.5 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all"
+        className="w-full flex items-center justify-between bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 py-3 px-4 rounded-xl text-sm font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all shadow-sm"
       >
         <span className={selected ? '' : 'text-slate-400'}>{selected?.label || placeholder || 'Seleccionar...'}</span>
-        <svg className={`w-4 h-4 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        <svg className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
       </button>
       {open && (
-        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-56 overflow-y-auto">
+        <div className="absolute z-[100] w-full mt-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700/50 [&::-webkit-scrollbar-thumb]:rounded-full">
           {placeholder && (
             <button type="button" onClick={() => { onChange(''); setOpen(false); }}
-              className="w-full text-left px-4 py-2.5 text-sm text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+              className="w-full text-left px-4 py-3 text-sm text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-white/5">
               {placeholder}
             </button>
           )}
@@ -559,10 +594,10 @@ function CustomSelect({ value, onChange, options, placeholder }: {
               key={o.value}
               type="button"
               onClick={() => { onChange(o.value); setOpen(false); }}
-              className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+              className={`w-full text-left px-4 py-3 text-sm transition-colors ${
                 o.value === value
-                  ? 'bg-indigo-600/10 text-indigo-400 font-semibold'
-                  : 'text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5'
+                  ? 'bg-indigo-600/10 text-indigo-400 font-bold border-l-2 border-indigo-500'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 font-medium border-l-2 border-transparent'
               }`}
             >
               {o.label}
