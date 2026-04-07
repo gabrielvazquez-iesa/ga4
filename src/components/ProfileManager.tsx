@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { User, Mail, Lock, Camera, Link as LinkIcon, Save, RefreshCw, ShieldCheck } from 'lucide-react';
+import { User, Mail, Lock, Camera, Link as LinkIcon, Save, RefreshCw, ShieldCheck, Download } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 import SecuritySettings from './SecuritySettings';
 
@@ -36,9 +36,29 @@ export default function ProfileManager() {
     twitter_url: ''
   });
 
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
   useEffect(() => {
     loadUser();
+    
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      console.log('Capture PWA prompt');
+    };
+    
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
 
   const loadUser = async () => {
     setLoading(true);
@@ -285,6 +305,26 @@ export default function ProfileManager() {
 
           {/* Configuración Biométrica Nativa Avanzada */}
           <SecuritySettings />
+
+          {/* PWA Install App */}
+          {deferredPrompt && (
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl animate-in fade-in slide-in-from-bottom-4 transition-all">
+              <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
+                <RefreshCw className="w-5 h-5 text-blue-200" />
+                Lleva GA4 Dashboard contigo
+              </h3>
+              <p className="text-sm text-blue-100 mb-4 opacity-90">
+                Instala la aplicación en tu pantalla de inicio para un acceso rápido y seguro a tus métricas.
+              </p>
+              <button 
+                onClick={handleInstallClick}
+                className="w-full bg-white text-blue-700 font-extrabold py-3.5 rounded-xl hover:bg-blue-50 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2"
+              >
+                <Download className="w-5 h-5" />
+                Instalar Aplicación
+              </button>
+            </div>
+          )}
         </div>
 
       </div>

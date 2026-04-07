@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { Bell, Search, Filter, Calendar, Send, Info, AlertTriangle, CheckCircle, XCircle, Users } from 'lucide-react';
+import { Bell, Search, Filter, Calendar, Send, Info, AlertTriangle, CheckCircle, XCircle, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
 interface Notification {
@@ -21,7 +21,7 @@ interface UserProfile {
 
 export default function NotificationsManager() {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<'history' | 'send'>('history');
+  const [activeTab, setActiveTab] = useState<'history' | 'send'>('send');
   
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -141,229 +141,203 @@ export default function NotificationsManager() {
         </div>
 
         {isAdmin && (
-          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-            <button
-              onClick={() => setActiveTab('history')}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'history' ? 'bg-white dark:bg-slate-950 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
-            >
-              Historial
-            </button>
+          <div className="flex bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 p-1.5 rounded-2xl shadow-inner">
             <button
               onClick={() => setActiveTab('send')}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'send' ? 'bg-white dark:bg-slate-950 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'send' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-white/5'}`}
             >
+              <Send className="w-4 h-4" />
               Enviar Mensaje
+            </button>
+            <button
+              onClick={() => setActiveTab('history')}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'history' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-white/5'}`}
+            >
+              <Calendar className="w-4 h-4" />
+              Historial
             </button>
           </div>
         )}
       </div>
 
-      {/* Main Content Area */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-white/10 shadow-xl shadow-slate-200/50 dark:shadow-none">
-        
-        {activeTab === 'history' ? (
-          <div className="space-y-6">
-            {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Buscar por palabra clave..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
-                />
+      {activeTab === 'send' && isAdmin ? (
+        <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 p-6 md:p-8 rounded-3xl backdrop-blur-xl shadow-xl animate-in fade-in slide-in-from-bottom-4">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+            <Send className="w-5 h-5 text-blue-500" />
+            Redactar Notificación
+          </h2>
+          <form onSubmit={handleSendNotification} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1.5">Título</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={newTitle} 
+                    onChange={e => setNewTitle(e.target.value)} 
+                    className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition-all text-slate-900 dark:text-white" 
+                    placeholder="Ej. Nueva actualización del sistema"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1.5">Tipo de Alerta</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: 'info', label: 'Info', color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                      { id: 'success', label: 'Éxito', color: 'text-green-500', bg: 'bg-green-500/10' },
+                      { id: 'warning', label: 'Aviso', color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
+                      { id: 'error', label: 'Error', color: 'text-red-500', bg: 'bg-red-500/10' },
+                    ].map(type => (
+                      <button
+                        key={type.id}
+                        type="button"
+                        onClick={() => setNewType(type.id)}
+                        className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border transition-all ${newType === type.id ? 'border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'}`}
+                      >
+                        <div className={`w-2 h-2 rounded-full ${type.bg.replace('/10', '')}`} />
+                        <span className="text-xs font-bold">{type.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div className="relative md:w-64">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="date"
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all [color-scheme:light] dark:[color-scheme:dark]"
-                />
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1.5">Destinatario</label>
+                  <div className="relative">
+                    <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <select 
+                      value={targetUser} 
+                      onChange={e => setTargetUser(e.target.value)} 
+                      className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-blue-500 transition-all text-slate-900 dark:text-white appearance-none cursor-pointer"
+                    >
+                      <option value="all">Todos los usuarios</option>
+                      {users.map(u => (
+                        <option key={u.user_id} value={u.user_id}>{u.display_name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1.5">Mensaje</label>
+                  <textarea 
+                    required 
+                    rows={4} 
+                    value={newMessage} 
+                    onChange={e => setNewMessage(e.target.value)} 
+                    className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition-all text-slate-900 dark:text-white resize-none" 
+                    placeholder="Escribe el contenido de la notificación..."
+                  />
+                </div>
               </div>
             </div>
+            <div className="flex justify-end">
+              <button 
+                type="submit" 
+                disabled={sending} 
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:opacity-50"
+              >
+                {sending ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                Publicar Notificación
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : (
+        <div className="space-y-6 animate-in fade-in duration-500">
+          {/* Filters Bar */}
+          <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center">
+            <div className="relative flex-1 group w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+              <input 
+                type="text" 
+                placeholder="Buscar por título o contenido..." 
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-100 dark:bg-white/5 border-none rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+              />
+            </div>
+            <div className="relative w-full md:w-auto">
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input 
+                type="date" 
+                className="w-full bg-slate-100 dark:bg-white/5 border-none rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                value={dateFilter}
+                onChange={e => setDateFilter(e.target.value)}
+              />
+            </div>
+          </div>
 
-            {/* List */}
+          {/* List */}
+          <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-xl backdrop-blur-xl">
             {loading ? (
-              <div className="text-center py-12 text-slate-500">Cargando notificaciones...</div>
+              <div className="p-12 flex flex-col items-center gap-4">
+                <div className="w-10 h-10 border-4 border-slate-200 dark:border-white/10 border-t-blue-500 rounded-full animate-spin" />
+                <p className="text-slate-500 font-medium">Cargando historial...</p>
+              </div>
             ) : currentItems.length === 0 ? (
-              <div className="text-center py-12 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 border-dashed rounded-2xl">
-                <Filter className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
-                <h3 className="text-slate-900 dark:text-white font-bold mb-1">No hay resultados</h3>
-                <p className="text-slate-500 text-sm">Prueba ajustando los filtros de búsqueda o fecha.</p>
+              <div className="p-12 text-center text-slate-500">
+                <Bell className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                No se encontraron notificaciones con los filtros actuales.
               </div>
             ) : (
-              <div className="space-y-4">
-                {currentItems.map(notif => (
-                  <div key={notif.id} className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-white/5 hover:border-blue-500/30 transition-colors group">
-                    <div className="mt-1 shrink-0 p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm">
-                      {getIconForType(notif.type)}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-slate-900 dark:text-white">{notif.title}</h4>
-                        <span className="text-xs font-semibold text-slate-400 bg-white dark:bg-slate-900 px-2 py-1 rounded-md border border-slate-200 dark:border-white/5">
-                          {new Date(notif.created_at).toLocaleDateString()}
-                        </span>
+              <div className="divide-y divide-slate-100 dark:divide-white/5">
+                {currentItems.map((n) => (
+                  <div key={n.id} className="p-5 md:p-6 hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all group">
+                    <div className="flex items-start gap-4">
+                      <div className="shrink-0 mt-1">
+                        {getIconForType(n.type)}
                       </div>
-                      <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">{notif.message}</p>
+                      <div className="flex-1">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-1.5">
+                          <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors uppercase tracking-tight text-sm md:text-base">{n.title}</h3>
+                          <span className="text-[10px] md:text-xs font-semibold text-slate-400 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-full border border-slate-200 dark:border-white/5">
+                            {new Date(n.created_at).toLocaleString('es-VE', { 
+                              day: '2-digit', month: 'short', year: 'numeric',
+                              hour: '2-digit', minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{n.message}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             )}
-
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-white/10">
-                <button 
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(prev => prev - 1)}
-                  className="px-4 py-2 font-semibold text-slate-600 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                >
-                  Anterior
-                </button>
-                <div className="text-sm font-bold text-slate-500">
-                  Página <span className="text-slate-900 dark:text-white">{currentPage}</span> de {totalPages}
-                </div>
-                <button 
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(prev => prev + 1)}
-                  className="px-4 py-2 font-semibold text-slate-600 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                >
-                  Siguiente
-                </button>
-              </div>
-            )}
           </div>
-        ) : (
-          /* Admin Send Tab */
-          <div className="max-w-2xl mx-auto space-y-6">
-            <div className="text-center mb-8">
-              <Send className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Redactar Mensaje</h2>
-              <p className="text-slate-500">Envía alertas personalizadas o al sistema entero.</p>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 pt-2">
+              <button 
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(p => p - 1)}
+                className="p-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/5 transition-all disabled:opacity-30 active:scale-90"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <div className="flex gap-1.5">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${currentPage === i + 1 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 bg-slate-100 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10'}`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+              <button 
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(p => p + 1)}
+                className="p-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/5 transition-all disabled:opacity-30 active:scale-90"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
-            
-            <form onSubmit={handleSendNotification} className="space-y-5">
-              <div>
-                <label className="block text-sm font-bold text-slate-900 dark:text-white mb-2">Destinatario</label>
-                <div className="relative">
-                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <CustomSelect
-                    value={targetUser}
-                    onChange={setTargetUser}
-                    options={[
-                      { value: 'all', label: '🌐 Todos los usuarios (Aviso Global)' },
-                      ...users.map(u => ({ value: u.user_id, label: `👤 ${u.display_name || 'Usuario ' + u.user_id.substring(0,6)}` }))
-                    ]}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-slate-900 dark:text-white mb-2">Tipo de Aviso</label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {['info', 'success', 'warning', 'error'].map(t => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => setNewType(t)}
-                      className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${newType === t ? 'border-blue-500 bg-blue-500/5' : 'border-slate-200 dark:border-slate-800 hover:border-blue-500/30'}`}
-                    >
-                      {getIconForType(t)}
-                      <span className="text-xs font-bold mt-2 capitalize text-slate-600 dark:text-slate-300">{t}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-slate-900 dark:text-white mb-2">Título</label>
-                <input
-                  type="text"
-                  required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="Ej: Cambio de guardia exitoso"
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-slate-900 dark:text-white mb-2">Mensaje</label>
-                <textarea
-                  required
-                  rows={4}
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Detalles de la notificación..."
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
-                />
-              </div>
-
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={sending}
-                  className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex justify-center items-center gap-2 transition-colors disabled:opacity-50"
-                >
-                  {sending ? 'Enviando...' : <><Send className="w-5 h-5" /> Enviar Notificación</>}
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-interface SelectOption { value: string; label: string; }
-function CustomSelect({ value, onChange, options }: {
-  value: string;
-  onChange: (v: string) => void;
-  options: SelectOption[];
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const selected = options.find(o => o.value === value);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  return (
-    <div ref={ref} className="relative w-full">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-semibold"
-      >
-        <span className="truncate">{selected?.label || 'Seleccionar...'}</span>
-        <svg className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-      </button>
-      {open && (
-        <div className="absolute z-[100] w-full mt-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700/50 [&::-webkit-scrollbar-thumb]:rounded-full">
-          {options.map(o => (
-            <button
-              key={o.value}
-              type="button"
-              onClick={() => { onChange(o.value); setOpen(false); }}
-              className={`w-full text-left px-4 py-3 text-sm transition-colors cursor-pointer ${
-                o.value === value
-                  ? 'bg-blue-600/10 text-blue-500 font-bold border-l-2 border-blue-500'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 font-medium border-l-2 border-transparent'
-              }`}
-            >
-              {o.label}
-            </button>
-          ))}
+          )}
         </div>
       )}
     </div>

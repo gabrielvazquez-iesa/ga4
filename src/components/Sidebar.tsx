@@ -150,33 +150,35 @@ export default function Sidebar({ currentPath }: SidebarProps) {
       </aside>
 
       {/* Mobile Floating Dock */}
-      <nav className="md:hidden fixed bottom-4 left-4 right-4 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-[2rem] p-2 flex items-center justify-between z-50 transition-all duration-300">
+      <nav className="md:hidden fixed bottom-4 left-4 right-4 bg-white/40 dark:bg-slate-900/50 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-[2rem] px-3 py-2 flex items-center justify-between z-50 transition-all duration-300">
         
         {/* Atajos Rápidos Izquierda */}
-        <div className="flex items-center gap-1">
-          <a href="/analytics" className={`p-3 rounded-full transition-colors ${currentPath === '/analytics' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
-            <BarChart3 className="w-5 h-5" />
+        <div className="flex items-center gap-0.5">
+          <a href="/analytics" className={`p-2.5 rounded-2xl transition-colors ${currentPath === '/analytics' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
+            <BarChart3 className="w-[22px] h-[22px]" />
           </a>
-          <a href="/social-reports" className={`p-3 rounded-full transition-colors ${currentPath === '/social-reports' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
-            <Instagram className="w-5 h-5" />
+          <a href="/social-reports" className={`p-2.5 rounded-2xl transition-colors ${currentPath === '/social-reports' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
+            <Instagram className="w-[22px] h-[22px]" />
           </a>
         </div>
 
         {/* Central Menu Button */}
         <button 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="relative group flex items-center justify-center p-4 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full shadow-lg shadow-blue-500/30 transform transition-transform active:scale-95"
+          className="relative mx-1 flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full shadow-lg shadow-blue-500/40 transform transition-all active:scale-95 hover:shadow-blue-500/60"
         >
           {isMobileMenuOpen ? <X className="w-6 h-6" /> : <LayoutGrid className="w-6 h-6" />}
         </button>
 
         {/* Atajos Rápidos Derecha */}
-        <div className="flex items-center gap-1">
-          <a href="/vault" className={`p-3 rounded-full transition-colors ${currentPath === '/vault' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
-            <KeyRound className="w-5 h-5" />
+        <div className="flex items-center gap-0.5">
+          <a href="/vault" className={`p-2.5 rounded-2xl transition-colors ${currentPath === '/vault' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
+            <KeyRound className="w-[22px] h-[22px]" />
           </a>
-          <button onClick={handleLogout} className="p-3 text-slate-600 dark:text-slate-300 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-colors">
-            <LogOut className="w-5 h-5" />
+          {/* Separator */}
+          <div className="w-px h-6 bg-slate-300 dark:bg-white/15 mx-1 rounded-full" />
+          <button onClick={handleLogout} className="p-2.5 text-slate-400 dark:text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-colors">
+            <LogOut className="w-[22px] h-[22px]" />
           </button>
         </div>
       </nav>
@@ -185,19 +187,19 @@ export default function Sidebar({ currentPath }: SidebarProps) {
       {isMobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setIsMobileMenuOpen(false)}>
           <div 
-            className="absolute bottom-24 left-4 right-4 bg-white/70 dark:bg-[#0f172a]/70 backdrop-blur-2xl border border-white/50 dark:border-white/10 p-6 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] animate-in slide-in-from-bottom-8 fade-in duration-300"
+            className="absolute bottom-24 left-4 right-4 bg-white/70 dark:bg-[#0f172a]/80 backdrop-blur-2xl border border-white/50 dark:border-white/10 p-6 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] animate-in slide-in-from-bottom-8 fade-in duration-300"
             onClick={e => e.stopPropagation()}
           >
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Todas las aplicaciones</h3>
-            <div className="grid grid-cols-4 gap-y-6 gap-x-2">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-5">Todas las aplicaciones</h3>
+            <div className="grid grid-cols-3 gap-4">
               {menuItems.map(item => {
                 const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
                 return (
-                  <a key={item.path} href={item.path} onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2 group">
-                    <div className={`w-14 h-14 flex items-center justify-center rounded-2xl transition-all ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-slate-100/50 dark:bg-white/5 text-slate-600 dark:text-slate-300 group-hover:bg-blue-50 dark:group-hover:bg-white/10'}`}>
-                      <item.icon className="w-6 h-6" />
+                  <a key={item.path} href={item.path} onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2.5 group">
+                    <div className={`w-16 h-16 flex items-center justify-center rounded-2xl transition-all ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-slate-100/80 dark:bg-white/8 text-slate-600 dark:text-slate-300 group-hover:bg-blue-50 dark:group-hover:bg-white/15 border border-slate-200/50 dark:border-white/5'}`}>
+                      <item.icon className="w-7 h-7" />
                     </div>
-                    <span className="text-[10px] font-bold text-center leading-tight dark:text-slate-300">{item.name}</span>
+                    <span className="text-[11px] font-semibold text-center leading-tight text-slate-600 dark:text-slate-300">{item.name}</span>
                   </a>
                 );
               })}
