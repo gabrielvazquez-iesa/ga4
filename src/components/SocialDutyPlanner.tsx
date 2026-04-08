@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Calendar, Clock, User, Plus, Trash2, Edit2, ChevronLeft, ChevronRight, Bell, Shield } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import DatePicker, { registerLocale } from 'react-datepicker';
@@ -186,7 +186,7 @@ export default function SocialDutyPlanner() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (!formData.user_id) { toast.error('Selecciona un responsable.'); return; }
+      if (!formData.user_id) { toast.error('Opps, por favor selecciona a un responsable para este turno.'); return; }
       
       const { tag, notes, ...rest } = formData;
       const combinedNotes = `[${tag}] ${notes}`;
@@ -195,19 +195,37 @@ export default function SocialDutyPlanner() {
       if (editingShift) {
         const { error } = await supabase.from('duty_shifts').update(payload).eq('id', editingShift.id);
         if (error) throw error;
+        
+        // Notify
+        const targetUser = users.find(u => u.user_id === formData.user_id);
+        await supabase.from('system_notifications').insert([{
+          title: 'Guardia Actualizada',
+          message: `${targetUser?.display_name || 'Un usuario'} tiene su guardia editada para el ${new Date(formData.start_date).toLocaleDateString()}.`,
+          type: 'info'
+        }]);
+
         await supabase.from('duty_audit_logs').insert({ shift_id: editingShift.id, user_id: currentUser?.id, action: 'update', new_value: payload });
-        toast.success('Guardia actualizada.');
+        toast.success('¡Listo! La guardia se ha actualizado correctamente.');
       } else {
         const { data, error } = await supabase.from('duty_shifts').insert([payload]).select().single();
         if (error) throw error;
+
+        // Notify
+        const targetUser = users.find(u => u.user_id === formData.user_id);
+        await supabase.from('system_notifications').insert([{
+          title: 'Nueva Guardia Programada',
+          message: `${targetUser?.display_name || 'Se'} ha sido asignado para una guardia el ${new Date(formData.start_date).toLocaleDateString()}.`,
+          type: 'success'
+        }]);
+
         await supabase.from('duty_audit_logs').insert({ shift_id: data.id, user_id: currentUser?.id, action: 'create', new_value: payload });
-        toast.success('Guardia programada.');
+        toast.success('¡Genial! El turno ha sido programado con éxito.');
       }
       setShowModal(false);
       setEditingShift(null);
       fetchData();
     } catch (err: any) {
-      toast.error('Error: ' + err.message);
+      toast.error('Lo sentimos, no pudimos procesar la solicitud. Por favor, intenta de nuevo.');
     }
   };
 
@@ -219,12 +237,19 @@ export default function SocialDutyPlanner() {
       const { error } = await supabase.from('duty_shifts').delete().eq('id', id);
       if (error) throw error;
       
+      // Notify (optional but good)
+      await supabase.from('system_notifications').insert([{
+        title: 'Guardia Eliminada',
+        message: `Un turno ha sido removido del calendario de guardias.`,
+        type: 'warning'
+      }]);
+
       await supabase.from('duty_audit_logs').insert({ user_id: currentUser?.id, action: 'delete' });
-      toast.success('Guardia eliminada correctamente.');
+      toast.success('El turno ha sido eliminado del calendario correctamente.');
       setShowDeleteConfirm(null);
       fetchData();
     } catch (err: any) {
-      toast.error('Error al eliminar: ' + err.message);
+      toast.error('Vaya, no pudimos eliminar el turno. Inténtalo de nuevo en unos momentos.');
     }
   };
 
@@ -252,7 +277,6 @@ export default function SocialDutyPlanner() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <Toaster theme="dark" position="top-right" richColors />
       
       <style>{`
         .react-datepicker-wrapper { width: 100%; }

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { apiFetch } from '../lib/api-fetch';
 import { KeyRound, Plus, Edit2, Trash2, Eye, EyeOff, Search, ExternalLink, RefreshCw, AlertCircle, LayoutGrid, List, Shield, ShieldAlert, ShieldCheck, User, Clock, LogOut } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 
@@ -99,7 +99,7 @@ export default function VaultManager() {
 
   const handleTimeoutLogout = () => {
     // We can either redirect to dashboard or just lock the vault
-    toast.error('Sesión de bóveda cerrada por inactividad.');
+    toast.error('Tu sesión en la bóveda ha expirado por inactividad para proteger tus datos.');
     window.location.href = '/analytics'; // Redirect to a safe general page
   };
 
@@ -161,7 +161,7 @@ export default function VaultManager() {
       setCredentials(json.data || []);
     } catch (error: any) {
       console.error(error);
-      toast.error('Error al cargar las credenciales seguras.');
+      toast.error('No pudimos cargar las credenciales en este momento. Por favor, intenta de nuevo más tarde.');
     }
   };
 
@@ -178,7 +178,7 @@ export default function VaultManager() {
   const submitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAdmin) {
-      toast.error('Solo los administradores pueden gestionar la bóveda.');
+      toast.error('Lo sentimos, solo los administradores pueden realizar cambios en la bóveda.');
       return;
     }
 
@@ -195,12 +195,12 @@ export default function VaultManager() {
       const json = await res.json();
       if (json.error) throw new Error(json.error);
 
-      toast.success(editingId ? 'Credencial actualizada.' : 'Nueva credencial guardada con éxito.');
+      toast.success(editingId ? '¡Listo! Los cambios se han guardado correctamente.' : '¡Genial! La nueva credencial ha sido registrada con éxito.');
       setIsModalOpen(false);
       resetForm();
       fetchCredentials();
     } catch (error: any) {
-      toast.error('Error: ' + error.message);
+      toast.error('Hubo un inconveniente al procesar la solicitud. Por favor, verifica los datos e intenta de nuevo.');
     }
   };
 
@@ -228,10 +228,10 @@ export default function VaultManager() {
       const json = await res.json();
       if (json.error) throw new Error(json.error);
       
-      toast.info('Credencial enviada a la papelera.');
+      toast.info('La credencial se ha movido a la papelera correctamente.');
       fetchCredentials();
     } catch (error: any) {
-      toast.error('Error: ' + (error.message || 'No se pudo eliminar.'));
+      toast.error('No fue posible eliminar la credencial. Inténtalo de nuevo en unos momentos.');
     }
   };
 
@@ -246,10 +246,10 @@ export default function VaultManager() {
       const json = await res.json();
       if (json.error) throw new Error(json.error);
       
-      toast.success('Credencial restaurada.');
+      toast.success('¡Hecho! La credencial ha sido restaurada con éxito.');
       fetchCredentials();
     } catch (error: any) {
-      toast.error('Error: ' + (error.message || 'No se pudo restaurar.'));
+      toast.error('No pudimos restaurar la credencial en este momento. Por favor, intenta de nuevo.');
     }
   };
 
@@ -262,8 +262,7 @@ export default function VaultManager() {
   }
 
   return (
-    <div className="space-y-6">
-      <Toaster theme="dark" position="top-right" />
+ <div className="space-y-6">
 
       {/* Security Status Bar */}
       <div className={`p-4 rounded-xl border flex flex-col md:flex-row items-center gap-4 transition-all ${

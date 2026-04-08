@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, UserX, ShieldCheck, Search, KeyRound } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 
 interface UserProfile {
   user_id: string;
@@ -41,7 +41,7 @@ export default function UsersManager() {
       .from('user_profiles')
       .select('user_id, display_name, department, has_vault_access, avatar_url, is_banned, last_seen')
       .order('display_name');
-    if (error) toast.error('Error al cargar los usuarios.');
+    if (error) toast.error('No pudimos cargar la lista de usuarios. Por favor, refresca la página.');
     else setUsers(data || []);
     setLoading(false);
   };
@@ -51,8 +51,8 @@ export default function UsersManager() {
     if (!window.confirm(`¿Estás seguro de que deseas ${action} a este usuario?`)) return;
 
     const { error } = await supabase.from('user_profiles').update({ is_banned: !current }).eq('user_id', userId);
-    if (error) toast.error('Error: ' + error.message);
-    else { toast.success(`Usuario ${!current ? 'desincorporado' : 'reactivado'} con éxito.`); fetchUsers(); }
+    if (error) toast.error('Hubo un pequeño inconveniente al cambiar el estado del usuario.');
+    else { toast.success(`¡Hecho! El usuario ha sido ${!current ? 'desincorporado' : 'reactivado'} correctamente.`); fetchUsers(); }
   };
 
   const toggleVaultAccess = async (userId: string, current: boolean) => {
@@ -60,17 +60,17 @@ export default function UsersManager() {
     if (!window.confirm(`¿Deseas ${action} el acceso a la bóveda para este usuario?`)) return;
 
     const { error } = await supabase.from('user_profiles').update({ has_vault_access: !current }).eq('user_id', userId);
-    if (error) toast.error('Error: ' + error.message);
-    else { toast.success(`Acceso a bóveda ${!current ? 'concedido' : 'revocado'} correctamente.`); fetchUsers(); }
+    if (error) toast.error('No fue posible modificar los permisos en este momento.');
+    else { toast.success(`¡Listo! El acceso a la bóveda ha sido ${!current ? 'concedido' : 'revocado'} exitosamente.`); fetchUsers(); }
   };
 
   const handleUpdateDept = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingUser) return;
     const { error } = await supabase.from('user_profiles').update({ department: newDept }).eq('user_id', editingUser.user_id);
-    if (error) toast.error('Error: ' + error.message);
+    if (error) toast.error('Lo sentimos, no pudimos actualizar el departamento. Inténtalo de nuevo.');
     else {
-      toast.success('Departamento actualizado con éxito.');
+      toast.success('¡Perfecto! El departamento se ha actualizado sin problemas.');
       setEditingUser(null);
       fetchUsers();
     }
@@ -105,7 +105,6 @@ export default function UsersManager() {
 
   return (
     <div className="space-y-6">
-      <Toaster theme="dark" position="top-right" />
 
       {/* Tabs and Search */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">

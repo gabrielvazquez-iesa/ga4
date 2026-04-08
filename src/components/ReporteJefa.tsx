@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from '../lib/api-fetch';
 import { Copy, Check, Download, Calendar, RefreshCw, AlertTriangle } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 
 const ROWS = [
   'Páginas vistas',
@@ -74,7 +74,7 @@ export default function ReporteJefa() {
 
   return (
     <div className="space-y-6">
-      <Toaster theme="dark" position="top-right" />
+
 
       <div className="bg-white/80 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 p-6 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-6 backdrop-blur-sm shadow-xl">
         <div>

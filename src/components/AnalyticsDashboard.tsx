@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { apiFetch } from '../lib/api-fetch';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, LineChart, Line } from 'recharts';
 import { Eye, Users, MousePointerClick, Clock, ArrowUpRight, ArrowDownRight, RefreshCw, BarChart2, TrendingUp, Calendar, Download, ChevronDown, BookOpen, GraduationCap, X } from 'lucide-react';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 import MoMModule from './MoMModule';
 import EngagementModule from './EngagementModule';
 import PerformanceModule from './PerformanceModule';
@@ -97,7 +97,7 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <Toaster position="top-right" theme="dark" />
+
       
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="w-full overflow-x-auto pb-2 scrollbar-hide">

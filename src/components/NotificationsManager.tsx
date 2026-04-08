@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Bell, Search, Filter, Calendar, Send, Info, AlertTriangle, CheckCircle, XCircle, Users, ChevronLeft, ChevronRight, Trash2, RefreshCw } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 
 interface Notification {
   id: string;
@@ -44,6 +44,22 @@ export default function NotificationsManager() {
 
   useEffect(() => {
     fetchData();
+
+    // Setup Realtime Subscription
+    const channel = supabase
+      .channel('notifs_history_realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', table: 'system_notifications', schema: 'public' },
+        () => {
+          fetchData(); // Refresh history on any change
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [searchQuery, dateFilter]);
 
   const fetchData = async () => {
@@ -141,7 +157,7 @@ export default function NotificationsManager() {
 
   return (
     <div className="space-y-6">
-      <Toaster position="top-right" richColors />
+
       
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

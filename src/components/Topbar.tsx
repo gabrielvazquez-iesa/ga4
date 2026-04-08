@@ -1,6 +1,7 @@
 import { Bell, Search, User, Check, Trash2, X, Calendar, ShieldCheck } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
+import { toast } from 'sonner';
 import ThemeToggle from './ThemeToggle';
 
 interface Notification {
@@ -34,42 +35,45 @@ export default function Topbar() {
   ];
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      const user = data.session?.user;
-      if (!user) return;
-      
-      setUserEmail(user.email || 'Usuario');
-      
-      // Fetch profile
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('avatar_url')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      
-      if (profile?.avatar_url) setAvatarUrl(profile.avatar_url);
-
-      // Check if user is on duty
-      const now = new Date().toISOString();
-      const { data: activeShift } = await supabase
-        .from('duty_shifts')
-        .select('id')
-        .eq('user_id', user.id)
-        .lte('start_date', now)
-        .gte('end_date', now)
-        .maybeSingle();
-      
-      setOnDuty(!!activeShift);
-
-      // Fetch notifications
-      const { data: notifs } = await supabase
-        .from('system_notifications')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(10);
+    fetchInitialData();
+    
+    // Setup Realtime Subscription with better channel name and events
+    const channel = supabase
+      .channel('public:system_notifications')
+      .on(
+        'postgres_changes',
+        { 
+          event: 'INSERT', 
+          table: 'system_notifications', 
+          schema: 'public' 
+        },
+        (payload) => {
+          console.log('Nueva notificación recibida:', payload);
+          // Actualizamos la lista con el nuevo item en lugar de re-fetch total
+          setNotifications(prev => [payload.new as Notification, ...prev].slice(0, 10));
           
-      if (notifs) setNotifications(notifs);
-    });
+          // Disparamos un toast si la notificación es nueva
+          toast(payload.new.title, {
+            description: payload.new.message,
+            icon: payload.new.type === 'success' ? '✅' : payload.new.type === 'error' ? '❌' : '🔔',
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', table: 'system_notifications', schema: 'public' },
+        () => fetchInitialData()
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', table: 'system_notifications', schema: 'public' },
+        () => fetchInitialData()
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Conectado a notificaciones Realtime');
+        }
+      });
 
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -80,8 +84,49 @@ export default function Topbar() {
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      supabase.removeChannel(channel);
+    };
   }, []);
+
+  const fetchInitialData = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
+    if (!user) return;
+    
+    setUserEmail(user.email || 'Usuario');
+    
+    // Fetch profile
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('avatar_url')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    
+    if (profile?.avatar_url) setAvatarUrl(profile.avatar_url);
+
+    // Check if user is on duty
+    const now = new Date().toISOString();
+    const { data: activeShift } = await supabase
+      .from('duty_shifts')
+      .select('id')
+      .eq('user_id', user.id)
+      .lte('start_date', now)
+      .gte('end_date', now)
+      .maybeSingle();
+    
+    setOnDuty(!!activeShift);
+
+    // Fetch notifications
+    const { data: notifs } = await supabase
+      .from('system_notifications')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10);
+        
+    if (notifs) setNotifications(notifs);
+  };
 
   const searchResults = searchQuery.trim() === '' ? [] : searchableRoutes.filter(route => 
     route.name.toLowerCase().includes(searchQuery.toLowerCase()) || 

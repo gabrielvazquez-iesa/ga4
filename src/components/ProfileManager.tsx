@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, Mail, Lock, Camera, Link as LinkIcon, Save, RefreshCw, ShieldCheck, Download } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 import SecuritySettings from './SecuritySettings';
 
 interface ProfileData {
@@ -112,15 +112,15 @@ export default function ProfileManager() {
       
       if (error) {
         if (error.code === '42P01') {
-          toast.error('La tabla user_profiles no existe en la base de datos.');
+          toast.error('Parece que el sistema de perfiles no está disponible en la base de datos. Por favor, contacta a soporte.');
         } else {
           throw error;
         }
       } else {
-        toast.success('Perfil actualizado correctamente.');
+        toast.success('¡Genial! Tu perfil se ha actualizado con éxito.');
       }
     } catch (error: any) {
-      toast.error('Error al guardar: ' + error.message);
+      toast.error('Lo sentimos, no pudimos guardar los cambios. Por favor, verifica tu conexión e inténtalo de nuevo.');
     } finally {
       setSaving(false);
     }
@@ -129,11 +129,11 @@ export default function ProfileManager() {
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword.length < 6) {
-      toast.error('La contraseña debe tener al menos 6 caracteres');
+      toast.error('La seguridad es importante: la contraseña debe tener al menos 6 caracteres.');
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error('Las contraseñas no coinciden');
+      toast.error('Las contraseñas no coinciden. Por favor, asegúrate de que sean iguales.');
       return;
     }
 
@@ -141,11 +141,11 @@ export default function ProfileManager() {
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
-      toast.success('Contraseña actualizada con éxito');
+      toast.success('¡Listo! Tu contraseña ha sido cambiada correctamente.');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: any) {
-      toast.error('Error al cambiar contraseña: ' + error.message);
+      toast.error('Hubo un pequeño error al actualizar tu contraseña. Reinténtalo en unos momentos.');
     } finally {
       setSaving(false);
     }
@@ -157,7 +157,6 @@ export default function ProfileManager() {
 
   return (
     <div className="space-y-8">
-      <Toaster theme="system" richColors position="top-right" />
 
       {/* Header Profile Card */}
       <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl p-8 backdrop-blur-sm shadow-xl flex flex-col md:flex-row gap-8 items-center md:items-start relative overflow-hidden">
