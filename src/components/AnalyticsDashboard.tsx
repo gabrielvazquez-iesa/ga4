@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { apiFetch } from '../lib/api-fetch';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, LineChart, Line } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Eye, Users, MousePointerClick, Clock, ArrowUpRight, ArrowDownRight, RefreshCw, BarChart2, TrendingUp, Calendar, Download, ChevronDown, BookOpen, GraduationCap, X } from 'lucide-react';
 import { toast } from 'sonner';
 import MoMModule from './MoMModule';
@@ -16,7 +16,7 @@ const RANGES = [
 ];
 
 export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráfico y Audiencia (GA4)' }: { filterPath?: string; mainTitle?: string }) {
-  const [range, setRange] = useState(RANGES[1]);
+  const [range, setRange] = useState(RANGES[1]); // Default 30 days
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +46,6 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
   useEffect(() => {
     fetchData(range.days);
   }, [range, filterPath]);
-
 
   const totals = useMemo(() => {
     if (!data.length) return { views: 0, users: 0, sessions: 0, bounceRate: 0, avgSession: 0 };
@@ -97,8 +96,6 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-
-      
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
           <div className="inline-flex gap-1 p-1.5 bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl backdrop-blur-sm shadow-sm transition-all duration-300 min-w-max">
@@ -195,57 +192,53 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
         </div>
       )}
 
-      {!filterPath && (
-        <>
-          {loading ? (
-            <div className="h-64 flex items-center justify-center border border-slate-200 dark:border-white/10 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
-              <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
-                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Vistas vs Usuarios</h3>
-                <p className="text-xs text-slate-500 mb-4">Páginas vistas frente a la cantidad de usuarios activos</p>
-                <ResponsiveContainer width="100%" height={250}>
-                  <AreaChart data={data}>
-                    <defs>
-                      <linearGradient id="colViews" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="colUsers" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
-                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
-                    <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
-                    <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
-                    <RechartsTooltip content={<CustomTooltip />} />
-                    <Area type="monotone" dataKey="views" name="Vistas" stroke="#3b82f6" fill="url(#colViews)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
-                    <Area type="monotone" dataKey="users" name="Usuarios" stroke="#8b5cf6" fill="url(#colUsers)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+      {loading ? (
+        <div className="h-64 flex items-center justify-center border border-slate-200 dark:border-white/10 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+          <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+            <h3 className="font-bold text-slate-900 dark:text-white mb-1">Vistas vs Usuarios</h3>
+            <p className="text-xs text-slate-500 mb-4">Páginas vistas frente a la cantidad de usuarios activos</p>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={data}>
+                <defs>
+                  <linearGradient id="colViews" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="colUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
+                <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
+                <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
+                <RechartsTooltip content={<CustomTooltip />} />
+                <Area type="monotone" dataKey="views" name="Vistas" stroke="#3b82f6" fill="url(#colViews)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                <Area type="monotone" dataKey="users" name="Usuarios" stroke="#8b5cf6" fill="url(#colUsers)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
 
-              <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
-                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Sesiones vs Tasa de Rebote</h3>
-                <p className="text-xs text-slate-500 mb-4">Cantidad de sesiones y el porcentaje de abandono</p>
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
-                    <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
-                    <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
-                    <YAxis yAxisId="right" orientation="right" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
-                    <RechartsTooltip content={<CustomTooltip />} />
-                    <Line yAxisId="left" type="monotone" dataKey="sessions" name="Sesiones" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
-                    <Line yAxisId="right" type="step" dataKey="bounceRate" name="Tasa de Rebote (%)" stroke="#f43f5e" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          )}
-        </>
+          <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+            <h3 className="font-bold text-slate-900 dark:text-white mb-1">Sesiones vs Tasa de Rebote</h3>
+            <p className="text-xs text-slate-500 mb-4">Cantidad de sesiones y el porcentaje de abandono</p>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
+                <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
+                <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
+                <RechartsTooltip content={<CustomTooltip />} />
+                <Line yAxisId="left" type="monotone" dataKey="sessions" name="Sesiones" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                <Line yAxisId="right" type="step" dataKey="bounceRate" name="Tasa de Rebote (%)" stroke="#f43f5e" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       )}
 
       {filterPath ? (
