@@ -260,7 +260,7 @@ export default function UsersManager() {
                             : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20'
                         }`}
                       >
-                        {user.is_banned ? 'Reactivar' : 'Baja'}
+                        {user.is_banned ? 'Reactivar' : 'Desincorporar'}
                       </button>
 
                       {user.is_banned && (
