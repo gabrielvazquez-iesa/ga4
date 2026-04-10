@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, Mail, Lock, Camera, Link as LinkIcon, Save, RefreshCw, ShieldCheck, Download } from 'lucide-react';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 import SecuritySettings from './SecuritySettings';
 
 interface ProfileData {
@@ -241,7 +241,10 @@ export default function ProfileManager() {
                     <button
                       key={color}
                       type="button"
-                      onClick={() => setProfile({...profile, custom_color: color})}
+                      onClick={() => {
+                        setProfile({...profile, custom_color: color});
+                        toast.info(`Color seleccionado. No olvides guardar los cambios.`);
+                      }}
                       className={`shrink-0 transition-all duration-300 ease-out snap-center focus:outline-none
                         ${profile.custom_color === color 
                           ? 'w-14 h-14 rounded-[16px] shadow-lg scale-105 border-2 border-slate-900/10 dark:border-white/20' 

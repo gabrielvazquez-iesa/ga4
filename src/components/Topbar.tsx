@@ -1,7 +1,7 @@
 import { Bell, Search, User, Check, Trash2, X, Calendar, ShieldCheck } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 import ThemeToggle from './ThemeToggle';
 
 interface Notification {
@@ -53,9 +53,8 @@ export default function Topbar() {
           setNotifications(prev => [payload.new as Notification, ...prev].slice(0, 10));
           
           // Disparamos un toast si la notificación es nueva
-          toast(payload.new.title, {
-            description: payload.new.message,
-            icon: payload.new.type === 'success' ? '✅' : payload.new.type === 'error' ? '❌' : '🔔',
+          toast.info(payload.new.title, {
+            description: payload.new.message
           });
         }
       )

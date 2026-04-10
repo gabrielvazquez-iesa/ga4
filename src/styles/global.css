@@ -62,3 +62,56 @@ body {
 .dark .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
   @apply border-white;
 }
+
+/* --- Responsive Overrides --- */
+@media (max-width: 640px) {
+  .grid {
+    gap: 1rem !important;
+  }
+}
+
+@media (max-width: 450px) {
+  /* Ajustes para Tablas Responsivas */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  /* Evitar que el contenido se salga de la pantalla */
+  main {
+    padding-bottom: 5rem !important; /* Espacio justo para no chocar con menús móviles si existen */
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Forzar que las tablas no rompan el layout */
+  table {
+    display: block;
+    width: 100%;
+  }
+
+  /* Ajustar tarjetas para móviles */
+  .rounded-3xl {
+    border-radius: 1.25rem !important;
+  }
+}
+  /* Reducir tamaño de fuentes grandes en móvil */
+  .text-3xl, .text-4xl, .text-5xl {
+    font-size: 1.5rem !important;
+    line-height: 2rem !important;
+  }
+
+  /* Ajustar paddings de cards para ganar espacio */
+  .p-4, .p-6, .p-8 {
+    padding: 0.75rem !important;
+  }
+
+  /* El sidebar móvil no debe tener márgenes excesivos */
+  #main-content {
+    padding-left: 0 !important;
+  }
+}

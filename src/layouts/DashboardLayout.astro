@@ -4,6 +4,7 @@ import '../styles/global.css';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
 import PresenceManager from '../components/PresenceManager';
+import NativeToaster from '../components/NativeToaster';
 
 interface Props {
   title: string;
@@ -52,17 +53,26 @@ const currentPath = Astro.url.pathname;
       applyTheme();
       document.addEventListener('astro:after-swap', applyTheme);
     </script>
+    <style is:global>
+      /* Asegurar visibilidad total de las alertas de Sonner */
+      [data-sonner-toaster] {
+        z-index: 1000000 !important;
+      }
+      .sonner-toast {
+        z-index: 1000001 !important;
+      }
+    </style>
 	</head>
 	<body class="bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased min-h-screen">
 		<!-- Sidebar for Desktop -->
 		<Sidebar client:load currentPath={currentPath} />
 
 		<!-- Main Content Wrapper -->
-		<div id="main-content" class="md:pl-64 flex flex-col min-h-screen transition-all duration-300 ease-in-out">
+		<div id="main-content" class="md:pl-64 flex flex-col min-h-screen transition-all duration-300 ease-in-out w-full overflow-x-hidden">
 			<PresenceManager client:load />
 			<Topbar client:load />
 			
-			<main class="flex-1 p-4 pb-32 md:p-8 md:pb-8">
+			<main class="flex-1 p-4 pb-40 md:p-8 md:pb-8 max-w-full">
 				<slot />
 			</main>
 		</div>
@@ -101,5 +111,8 @@ const currentPath = Astro.url.pathname;
         }
       });
     </script>
+
+    <!-- Sistema de Alertas Nativo (Alta prioridad) -->
+    <NativeToaster client:load />
 	</body>
 </html>

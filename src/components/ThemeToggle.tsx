@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react';
+import { nativeToast as toast } from './NativeToaster';
 
 export default function ThemeToggle() {
   const [isDark, setIsDark] = useState(true);
@@ -23,9 +24,11 @@ export default function ThemeToggle() {
     if (nextDark) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
+      toast.info('Modo Oscuro activado');
     } else {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
+      toast.info('Modo Claro activado');
     }
   };
 

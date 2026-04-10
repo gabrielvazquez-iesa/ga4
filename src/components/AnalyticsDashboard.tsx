@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { apiFetch } from '../lib/api-fetch';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Eye, Users, MousePointerClick, Clock, ArrowUpRight, ArrowDownRight, RefreshCw, BarChart2, TrendingUp, Calendar, Download, ChevronDown, BookOpen, GraduationCap, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 import MoMModule from './MoMModule';
 import EngagementModule from './EngagementModule';
 import PerformanceModule from './PerformanceModule';

@@ -5,6 +5,7 @@ import { Target, Clock, MousePointerClick, Search, Users, ExternalLink, ChevronL
 export default function EngagementModule({ days, filterPath }: { days: number; filterPath?: string }) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -12,12 +13,15 @@ export default function EngagementModule({ days, filterPath }: { days: number; f
   useEffect(() => {
     const fetchEngagement = async () => {
       setLoading(true);
+      setError(null);
       try {
         const res = await apiFetch(`/api/ga4-engagement?days=${days}${filterPath ? `&pathFilter=${filterPath}` : ''}`);
         const json = await res.json();
+        if (json.error) throw new Error(json.error);
         if (json.data) setData(json.data);
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
+        setError(err.message || 'No se pudieron cargar los datos de engagement.');
       } finally {
         setLoading(false);
       }
@@ -87,6 +91,8 @@ export default function EngagementModule({ days, filterPath }: { days: number; f
                   </td>
                 </tr>
               ))
+            ) : error ? (
+              <tr><td colSpan={6} className="px-6 py-12 text-center text-red-400 font-medium bg-red-500/10 rounded-3xl border border-red-500/20">{error}</td></tr>
             ) : filteredData.length === 0 ? (
               <tr><td colSpan={6} className="px-6 py-12 text-center text-slate-500 font-medium italic bg-slate-50 dark:bg-white/5 rounded-3xl">No se encontraron resultados para "{searchTerm}"</td></tr>
             ) : (

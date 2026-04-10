@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { apiFetch } from '../lib/api-fetch';
 import { KeyRound, Plus, Edit2, Trash2, Eye, EyeOff, Search, ExternalLink, RefreshCw, AlertCircle, LayoutGrid, List, Shield, ShieldAlert, ShieldCheck, User, Clock, LogOut } from 'lucide-react';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 

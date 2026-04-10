@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Calendar, Clock, User, Plus, Trash2, Edit2, ChevronLeft, ChevronRight, Bell, Shield } from 'lucide-react';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import DatePicker, { registerLocale } from 'react-datepicker';

@@ -6,14 +6,17 @@ import { Gauge } from 'lucide-react';
 export default function PerformanceModule({ days, filterPath }: { days: number; filterPath?: string }) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPerf = async () => {
       setLoading(true);
+      setError(null);
       try {
         const res = await apiFetch(`/api/ga4-performance?days=${days}${filterPath ? `&pathFilter=${filterPath}` : ''}`);
         const json = await res.json();
         
+        if (json.error) throw new Error(json.error);
         if (json.data) {
           // Format labels to DD/MM
           const formatted = json.data.map((d: any) => {
@@ -25,14 +28,15 @@ export default function PerformanceModule({ days, filterPath }: { days: number; 
           });
           setData(formatted);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
+        setError(err.message || 'Error al cargar datos de rendimiento.');
       } finally {
         setLoading(false);
       }
     };
     fetchPerf();
-  }, [days]);
+  }, [days, filterPath]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
@@ -65,6 +69,10 @@ export default function PerformanceModule({ days, filterPath }: { days: number; 
         {loading ? (
           <div className="w-full h-full flex items-center justify-center bg-slate-50/50 dark:bg-slate-800/30 rounded-xl border border-slate-100 dark:border-white/5 animate-pulse">
             <span className="text-slate-400 text-sm">Cargando Rendimiento...</span>
+          </div>
+        ) : error ? (
+          <div className="w-full h-full flex items-center justify-center text-red-500 bg-red-500/5 rounded-xl border border-red-500/10 p-6 text-center text-sm">
+            {error}
           </div>
         ) : data.length === 0 ? (
           <div className="w-full h-full flex items-center justify-center text-slate-500 text-sm">No hay datos disponibles.</div>

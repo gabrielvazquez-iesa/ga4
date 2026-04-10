@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, UserX, ShieldCheck, Search, KeyRound } from 'lucide-react';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 
 interface UserProfile {
   user_id: string;

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiFetch } from '../lib/api-fetch';
 import { supabase } from '../lib/supabase';
 import { Copy, Calendar, ShieldCheck, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 
 export default function MonthlyReport() {
   const [isAdmin, setIsAdmin] = useState(false);

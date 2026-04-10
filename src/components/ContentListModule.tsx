@@ -5,6 +5,7 @@ import { ExternalLink, Eye, Clock, FileText, TrendingUp, TrendingDown, Minus, Se
 export default function ContentListModule({ days, filterPath }: { days: number; filterPath: string }) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   // Nuevos estados
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,12 +15,15 @@ export default function ContentListModule({ days, filterPath }: { days: number; 
   useEffect(() => {
     const fetchList = async () => {
       setLoading(true);
+      setError(null);
       try {
         const res = await apiFetch(`/api/ga4-content-list?days=${days}&pathFilter=${filterPath}`);
         const json = await res.json();
+        if (json.error) throw new Error(json.error);
         if (json.data) setData(json.data);
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
+        setError(err.message || 'Error al cargar el listado de contenido.');
       } finally {
         setLoading(false);
       }
@@ -146,6 +150,12 @@ export default function ContentListModule({ days, filterPath }: { days: number; 
                   <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-16 mx-auto"></div></td>
                 </tr>
               ))
+            ) : error ? (
+              <tr>
+                <td colSpan={3} className="px-6 py-12 text-center text-red-500 bg-red-500/5 border-y border-red-500/10">
+                  {error}
+                </td>
+              </tr>
             ) : processedData.length === 0 ? (
               <tr>
                 <td colSpan={3} className="px-6 py-12 text-center text-slate-500">

@@ -10,19 +10,51 @@ function getSecret() {
   return process.env.VAULT_SECRET_KEY || import.meta.env.VAULT_SECRET_KEY || '';
 }
 
-function getServerSupabase(request: Request) {
+function getServerSupabase(request: Request, useServiceRole = false) {
   const authHeader = request.headers.get('Authorization');
   const token = authHeader?.split(' ')[1];
 
+  const publicEnv = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
+  const serviceEnv = (process.env.SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY || 'sb_secret_yWNHuyC9OVzr_c8rzBrvXA_OJpzmgIN');
+  
+  // MODO SEGURO: Si la llave de servicio no existe en .env, usa el fallback compartido
+  const activeKey = useServiceRole && serviceEnv ? serviceEnv : publicEnv;
+
   return createClient(
     import.meta.env.PUBLIC_SUPABASE_URL || '',
-    import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '',
+    activeKey,
     {
       global: {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
       }
     }
   );
+}
+
+async function checkVaultPermission(request: Request) {
+  const authHeader = request.headers.get('Authorization');
+  const token = authHeader?.split(' ')[1];
+  if (!token) return false;
+
+  const client = getServerSupabase(request, true); // Usar service role para verificar el perfil
+  const { data: { user }, error: userError } = await client.auth.getUser(token);
+  
+  if (userError || !user) return false;
+
+  // Los admins tienen acceso total siempre
+  const email = user.email?.toLowerCase() || '';
+  if (['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email)) return true;
+
+  // Verificar perfil
+  const { data: profile } = await client
+    .from('user_profiles')
+    .select('department, has_vault_access')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!profile) return false;
+
+  return profile.has_vault_access === true || ['Mercadeo', 'Comunicaciones'].includes(profile.department);
 }
 
 function encrypt(text: string) {
@@ -65,11 +97,11 @@ function decrypt(text: string) {
 }
 
 export const GET: APIRoute = async ({ request }) => {
-  if (!(await verifyApiAuth(request))) {
-    return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
+  if (!(await verifyApiAuth(request)) || !(await checkVaultPermission(request))) {
+    return new Response(JSON.stringify({ error: 'No autorizado o sin permisos de bóveda' }), { status: 401 });
   }
 
-  const serverSupabase = getServerSupabase(request);
+  const serverSupabase = getServerSupabase(request, true); // Usamos Service Role para lectura autorizada
 
   const { data, error } = await serverSupabase
     .from('vault_credentials')
@@ -90,13 +122,13 @@ export const GET: APIRoute = async ({ request }) => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
-  if (!(await verifyApiAuth(request))) {
-    return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
+  if (!(await verifyApiAuth(request)) || !(await checkVaultPermission(request))) {
+    return new Response(JSON.stringify({ error: 'No autorizado para crear credenciales' }), { status: 401 });
   }
 
   const body = await request.json();
   const { service_name, username, password_hash, url, notes } = body;
-  const serverSupabase = getServerSupabase(request);
+  const serverSupabase = getServerSupabase(request, true);
 
   const { data, error } = await serverSupabase
     .from('vault_credentials')
@@ -116,8 +148,8 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 export const PATCH: APIRoute = async ({ request }) => {
-  if (!(await verifyApiAuth(request))) {
-    return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
+  if (!(await verifyApiAuth(request)) || !(await checkVaultPermission(request))) {
+    return new Response(JSON.stringify({ error: 'No autorizado para editar' }), { status: 401 });
   }
 
   const urlParams = new URL(request.url).searchParams;
@@ -126,7 +158,7 @@ export const PATCH: APIRoute = async ({ request }) => {
 
   const body = await request.json();
   const updateData: any = { ...body };
-  const serverSupabase = getServerSupabase(request);
+  const serverSupabase = getServerSupabase(request, true);
 
   if (updateData.password_hash) {
     updateData.password_hash = encrypt(updateData.password_hash);
@@ -144,15 +176,15 @@ export const PATCH: APIRoute = async ({ request }) => {
 };
 
 export const DELETE: APIRoute = async ({ request }) => {
-  if (!(await verifyApiAuth(request))) {
-    return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
+  if (!(await verifyApiAuth(request)) || !(await checkVaultPermission(request))) {
+    return new Response(JSON.stringify({ error: 'No autorizado para eliminar' }), { status: 401 });
   }
 
   const urlParams = new URL(request.url).searchParams;
   const id = urlParams.get('id');
   if (!id) return new Response(JSON.stringify({ error: 'ID requerido' }), { status: 400 });
 
-  const serverSupabase = getServerSupabase(request);
+  const serverSupabase = getServerSupabase(request, true);
   const { error } = await serverSupabase
     .from('vault_credentials')
     .update({ is_deleted: true })

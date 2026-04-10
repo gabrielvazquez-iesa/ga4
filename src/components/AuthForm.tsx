@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Mail, Lock, LogIn, UserPlus, KeyRound, AlertCircle, CheckCircle2, Eye, EyeOff, Fingerprint, ShieldCheck } from 'lucide-react';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 
 export default function AuthForm() {
   const [mode, setMode] = useState<'login' | 'register' | 'recovery'>('login');
@@ -45,7 +45,10 @@ export default function AuthForm() {
           }, { onConflict: 'user_id' });
         }
 
-        toast.success('Inicio de sesión exitoso. Redirigiendo...');
+        sessionStorage.setItem('pending_toast', JSON.stringify({
+          message: '¡Bienvenido de nuevo! Sesión iniciada con éxito.',
+          type: 'success'
+        }));
         window.location.href = '/dashboard';
       } else if (mode === 'register') {
         const hasUpperCase = /[A-Z]/.test(password);

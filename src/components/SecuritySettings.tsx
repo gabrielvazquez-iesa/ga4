@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Shield, Fingerprint, Trash2, CheckCircle2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 
 export default function SecuritySettings() {
   const [factors, setFactors] = useState<any[]>([]);

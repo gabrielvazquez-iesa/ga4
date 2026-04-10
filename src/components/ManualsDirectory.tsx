@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Search, Plus, BookOpen, Trash2, ExternalLink, Tag, Edit3 } from 'lucide-react';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 
 export default function ManualsDirectory() {
   const [isAdmin, setIsAdmin] = useState(false);

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Fingerprint, X, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 
 export default function PasskeyBanner() {
   const [isVisible, setIsVisible] = useState(false);

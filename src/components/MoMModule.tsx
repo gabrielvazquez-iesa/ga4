@@ -5,24 +5,28 @@ import { ArrowUpRight, ArrowDownRight, Activity, Users, Percent } from 'lucide-r
 export default function MoMModule({ days, filterPath }: { days: number; filterPath?: string }) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMoM = async () => {
       setLoading(true);
+      setError(null);
       try {
         const res = await apiFetch(`/api/ga4-mom?days=${days}${filterPath ? `&pathFilter=${filterPath}` : ''}`);
         const json = await res.json();
+        if (json.error) throw new Error(json.error);
         if (json.data) setData(json.data);
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
+        setError(err.message || 'Error al cargar comparativa mensual.');
       } finally {
         setLoading(false);
       }
     };
     fetchMoM();
-  }, [days]);
+  }, [days, filterPath]);
 
-  if (loading || !data) {
+  if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-pulse">
         {[1, 2, 3].map(i => (
@@ -31,6 +35,16 @@ export default function MoMModule({ days, filterPath }: { days: number; filterPa
       </div>
     );
   }
+
+  if (error) {
+    return (
+      <div className="bg-red-500/5 border border-red-500/10 rounded-2xl p-6 text-center text-red-500 text-sm">
+        {error}
+      </div>
+    );
+  }
+
+  if (!data) return null;
 
   const { current, previous } = data;
 

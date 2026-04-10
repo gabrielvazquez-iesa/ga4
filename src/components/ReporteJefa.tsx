@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from '../lib/api-fetch';
 import { Copy, Check, Download, Calendar, RefreshCw, AlertTriangle } from 'lucide-react';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 
 const ROWS = [
   'Páginas vistas',

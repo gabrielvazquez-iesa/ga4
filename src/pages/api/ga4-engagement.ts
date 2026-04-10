@@ -26,32 +26,12 @@ export const GET: APIRoute = async ({ request }) => {
         { name: 'totalUsers' },
         { name: 'bounceRate' }
       ],
-      // Filter by click, purchase or register to measure interaction
       dimensionFilter: pathFilter ? {
-        andGroup: {
-          expressions: [
-            {
-              filter: {
-                fieldName: 'eventName',
-                inListFilter: { values: ['page_view', 'click', 'purchase', 'sign_up'] }
-              }
-            },
-            {
-              filter: {
-                fieldName: 'pagePathPlusQueryString',
-                stringFilter: { matchType: 'CONTAINS', value: pathFilter }
-              }
-            }
-          ]
-        }
-      } : {
         filter: {
-          fieldName: 'eventName',
-          inListFilter: {
-            values: ['page_view', 'click', 'purchase', 'sign_up'],
-          }
+          fieldName: 'pagePathPlusQueryString',
+          stringFilter: { matchType: 'CONTAINS', value: pathFilter }
         }
-      },
+      } : undefined,
       orderBys: [{ metric: { metricName: 'totalUsers' }, desc: true }],
       limit: 100,
     });
