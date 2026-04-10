@@ -4,7 +4,7 @@ import { Mail, Lock, LogIn, UserPlus, KeyRound, AlertCircle, CheckCircle2, Eye, 
 import { nativeToast as toast } from './NativeToaster';
 
 export default function AuthForm() {
-  const [mode, setMode] = useState<'login' | 'register' | 'recovery'>('login');
+  const [mode, setMode] = useState<'login' | 'register' | 'recovery' | 'success'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [department, setDepartment] = useState('Comunicaciones');
@@ -51,11 +51,9 @@ export default function AuthForm() {
         }));
         window.location.href = '/dashboard';
       } else if (mode === 'register') {
-        const hasUpperCase = /[A-Z]/.test(password);
-        const hasNumber = /[0-9]/.test(password);
-        
-        if (password.length < 8 || !hasUpperCase || !hasNumber) {
-          toast.error('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.');
+        const { score } = getPasswordStrength(password);
+        if (score < 3) {
+          toast.error('Por favor, elige una contraseña más fuerte.');
           setLoading(false);
           return;
         }
@@ -64,50 +62,61 @@ export default function AuthForm() {
           email, 
           password,
           options: {
-            data: { department }
+            data: { department },
+            emailRedirectTo: `${window.location.origin}/dashboard`
           }
         });
         
         if (error) throw error;
 
         if (data.user) {
-          // Registrar perfil
           await supabase.from('user_profiles').upsert({
             user_id: data.user.id,
             display_name: email.split('@')[0],
             department: department
           });
 
-          // Enviar notificación a los admins
           await supabase.from('system_notifications').insert([{
             title: 'Nuevo Registro',
             message: `El usuario ${email} se ha registrado bajo el área de ${department}.`,
             is_read: false
           }]);
         }
-
-        toast.success(
-          '¡Registro exitoso! Por favor, revisa la bandeja de entrada de tu correo institucional para verificar la cuenta.', 
-          { duration: 8000 }
-        );
-        setMode('login');
-        setPassword('');
+        
+        setMode('success');
       } else if (mode === 'recovery') {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
         if (error) throw error;
-        toast.success('Se han enviado las instrucciones a tu correo.', {
-          duration: 5000,
-        });
+        toast.success('Se han enviado las instrucciones a tu correo.');
         setMode('login');
       }
     } catch (error: any) {
-      toast.error(error.message || 'Ha ocurrido un error durante la autenticación.');
+      toast.error(error.message || 'Error en la autenticación.');
     } finally {
       setLoading(false);
     }
   };
+
+  const getPasswordStrength = (pass: string) => {
+    if (!pass) return { score: 0, label: '', color: 'bg-slate-200' };
+    let score = 0;
+    if (pass.length >= 8) score++;
+    if (/[A-Z]/.test(pass)) score++;
+    if (/[0-9]/.test(pass)) score++;
+    if (/[^A-Za-z0-9]/.test(pass)) score++;
+    
+    const levels = [
+      { label: 'Muy débil', color: 'bg-rose-500' },
+      { label: 'Débil', color: 'bg-orange-500' },
+      { label: 'Normal', color: 'bg-amber-500' },
+      { label: 'Fuerte', color: 'bg-emerald-500' }
+    ];
+    return { score, ...levels[score - 1] || levels[0] };
+  };
+
+  const strength = getPasswordStrength(password);
 
   const handlePasskeyLogin = async () => {
     if (!email) {
@@ -123,28 +132,29 @@ export default function AuthForm() {
 
     setLoading(true);
     try {
-      // 1. Obtener los factores del usuario primero (requiere email)
-      // En un flujo MFA real de Supabase, esto suele requerir un login parcial 
-      // o un desafío de factor. Para simplificar y usar la biometría como acceso rápido:
-      
+      // Intento de listar factores (MFA)
+      // Nota técnica: Supabase requiere una sesión parcial o completa para listar factores.
+      // La biometría suele ser un segundo paso.
       const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
       
-      if (factorsError) throw factorsError;
+      if (factorsError) {
+        // Si no hay sesión, informamos al usuario sobre la limitación técnica
+        if (factorsError.message.includes('not found') || factorsError.status === 401) {
+          throw new Error("La huella es un método de seguridad adicional. Por favor, inicia sesión con tu contraseña primero para configurarla o usarla en este dispositivo.");
+        }
+        throw factorsError;
+      }
       
       const webAuthnFactor = factors?.all.find(f => f.factor_type === 'webauthn' && f.status === 'verified');
       
       if (!webAuthnFactor) {
-        throw new Error("No se encontró una huella registrada para este dispositivo. Inicia sesión normalmente y regístrala.");
+        throw new Error("No se encontró una huella registrada para este dispositivo. Inicia sesión normalmente y regístrala en tu perfil.");
       }
 
-      // 2. Iniciar el desafío (Challenge)
-      const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
-        factorId: webAuthnFactor.id
-      });
-
+      // Desafío y verificación...
+      const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: webAuthnFactor.id });
       if (challengeError) throw challengeError;
 
-      // 3. Verificar con la huella
       const { data: verifyData, error: verifyError } = await supabase.auth.mfa.verify({
         factorId: webAuthnFactor.id,
         challengeId: challenge.id,
@@ -157,7 +167,7 @@ export default function AuthForm() {
         window.location.href = '/dashboard';
       }
     } catch (error: any) {
-      toast.error(error.message || 'Error en la autenticación biométrica.');
+      toast.info(error.message || 'Error en la autenticación biométrica.');
     } finally {
       setLoading(false);
     }
@@ -179,6 +189,44 @@ export default function AuthForm() {
       toast.error(error.message || 'Error al conectar con Google.');
     }
   };
+
+  if (mode === 'success') {
+    return (
+      <div className="w-full max-w-md p-8 md:p-10 space-y-8 bg-white dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2rem] shadow-xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] relative overflow-hidden text-center animate-in fade-in zoom-in duration-500">
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+        
+        <div className="flex justify-center">
+          <div className="relative">
+            <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full"></div>
+            <div className="relative p-6 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+              <CheckCircle2 className="w-16 h-16 text-emerald-500" />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">¡Revisa tu correo!</h2>
+          <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
+            Hemos enviado un enlace de confirmación a <span className="font-bold text-slate-900 dark:text-white">{email}</span>. 
+            Por favor, confirma tu cuenta para poder acceder al Dashboard.
+          </p>
+        </div>
+
+        <div className="pt-4">
+          <button 
+            onClick={() => setMode('login')}
+            className="w-full py-4 px-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold transition-all hover:scale-[1.02] active:scale-95 shadow-xl"
+          >
+            Volver al Inicio
+          </button>
+        </div>
+        
+        <p className="text-xs text-slate-400 pt-4">
+          ¿No recibiste nada? Revisa tu carpeta de spam o contacta a soporte.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md p-8 md:p-10 space-y-8 bg-white dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2rem] shadow-xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] relative overflow-hidden">
@@ -279,6 +327,25 @@ export default function AuthForm() {
             </div>
           )}
 
+          {mode === 'register' && password && (
+            <div className="space-y-2 px-1 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex gap-1.5 h-1.5">
+                {[1, 2, 3, 4].map((i) => (
+                  <div 
+                    key={i} 
+                    className={`flex-1 rounded-full transition-all duration-500 ${i <= strength.score ? strength.color : 'bg-slate-200 dark:bg-white/5'}`}
+                  />
+                ))}
+              </div>
+              <div className="flex justify-between items-center">
+                <span className={`text-[10px] font-black uppercase tracking-widest ${strength.color.replace('bg-', 'text-')}`}>
+                  {strength.label}
+                </span>
+                <span className="text-[10px] text-slate-500 font-bold uppercase">Seguridad</span>
+              </div>
+            </div>
+          )}
+
           {mode === 'register' && (
             <div className="space-y-4 mb-4 mt-4">
               <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-1">Área de la Empresa</label>
@@ -304,7 +371,7 @@ export default function AuthForm() {
 
         <button 
           type="submit" 
-          disabled={loading}
+          disabled={loading || (mode === 'register' && strength.score < 3)}
           className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-400 text-white py-3.5 rounded-xl font-bold transition-all disabled:opacity-50 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] disabled:hover:shadow-none"
         >
           {loading ? (
@@ -316,6 +383,11 @@ export default function AuthForm() {
             </>
           )}
         </button>
+        {mode === 'register' && (
+          <p className="text-[10px] text-center text-slate-500 dark:text-slate-400 italic px-4">
+            * Al registrarte, recibirás un correo de confirmación obligatorio de Supabase para activar tu cuenta.
+          </p>
+        )}
       </form>
 
       <div className="text-center relative z-10 pt-2">
