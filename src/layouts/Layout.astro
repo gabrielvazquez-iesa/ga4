@@ -2,7 +2,7 @@
 
 import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
-import { Toaster } from 'sonner';
+import NativeToaster from '../components/NativeToaster';
 
 interface Props {
   title: string;
@@ -42,6 +42,6 @@ const { title } = Astro.props;
 	</head>
 	<body>
 		<slot />
-    <Toaster client:only="react" transition:persist position="top-right" richColors theme="system" closeButton expand />
+    <NativeToaster client:load transition:persist />
 	</body>
 </html>

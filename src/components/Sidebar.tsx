@@ -49,6 +49,10 @@ export default function Sidebar({ currentPath }: SidebarProps) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    sessionStorage.setItem('pending_toast', JSON.stringify({
+      message: 'Has cerrado sesión correctamente. ¡Vuelve pronto!',
+      type: 'info'
+    }));
     window.location.href = '/login';
   };
 
