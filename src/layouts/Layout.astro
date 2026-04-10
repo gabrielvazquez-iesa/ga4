@@ -38,6 +38,7 @@ const { title } = Astro.props;
 
       applyTheme();
       document.addEventListener('astro:after-swap', applyTheme);
+      console.log("%c LAYOUT_LOADED: v3.0 ", "color: #3b82f6; font-weight: bold;");
     </script>
 	</head>
 	<body>
