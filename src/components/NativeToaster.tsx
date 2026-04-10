@@ -38,16 +38,21 @@ export default function NativeToaster() {
     // Export globally for non-react parts
     (window as any).showNativeToast = (msg: string, type: ToastType) => addToast({ message: msg, type });
 
-    // --- NEW: Persistencia entre páginas ---
-    const pending = sessionStorage.getItem('pending_toast');
-    if (pending) {
-      try {
-        const { message, type } = JSON.parse(pending);
-        addToast({ message, type });
-        sessionStorage.removeItem('pending_toast');
-      } catch (e) { /* ignore */ }
-    }
-    // ---------------------------------------
+    // --- NEW: Persistencia entre páginas con retardo para asegurar animación ---
+    const checkPending = () => {
+      const pending = sessionStorage.getItem('pending_toast');
+      if (pending) {
+        try {
+          const { message, type } = JSON.parse(pending);
+          addToast({ message, type });
+          sessionStorage.removeItem('pending_toast');
+        } catch (e) { /* ignore */ }
+      }
+    };
+    
+    const timeoutId = setTimeout(checkPending, 200);
+    return () => clearTimeout(timeoutId);
+    // -------------------------------------------------------------------------
   }, [addToast]);
 
   return (

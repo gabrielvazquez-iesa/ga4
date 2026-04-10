@@ -4,6 +4,8 @@ import { Mail, Lock, LogIn, UserPlus, KeyRound, AlertCircle, CheckCircle2, Eye, 
 import { nativeToast as toast } from './NativeToaster';
 
 export default function AuthForm() {
+  console.log("%c AUTH_FORM_VERSION: 2.2 ", "background: #3b82f6; color: white; font-weight: bold; border-radius: 4px; padding: 2px 5px;");
+  
   const [mode, setMode] = useState<'login' | 'register' | 'recovery' | 'success'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
