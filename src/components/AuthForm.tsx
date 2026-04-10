@@ -75,7 +75,8 @@ export default function AuthForm() {
           await supabase.from('user_profiles').upsert({
             user_id: data.user.id,
             display_name: email.split('@')[0],
-            department: department
+            department: department,
+            email: email.toLowerCase() // Nuevo campo para visualización administrativa
           });
 
           await supabase.from('system_notifications').insert([{

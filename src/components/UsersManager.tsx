@@ -5,6 +5,7 @@ import { nativeToast as toast } from './NativeToaster';
 
 interface UserProfile {
   user_id: string;
+  email?: string;
   display_name: string;
   department: string;
   has_vault_access: boolean;
@@ -39,7 +40,7 @@ export default function UsersManager() {
     setLoading(true);
     const { data, error } = await supabase
       .from('user_profiles')
-      .select('user_id, display_name, department, has_vault_access, avatar_url, is_banned, last_seen')
+      .select('user_id, email, display_name, department, has_vault_access, avatar_url, is_banned, last_seen')
       .order('display_name');
     if (error) toast.error('No pudimos cargar la lista de usuarios. Por favor, refresca la página.');
     else setUsers(data || []);
@@ -75,9 +76,35 @@ export default function UsersManager() {
       fetchUsers();
     }
   };
+  
+  const deleteUserPermanently = async (userId: string, name: string) => {
+    if (!window.confirm(`⚠️ ADVERTENCIA CRÍTICA: ¿Estás ABSOLUTAMENTE SEGURO de eliminar definitivamente a ${name}? \n\nEsta acción NO se puede deshacer y borrará permanentemente su cuenta de acceso y todo su perfil del sistema.`)) return;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    try {
+      const resp = await fetch(`/api/delete-user?userId=${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session?.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const resData = await resp.json();
+      
+      if (!resp.ok) throw new Error(resData.error || 'Error al eliminar');
+
+      toast.success('¡Usuario eliminado permanentemente del sistema!');
+      fetchUsers();
+    } catch (err: any) {
+      toast.error(err.message || 'Error al procesar la eliminación definitiva.');
+    }
+  };
 
   const filteredUsers = users.filter(u => {
     const matchesSearch = (u.display_name || '').toLowerCase().includes(search.toLowerCase()) ||
+                          (u.email || '').toLowerCase().includes(search.toLowerCase()) ||
                           (u.department || '').toLowerCase().includes(search.toLowerCase());
     const matchesTab = activeTab === 'active' ? !u.is_banned : u.is_banned;
     return matchesSearch && matchesTab;
@@ -149,10 +176,11 @@ export default function UsersManager() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-white/5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                <th className="py-3 px-6 w-1/3">Usuario</th>
-                <th className="py-3 px-6 w-1/4">Departamento</th>
-                <th className="py-3 px-6 text-center w-24">Bóveda</th>
-                <th className="py-3 px-6 text-center w-32">Acciones</th>
+                <th className="py-3 px-6 w-[20%]">Usuario</th>
+                <th className="py-3 px-6 w-[25%]">Correo</th>
+                <th className="py-3 px-6 w-[15%] text-center">Departamento</th>
+                <th className="py-3 px-6 text-center w-20">Bóveda</th>
+                <th className="py-3 px-6 text-center w-[25%]">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-white/5">
@@ -177,6 +205,13 @@ export default function UsersManager() {
                         </p>
                       </div>
                     </div>
+                  </td>
+
+                  {/* Email */}
+                  <td className="py-4 px-6">
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 break-all">
+                      {user.email || '—'}
+                    </p>
                   </td>
 
                   {/* Department */}
@@ -206,16 +241,28 @@ export default function UsersManager() {
 
                   {/* Actions */}
                   <td className="py-4 px-6 text-center">
-                    <button
-                      onClick={() => toggleBanStatus(user.user_id, user.is_banned)}
-                      className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
-                        user.is_banned
-                          ? 'bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20'
-                          : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20'
-                      }`}
-                    >
-                      {user.is_banned ? 'Reactivar' : 'Desincorporar'}
-                    </button>
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => toggleBanStatus(user.user_id, user.is_banned)}
+                        className={`text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-all ${
+                          user.is_banned
+                            ? 'bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20'
+                            : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20'
+                        }`}
+                      >
+                        {user.is_banned ? 'Reactivar' : 'Baja'}
+                      </button>
+
+                      {user.is_banned && (
+                        <button
+                          onClick={() => deleteUserPermanently(user.user_id, user.display_name)}
+                          className="p-1.5 bg-rose-600/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-600/20 rounded-lg transition-all"
+                          title="ELIMINACIÓN DEFINITIVA"
+                        >
+                          <UserX className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
