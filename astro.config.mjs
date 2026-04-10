@@ -12,6 +12,12 @@ export default defineConfig({
   integrations: [react()],
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    optimizeDeps: {
+      exclude: ['@tailwindcss/vite']
+    },
+    build: {
+      cssMinify: 'lightningcss',
+    }
   }
-});
+});

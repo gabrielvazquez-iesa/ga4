@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Search, Plus, BookOpen, Trash2, ExternalLink, Tag, Edit3 } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 
 export default function ManualsDirectory() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -11,6 +11,7 @@ export default function ManualsDirectory() {
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCat, setSelectedCat] = useState('');
   const [uploading, setUploading] = useState(false);
+
 
   // Upload modal
   const [showModal, setShowModal] = useState(false);
@@ -46,8 +47,10 @@ export default function ManualsDirectory() {
   };
 
   const handleUpload = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file || !newTitle || !newCategory) return toast.error('Rellena todos los campos');
+    if (!file || !newTitle || !newCategory) {
+      toast.error('Opps, por favor rellena todos los campos antes de subir el manual.');
+      return;
+    }
     setUploading(true);
 
     try {
@@ -70,14 +73,14 @@ export default function ManualsDirectory() {
       });
       if (dbError) throw new Error('Error guardando registro. ¿Corriste el Script SQL?: ' + dbError.message);
 
-      toast.success('Manual subido y listado exitosamente');
+      toast.success('¡Enhorabuena! El manual ha sido publicado y ya está disponible para el equipo.');
       setShowModal(false);
       setNewTitle('');
       setNewCategory('');
       setFile(null);
       fetchManuals();
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error('Lo sentimos, hubo un problema al subir el archivo. Por favor, verifica el formato e inténtalo de nuevo.');
     } finally {
       setUploading(false);
     }
@@ -88,9 +91,9 @@ export default function ManualsDirectory() {
     try {
       await supabase.from('process_manuals').delete().eq('id', id);
       fetchManuals();
-      toast.success('Manual eliminado correctamente.');
+      toast.success('El manual ha sido retirado del directorio correctamente.');
     } catch (err: any) {
-      toast.error('Error al borrar: ' + err.message);
+      toast.error('No pudimos eliminar el manual en este momento. Por favor, intenta más tarde.');
     }
   };
 
@@ -107,11 +110,11 @@ export default function ManualsDirectory() {
       
       if (error) throw new Error('Error al actualizar: ' + error.message);
       
-      toast.success('Manual modificado.');
+      toast.success('¡Hecho! Los cambios en el manual se han guardado con éxito.');
       setEditId(null);
       fetchManuals();
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error('Vaya, no pudimos actualizar el manual. Por favor, intenta de nuevo.');
     } finally {
       setUploading(false);
     }
@@ -130,7 +133,6 @@ export default function ManualsDirectory() {
 
   return (
     <div className="space-y-6">
-      <Toaster position="top-right" theme="dark" />
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/80 dark:bg-slate-900/60 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-white/5 backdrop-blur-sm">
         <div>
@@ -271,6 +273,7 @@ export default function ManualsDirectory() {
           </form>
         </div>
       )}
+      {/* Modals close here */}
     </div>
   );
 }

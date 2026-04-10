@@ -22,7 +22,9 @@ export const GET: APIRoute = async ({ request }) => {
       metrics: [
         { name: 'averageSessionDuration' },
         { name: 'userEngagementDuration' },
-        { name: 'eventCount' }
+        { name: 'eventCount' },
+        { name: 'totalUsers' },
+        { name: 'bounceRate' }
       ],
       // Filter by click, purchase or register to measure interaction
       dimensionFilter: pathFilter ? {
@@ -31,7 +33,7 @@ export const GET: APIRoute = async ({ request }) => {
             {
               filter: {
                 fieldName: 'eventName',
-                inListFilter: { values: ['click', 'purchase', 'sign_up'] }
+                inListFilter: { values: ['page_view', 'click', 'purchase', 'sign_up'] }
               }
             },
             {
@@ -46,12 +48,12 @@ export const GET: APIRoute = async ({ request }) => {
         filter: {
           fieldName: 'eventName',
           inListFilter: {
-            values: ['click', 'purchase', 'sign_up'],
+            values: ['page_view', 'click', 'purchase', 'sign_up'],
           }
         }
       },
-      orderBys: [{ metric: { metricName: 'userEngagementDuration' }, desc: true }],
-      limit: 50,
+      orderBys: [{ metric: { metricName: 'totalUsers' }, desc: true }],
+      limit: 100,
     });
 
     const rows = response.rows?.map(row => {
@@ -59,13 +61,15 @@ export const GET: APIRoute = async ({ request }) => {
       const avgDuration = Number(row.metricValues?.[0]?.value || 0);
       const engDuration = Number(row.metricValues?.[1]?.value || 0);
       const events = Number(row.metricValues?.[2]?.value || 0);
+      const users = Number(row.metricValues?.[3]?.value || 0);
+      const bounceRate = Number(row.metricValues?.[4]?.value || 0);
       
       // Lógica de Score de Efectividad (0-100)
-      // Basado libremente en duration y events. Normalmente normalizaríamos al máximo valor, pero aquí usamos un cálculo seguro:
-      let score = Math.min(100, Math.round((events * 1.5) + (avgDuration / 10)));
+      // Ahora incluimos los usuarios en la efectividad
+      let score = Math.min(100, Math.round((events * 1.5) + (users * 0.5) + (avgDuration / 10)));
       if (score < 0) score = 0;
 
-      return { path, avgDuration, engDuration, events, score };
+      return { path, avgDuration, engDuration, events, users, bounceRate, score };
     }) || [];
 
     return new Response(JSON.stringify({ data: rows }), { 

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { User, Mail, Lock, Camera, Link as LinkIcon, Save, RefreshCw, ShieldCheck } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { User, Mail, Lock, Camera, Link as LinkIcon, Save, RefreshCw, ShieldCheck, Download } from 'lucide-react';
+import { toast } from 'sonner';
+import SecuritySettings from './SecuritySettings';
 
 interface ProfileData {
   id?: string;
@@ -35,9 +36,29 @@ export default function ProfileManager() {
     twitter_url: ''
   });
 
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
   useEffect(() => {
     loadUser();
+    
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      console.log('Capture PWA prompt');
+    };
+    
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
 
   const loadUser = async () => {
     setLoading(true);
@@ -91,15 +112,15 @@ export default function ProfileManager() {
       
       if (error) {
         if (error.code === '42P01') {
-          toast.error('La tabla user_profiles no existe en la base de datos.');
+          toast.error('Parece que el sistema de perfiles no está disponible en la base de datos. Por favor, contacta a soporte.');
         } else {
           throw error;
         }
       } else {
-        toast.success('Perfil actualizado correctamente.');
+        toast.success('¡Genial! Tu perfil se ha actualizado con éxito.');
       }
     } catch (error: any) {
-      toast.error('Error al guardar: ' + error.message);
+      toast.error('Lo sentimos, no pudimos guardar los cambios. Por favor, verifica tu conexión e inténtalo de nuevo.');
     } finally {
       setSaving(false);
     }
@@ -108,11 +129,11 @@ export default function ProfileManager() {
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword.length < 6) {
-      toast.error('La contraseña debe tener al menos 6 caracteres');
+      toast.error('La seguridad es importante: la contraseña debe tener al menos 6 caracteres.');
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error('Las contraseñas no coinciden');
+      toast.error('Las contraseñas no coinciden. Por favor, asegúrate de que sean iguales.');
       return;
     }
 
@@ -120,11 +141,11 @@ export default function ProfileManager() {
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
-      toast.success('Contraseña actualizada con éxito');
+      toast.success('¡Listo! Tu contraseña ha sido cambiada correctamente.');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: any) {
-      toast.error('Error al cambiar contraseña: ' + error.message);
+      toast.error('Hubo un pequeño error al actualizar tu contraseña. Reinténtalo en unos momentos.');
     } finally {
       setSaving(false);
     }
@@ -136,7 +157,6 @@ export default function ProfileManager() {
 
   return (
     <div className="space-y-8">
-      <Toaster theme="system" richColors position="top-right" />
 
       {/* Header Profile Card */}
       <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl p-8 backdrop-blur-sm shadow-xl flex flex-col md:flex-row gap-8 items-center md:items-start relative overflow-hidden">
@@ -265,18 +285,9 @@ export default function ProfileManager() {
                 </button>
               </div>
             </form>
-
-            {/* PWA Passkey Placeholder */}
-            <div className="mt-8 pt-6 border-t border-slate-200 dark:border-white/10">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-green-500" /> Inicio Rápido (Biometría)</h4>
-              <p className="text-xs text-slate-500 mb-4">Configura FaceID, TouchID o PIN de tu dispositivo para iniciar sin contraseña en futuras sesiones.</p>
-              <button type="button" onClick={() => toast.success('Preparado para arquitectura WebAuthn en próxima fase.')} className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 font-medium transition-colors text-sm">
-                Activar Passkey en este dispositivo
-              </button>
-            </div>
           </div>
 
-          {/* Preferences */}
+          {/* Preferencias */}
           <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-xl">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Preferencias</h3>
             <div className="p-4 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-950/50 flex justify-between items-center">
@@ -290,6 +301,29 @@ export default function ProfileManager() {
               </label>
             </div>
           </div>
+
+          {/* Configuración Biométrica Nativa Avanzada */}
+          <SecuritySettings />
+
+          {/* PWA Install App */}
+          {deferredPrompt && (
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl animate-in fade-in slide-in-from-bottom-4 transition-all">
+              <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
+                <RefreshCw className="w-5 h-5 text-blue-200" />
+                Lleva GA4 Dashboard contigo
+              </h3>
+              <p className="text-sm text-blue-100 mb-4 opacity-90">
+                Instala la aplicación en tu pantalla de inicio para un acceso rápido y seguro a tus métricas.
+              </p>
+              <button 
+                onClick={handleInstallClick}
+                className="w-full bg-white text-blue-700 font-extrabold py-3.5 rounded-xl hover:bg-blue-50 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2"
+              >
+                <Download className="w-5 h-5" />
+                Instalar Aplicación
+              </button>
+            </div>
+          )}
         </div>
 
       </div>

@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, UserX, ShieldCheck, Search, KeyRound } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 
 interface UserProfile {
   user_id: string;
@@ -10,6 +10,7 @@ interface UserProfile {
   has_vault_access: boolean;
   avatar_url?: string;
   is_banned?: boolean;
+  last_seen?: string;
 }
 
 export default function UsersManager() {
@@ -17,6 +18,7 @@ export default function UsersManager() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<'active' | 'banned'>('active');
   
   // Edit logic
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
@@ -37,9 +39,9 @@ export default function UsersManager() {
     setLoading(true);
     const { data, error } = await supabase
       .from('user_profiles')
-      .select('user_id, display_name, department, has_vault_access, avatar_url, is_banned')
+      .select('user_id, display_name, department, has_vault_access, avatar_url, is_banned, last_seen')
       .order('display_name');
-    if (error) toast.error('Error al cargar los usuarios.');
+    if (error) toast.error('No pudimos cargar la lista de usuarios. Por favor, refresca la página.');
     else setUsers(data || []);
     setLoading(false);
   };
@@ -49,8 +51,8 @@ export default function UsersManager() {
     if (!window.confirm(`¿Estás seguro de que deseas ${action} a este usuario?`)) return;
 
     const { error } = await supabase.from('user_profiles').update({ is_banned: !current }).eq('user_id', userId);
-    if (error) toast.error('Error: ' + error.message);
-    else { toast.success(`Usuario ${!current ? 'desincorporado' : 'reactivado'} con éxito.`); fetchUsers(); }
+    if (error) toast.error('Hubo un pequeño inconveniente al cambiar el estado del usuario.');
+    else { toast.success(`¡Hecho! El usuario ha sido ${!current ? 'desincorporado' : 'reactivado'} correctamente.`); fetchUsers(); }
   };
 
   const toggleVaultAccess = async (userId: string, current: boolean) => {
@@ -58,26 +60,36 @@ export default function UsersManager() {
     if (!window.confirm(`¿Deseas ${action} el acceso a la bóveda para este usuario?`)) return;
 
     const { error } = await supabase.from('user_profiles').update({ has_vault_access: !current }).eq('user_id', userId);
-    if (error) toast.error('Error: ' + error.message);
-    else { toast.success(`Acceso a bóveda ${!current ? 'concedido' : 'revocado'} correctamente.`); fetchUsers(); }
+    if (error) toast.error('No fue posible modificar los permisos en este momento.');
+    else { toast.success(`¡Listo! El acceso a la bóveda ha sido ${!current ? 'concedido' : 'revocado'} exitosamente.`); fetchUsers(); }
   };
 
   const handleUpdateDept = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingUser) return;
     const { error } = await supabase.from('user_profiles').update({ department: newDept }).eq('user_id', editingUser.user_id);
-    if (error) toast.error('Error: ' + error.message);
+    if (error) toast.error('Lo sentimos, no pudimos actualizar el departamento. Inténtalo de nuevo.');
     else {
-      toast.success('Departamento actualizado con éxito.');
+      toast.success('¡Perfecto! El departamento se ha actualizado sin problemas.');
       setEditingUser(null);
       fetchUsers();
     }
   };
 
-  const filteredUsers = users.filter(u =>
-    (u.display_name || '').toLowerCase().includes(search.toLowerCase()) ||
-    (u.department || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = (u.display_name || '').toLowerCase().includes(search.toLowerCase()) ||
+                          (u.department || '').toLowerCase().includes(search.toLowerCase());
+    const matchesTab = activeTab === 'active' ? !u.is_banned : u.is_banned;
+    return matchesSearch && matchesTab;
+  });
+
+  const isOnline = (lastSeen?: string) => {
+    if (!lastSeen) return false;
+    const lastSeenDate = new Date(lastSeen);
+    const now = new Date();
+    const diffMinutes = (now.getTime() - lastSeenDate.getTime()) / (1000 * 60);
+    return diffMinutes < 5; // Verde si estuvo activo en los últimos 5 mins
+  };
 
   if (!loading && !isAdmin) {
     return (
@@ -93,18 +105,34 @@ export default function UsersManager() {
 
   return (
     <div className="space-y-6">
-      <Toaster theme="dark" position="top-right" />
 
-      {/* Search */}
-      <div className="flex bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-xl items-center px-4 py-2 w-full max-w-md shadow-sm">
-        <Search className="w-4 h-4 text-slate-400 shrink-0 mr-3" />
-        <input
-          type="text"
-          placeholder="Buscar por nombre o departamento..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="bg-transparent outline-none text-sm text-slate-900 dark:text-white placeholder-slate-500 w-full"
-        />
+      {/* Tabs and Search */}
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="flex bg-white/80 dark:bg-slate-900/60 p-1 border border-slate-200 dark:border-white/10 rounded-2xl w-full md:w-auto">
+          <button 
+            onClick={() => setActiveTab('active')}
+            className={`flex-1 md:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'active' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 hover:text-slate-700 dark:hover:text-white'}`}
+          >
+            Usuarios Activos
+          </button>
+          <button 
+            onClick={() => setActiveTab('banned')}
+            className={`flex-1 md:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'banned' ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'text-slate-500 hover:text-slate-700 dark:hover:text-white'}`}
+          >
+            Desincorporados
+          </button>
+        </div>
+
+        <div className="flex bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-xl items-center px-4 py-2 w-full max-w-md shadow-sm">
+          <Search className="w-4 h-4 text-slate-400 shrink-0 mr-3" />
+          <input
+            type="text"
+            placeholder="Buscar por nombre o departamento..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="bg-transparent outline-none text-sm text-slate-900 dark:text-white placeholder-slate-500 w-full"
+          />
+        </div>
       </div>
 
       {loading ? (
@@ -133,14 +161,20 @@ export default function UsersManager() {
                   {/* Avatar + Name */}
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 overflow-hidden">
-                        {user.avatar_url
-                          ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
-                          : <User className="w-4 h-4 text-blue-400" />}
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
+                          {user.avatar_url
+                            ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                            : <User className="w-5 h-5 text-blue-400" />}
+                        </div>
+                        {/* Status Dot */}
+                        <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white dark:border-slate-900 rounded-full ${isOnline(user.last_seen) ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-slate-400 dark:bg-slate-600'}`} />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900 dark:text-white text-sm">{user.display_name || 'Sin nombre'}</p>
-                        {user.is_banned && <span className="text-[10px] text-red-400 font-bold uppercase">Desincorporado</span>}
+                        <p className="font-bold text-slate-900 dark:text-white text-sm leading-tight">{user.display_name || 'Sin nombre'}</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider mt-0.5">
+                          {isOnline(user.last_seen) ? 'En Línea' : 'Desconectado'}
+                        </p>
                       </div>
                     </div>
                   </td>
@@ -202,17 +236,14 @@ export default function UsersManager() {
             <h2 className="text-xl font-bold mb-6 text-slate-900 dark:text-white text-center">Editar Departamento</h2>
             <p className="text-sm text-slate-500 mb-6 text-center">Asignar área para: <b>{editingUser.display_name}</b></p>
             
-            <select 
-              required
-              value={newDept} 
-              onChange={e => setNewDept(e.target.value)} 
-              className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-xl outline-none focus:ring-2 focus:ring-blue-500/50 mb-6 font-medium appearance-none cursor-pointer"
-            >
-              <option value="" disabled>Seleccionar departamento...</option>
-              {['Mercadeo', 'Comunicaciones', 'Tecnología', 'Ventas', 'Innovación', 'Incompany', 'RRHH'].map(d => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
+            <div className="mb-6">
+              <CustomSelect
+                value={newDept}
+                onChange={v => setNewDept(v)}
+                placeholder="Seleccionar departamento..."
+                options={['Mercadeo', 'Comunicaciones', 'Tecnología', 'Ventas', 'Innovación', 'Incompany', 'RRHH'].map(d => ({ value: d, label: d }))}
+              />
+            </div>
 
             <div className="flex gap-3">
               <button type="button" onClick={() => setEditingUser(null)} className="flex-1 py-3.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-500 font-bold hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
@@ -223,6 +254,62 @@ export default function UsersManager() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Custom styled dropdown ────────────────────────
+interface SelectOption { value: string; label: string; }
+function CustomSelect({ value, onChange, options, placeholder }: {
+  value: string;
+  onChange: (v: string) => void;
+  options: SelectOption[];
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = options.find(o => o.value === value);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 py-3 px-4 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all cursor-pointer"
+      >
+        <span className={selected ? '' : 'text-slate-400'}>{selected?.label || placeholder || 'Seleccionar...'}</span>
+        <svg className={`w-4 h-4 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+      </button>
+      {open && (
+        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-56 overflow-y-auto">
+          {placeholder && (
+            <button type="button" onClick={() => { onChange(''); setOpen(false); }}
+              className="w-full text-left px-4 py-2.5 text-sm text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+              {placeholder}
+            </button>
+          )}
+          {options.map(o => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => { onChange(o.value); setOpen(false); }}
+              className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer ${
+                o.value === value
+                  ? 'bg-blue-600/10 text-blue-500 font-semibold cursor-default'
+                  : 'text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5'
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
         </div>
       )}
     </div>

@@ -1,66 +1,65 @@
-# GA4 Analytics Dashboard (IESA) 📊
+# GA4 Analytics & Management System v4.0
 
-Un sistema de analítica profesional y seguro diseñado para la institución IESA. Proporciona una interfaz intuitiva para visualizar datos de Google Analytics 4, gestionar credenciales de servicios y generar reportes mensuales automatizados para gerencia.
+![Astro](https://img.shields.io/badge/Astro-BC52EE?style=for-the-badge&logo=astro&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Supabase](https://img.shields.io/badge/Supabase-181818?style=for-the-badge&logo=supabase&logoColor=3ECF8E)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-## 🚀 Características Principales
+Plataforma inteligente y segura diseñada para la gestión de analíticas de Google Analytics 4, administración de accesos institucionales y planificación de guardias para el equipo de Mercadeo y Comunicaciones.
 
-- **Dashboard Gerencial:** Visualización dinámica de métricas clave (Páginas Vistas, Usuarios, Engagement) con gráficos interactivos de Recharts.
-- **Autenticación Institucional:** Registro y acceso restringido exclusivamente al dominio `@iesa.edu.ve` (validado mediante Supabase Auth + Database Triggers).
-- **Gestión por Áreas:** Soporte para departamentos (Mercadeo, Comunicaciones, Ventas, RRHH, etc.) con perfiles de usuario personalizados.
-- **Bóveda de Credenciales:** Sistema seguro para almacenar y compartir cuentas de servicios (GA4, Google Ads, Meta, etc.) con niveles de acceso de administrador.
-- **Reportes Mensuales:** Herramienta de exportación rápida (Estilo Excel) para métricas de desempeño, optimizada para copiar y pegar directamente en Google Sheets.
-- **Modo Claro/Oscuro:** Interfaz moderna con soporte nativo de Tailwind CSS y persistencia de preferencia de tema.
-- **Navegación SPA:** Implementación de Astro ClientRouter para una experiencia fluida sin recargas de página.
+## 🚀 Arquitectura y Tecnologías
 
-## 🛠️ Stack Tecnológico
+El sistema utiliza una arquitectura híbrida moderna para garantizar velocidad, seguridad e interactividad:
 
-- **Frontend:** [Astro 6](https://astro.build/) (SSR & ClientRouter)
-- **Componentes:** [React](https://reactjs.org/) (Islas de interactividad)
-- **Estilos:** [Tailwind CSS](https://tailwindcss.com/)
-- **Base de Datos & Auth:** [Supabase](https://supabase.com/)
-- **IconButton / Iconos:** [Lucide React](https://lucide.dev/)
-- **Gráficos:** [Recharts](https://recharts.org/)
-- **Notificaciones:** [Sonner](https://sonner.stevenly.me/)
+- **Frontend Core**: [Astro](https://astro.build/) para una carga ultra-rápida (SSG/SSR).
+- **Componentes Interactivos**: [React](https://reactjs.org/) con transiciones fluidas.
+- **Base de Datos y Auth**: [Supabase](https://supabase.com/) con PostgreSQL y Row Level Security (RLS).
+- **Notificaciones en Tiempo Real**: WebSocket nativo de Supabase para alertas en vivo.
+- **Seguridad de Datos**: Encriptación AES-256 (Server-side) para la Bóveda de Accesos.
+- **Diseño**: Tailwind CSS con estética Dark Mode premium y animaciones de micro-interacción.
 
-## 📦 Instalación y Configuración
+## 📦 Módulos del Sistema
 
-### 1. Clonar el repositorio
-```bash
-git clone https://github.com/Harbinger93/GA4.git
-cd ga4-dashboard
-```
+| Módulo | Descripción |
+| :--- | :--- |
+| **Dashboard GA4** | Visualización centralizada de métricas (Visitas, Usuarios, Rebote) en tiempo real. |
+| **Analítica Web** | Desglose por secciones (IESA al Día, Cursos) con MoM (Month-over-Month). |
+| **Bóveda (Vault)** | Gestión segura de credenciales institucionales con encriptación militar. |
+| **Duty Planner** | Calendario inteligente de guardias con detección de feriados y cálculo de horas extra. |
+| **Social Metrics** | Reportes de engagement y rendimiento en plataformas sociales. |
+| **Directorio** | Gestión de usuarios, perfiles y permisos granulares de acceso. |
+| **Notificaciones** | Centro de alertas con suscripción en tiempo real y registro de auditoría. |
 
-### 2. Instalar dependencias
-```bash
-npm install
-```
+## 🛠️ Instalación y Desarrollo
 
-### 3. Variables de Entorno
-Crea un archivo `.env` en la raíz del proyecto con las siguientes claves de Supabase:
-```env
-PUBLIC_SUPABASE_URL=tu_url_de_supabase
-PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
-```
+1. **Clonar el repositorio**:
+   ```bash
+   git clone https://github.com/Harbinger93/GA4.git
+   ```
 
-### 4. Lanzar en Desarrollo
-```bash
-npm run dev
-```
-La aplicación estará disponible en `http://localhost:4321`.
+2. **Instalar dependencias**:
+   ```bash
+   npm install
+   ```
 
-## 🔒 Seguridad y Roles
+3. **Variables de Entorno**:
+   Configurar `.env` con las claves de Supabase y `VAULT_SECRET_KEY`.
 
-El sistema implementa una política de seguridad estricta:
-- **Validación de Dominio:** Solo correos `@iesa.edu.ve` pueden registrarse.
-- **Super Admins:** Cuentas específicas (`admin@iesa.edu.ve`, `gabriel.vazquez@iesa.edu.ve`) tienen permisos para gestionar usuarios y editar la bóveda de credenciales.
-- **Notificaciones:** Los administradores reciben alertas automáticas en su panel cuando un nuevo usuario se registra en el sistema.
+4. **Ejecutar en desarrollo**:
+   ```bash
+   npm run dev
+   ```
 
-## 📄 Estructura de Reportes
-El módulo de "Reportes y Analíticas" está diseñado para coincidir con la estructura del reporte mensual de IESA, incluyendo 16 métricas críticas como:
-- Usuarios nuevos vs recurrentes
-- Tasa de rebote
-- Tiempo promedio de sesión
-- Tráfico orgánico y de RRSS
+5. **Build para producción**:
+   ```bash
+   npm run build
+   ```
+
+## 🔒 Seguridad
+
+- **Autenticación**: Integración con Supabase Auth.
+- **Biometría**: Soporte para Passkeys y FaceID/TouchID en navegadores compatibles.
+- **Encriptación**: Datos sensibles de la bóveda nunca se almacenan en texto plano.
 
 ---
-Desarrollado para **IESA** | 2026
+*Desarrollado para el equipo de Mercadeo y Comunicaciones del IESA.*

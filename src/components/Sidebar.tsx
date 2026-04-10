@@ -1,4 +1,4 @@
-import { LogOut, LayoutDashboard, BarChart3, KeyRound, User, Calendar, Instagram, ChevronLeft, ChevronRight, Bell, FileSpreadsheet, BookOpen } from 'lucide-react';
+import { LogOut, LayoutDashboard, BarChart3, KeyRound, User, Calendar, Instagram, ChevronLeft, ChevronRight, Bell, FileSpreadsheet, BookOpen, LayoutGrid, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useState, useEffect } from 'react';
 
@@ -10,6 +10,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [customColor, setCustomColor] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     // Check local storage for preference
@@ -54,6 +55,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Analítica GA4', path: '/analytics', icon: BarChart3 },
+    { name: 'Planificador', path: '/duty', icon: Calendar },
     { name: 'Redes Sociales', path: '/social-reports', icon: Instagram },
     { name: 'Notificaciones', path: '/notifications', icon: Bell },
     { name: 'Bóveda', path: '/vault', icon: KeyRound },
@@ -148,45 +150,63 @@ export default function Sidebar({ currentPath }: SidebarProps) {
       </aside>
 
       {/* Mobile Floating Dock */}
-      <nav className="md:hidden fixed bottom-6 left-4 right-4 bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-xl border border-slate-700 dark:border-white/10 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] rounded-[2rem] p-2 flex items-center justify-between z-50">
-        {menuItems.filter(item => item.name !== 'Notificaciones').slice(0, 5).map((item) => {
-          const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
-          return (
-            <a
-              key={item.path}
-              href={item.path}
-              className={`relative flex items-center justify-center rounded-full transition-all duration-300 ease-in-out h-12 ${
-                isActive 
-                ? 'bg-white text-slate-900 flex-1 px-4 shadow-[0_2px_10px_rgba(255,255,255,0.2)]' 
-                : 'w-[3.5rem] text-slate-400 hover:text-white bg-transparent'
-              }`}
-            >
-              <div className="flex items-center justify-center gap-1.5 shrink-0 h-full w-full">
-                <item.icon 
-                  className={`w-5 h-5 transition-transform duration-300 shrink-0 ${isActive ? 'scale-110 text-slate-900' : 'scale-100'}`} 
-                  style={isActive && customColor ? { color: customColor } : {}}
-                />
-                
-                <div className={`transition-all duration-300 ease-in-out overflow-hidden flex items-center ${isActive ? 'max-w-[100px] opacity-100 ml-1' : 'max-w-0 opacity-0 ml-0'}`}>
-                   <span className="text-sm font-extrabold tracking-tight truncate" style={isActive && customColor ? { color: customColor } : {}}>
-                     {item.name.split(' ')[0]}
-                   </span>
-                </div>
-              </div>
-            </a>
-          );
-        })}
+      <nav className="md:hidden fixed bottom-4 left-4 right-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-full px-4 py-2 flex items-center justify-between z-50">
+        
+        {/* Atajos Rápidos Izquierda */}
+        <div className="flex items-center gap-1 flex-1 justify-start">
+          <a href="/analytics" className={`p-3 rounded-2xl transition-all active:scale-90 ${currentPath === '/analytics' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
+            <BarChart3 className="w-6 h-6" />
+          </a>
+          <a href="/social-reports" className={`p-3 rounded-2xl transition-all active:scale-90 ${currentPath === '/social-reports' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
+            <Instagram className="w-6 h-6" />
+          </a>
+        </div>
 
-        <div className="h-8 w-px bg-slate-700/50 mx-1 shrink-0"></div>
+        {/* Central Menu Button */}
+        <div className="mx-2 shrink-0">
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="relative flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-lg shadow-blue-500/40 transform transition-all active:scale-95 hover:shadow-blue-500/60"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <LayoutGrid className="w-6 h-6" />}
+          </button>
+        </div>
 
-        <button
-          onClick={handleLogout}
-          title="Cerrar sesión"
-          className="relative flex items-center justify-center rounded-full transition-all duration-300 ease-in-out h-12 w-[3.5rem] text-slate-400 hover:text-red-400 hover:bg-red-500/10 shrink-0"
-        >
-          <LogOut className="w-5 h-5 shrink-0" />
-        </button>
+        {/* Atajos Rápidos Derecha */}
+        <div className="flex items-center gap-1 flex-1 justify-end">
+          <a href="/vault" className={`p-3 rounded-2xl transition-all active:scale-90 ${currentPath === '/vault' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
+            <KeyRound className="w-6 h-6" />
+          </a>
+          <button onClick={handleLogout} className="p-3 text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all active:scale-90">
+            <LogOut className="w-6 h-6" />
+          </button>
+        </div>
       </nav>
+
+      {/* Expanded Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setIsMobileMenuOpen(false)}>
+          <div 
+            className="absolute bottom-24 left-4 right-4 bg-white/70 dark:bg-[#0f172a]/80 backdrop-blur-2xl border border-white/50 dark:border-white/10 p-6 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] animate-in slide-in-from-bottom-8 fade-in duration-300"
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-5">Todas las aplicaciones</h3>
+            <div className="grid grid-cols-3 gap-4">
+              {menuItems.map(item => {
+                const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
+                return (
+                  <a key={item.path} href={item.path} onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2.5 group">
+                    <div className={`w-16 h-16 flex items-center justify-center rounded-2xl transition-all ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-slate-100/80 dark:bg-white/8 text-slate-600 dark:text-slate-300 group-hover:bg-blue-50 dark:group-hover:bg-white/15 border border-slate-200/50 dark:border-white/5'}`}>
+                      <item.icon className="w-7 h-7" />
+                    </div>
+                    <span className="text-[11px] font-semibold text-center leading-tight text-slate-600 dark:text-slate-300">{item.name}</span>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -3,6 +3,7 @@ import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
+import PresenceManager from '../components/PresenceManager';
 
 interface Props {
   title: string;
@@ -52,12 +53,13 @@ const currentPath = Astro.url.pathname;
       document.addEventListener('astro:after-swap', applyTheme);
     </script>
 	</head>
-	<body class="bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased min-h-screen opacity-0 transition-opacity duration-500" id="dashboard-body">
+	<body class="bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased min-h-screen">
 		<!-- Sidebar for Desktop -->
 		<Sidebar client:load currentPath={currentPath} />
 
 		<!-- Main Content Wrapper -->
 		<div id="main-content" class="md:pl-64 flex flex-col min-h-screen transition-all duration-300 ease-in-out">
+			<PresenceManager client:load />
 			<Topbar client:load />
 			
 			<main class="flex-1 p-4 pb-32 md:p-8 md:pb-8">
@@ -70,34 +72,31 @@ const currentPath = Astro.url.pathname;
       import { supabase } from '../lib/supabase';
       
       document.addEventListener('astro:page-load', async () => {
-        // Check session
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
           window.location.replace('/login');
+          return;
+        }
+
+        const email = session.user?.email || '';
+        const isAdmin = ['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email.toLowerCase());
+
+        // 1. Domain Validation
+        if (!email.toLowerCase().endsWith('@iesa.edu.ve') && !isAdmin) {
+          await supabase.auth.signOut();
+          window.location.replace('/login?error=unauthorized_domain');
         } else {
-          const email = session.user?.email || '';
-          const isAdmin = ['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email.toLowerCase());
+          // 2. Ban Validation
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('is_banned')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
 
-          // 1. Validación de dominio
-          if (!email.toLowerCase().endsWith('@iesa.edu.ve') && !isAdmin) {
+          if (profile?.is_banned && !isAdmin) {
             await supabase.auth.signOut();
-            window.location.replace('/login?error=unauthorized_domain');
-          } else {
-            // 2. Validación de Ban (Desincorporado)
-            const { data: profile } = await supabase
-              .from('user_profiles')
-              .select('is_banned')
-              .eq('user_id', session.user.id)
-              .maybeSingle();
-
-            if (profile?.is_banned && !isAdmin) {
-              await supabase.auth.signOut();
-              window.location.replace('/login?error=banned');
-            } else {
-              // Mostrar contenido si todo está correcto
-              document.getElementById('dashboard-body')?.classList.remove('opacity-0');
-            }
+            window.location.replace('/login?error=banned');
           }
         }
       });

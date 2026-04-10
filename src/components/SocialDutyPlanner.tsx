@@ -1,9 +1,14 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Calendar, Clock, User, Plus, Trash2, Edit2, ChevronLeft, ChevronRight, Bell, Shield } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { es } from 'date-fns/locale/es';
+import { format, differenceInHours, isWeekend, getHours, addHours, startOfHour } from 'date-fns';
+registerLocale('es', es);
 
 // =============================================
 // VENEZUELAN HOLIDAYS (static list, updatable)
@@ -96,6 +101,38 @@ export default function SocialDutyPlanner() {
     user_id: '', start_date: '', end_date: '', shift_type: 'day', notes: '', tag: 'Redes Sociales'
   });
 
+  // Precise duty calculation logic
+  const dutyBreakdown = useMemo(() => {
+    if (!formData.start_date || !formData.end_date) return { total: 0, normal: 0, extra: 0 };
+    try {
+      const start = new Date(formData.start_date);
+      const end = new Date(formData.end_date);
+      const total = Math.max(0, differenceInHours(end, start));
+      
+      if (formData.tag !== 'Eventos') return { total, normal: total, extra: 0 };
+
+      let normal = 0;
+      let extra = 0;
+      let current = startOfHour(start);
+      const limit = end;
+
+      while (current < limit) {
+        const h = getHours(current);
+        const dayOff = isWeekend(current);
+        
+        // Regla: 8am a 5pm L-V (Normal), resto Extra
+        if (!dayOff && h >= 8 && h < 17) {
+          normal++;
+        } else {
+          extra++;
+        }
+        current = addHours(current, 1);
+      }
+      
+      return { total, normal, extra };
+    } catch { return { total: 0, normal: 0, extra: 0 }; }
+  }, [formData.start_date, formData.end_date, formData.tag]);
+
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
@@ -105,7 +142,10 @@ export default function SocialDutyPlanner() {
 
     const [{ data: shiftsData }, { data: usersData }] = await Promise.all([
       supabase.from('duty_shifts').select('*, user_profiles(display_name, department)').order('start_date', { ascending: true }),
-      supabase.from('user_profiles').select('user_id, display_name, department, custom_color').order('display_name'),
+      supabase.from('user_profiles')
+        .select('user_id, display_name, department, custom_color')
+        .eq('is_banned', false)
+        .order('display_name'),
     ]);
 
     setShifts(shiftsData || []);
@@ -146,7 +186,7 @@ export default function SocialDutyPlanner() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (!formData.user_id) { toast.error('Selecciona un responsable.'); return; }
+      if (!formData.user_id) { toast.error('Opps, por favor selecciona a un responsable para este turno.'); return; }
       
       const { tag, notes, ...rest } = formData;
       const combinedNotes = `[${tag}] ${notes}`;
@@ -155,28 +195,62 @@ export default function SocialDutyPlanner() {
       if (editingShift) {
         const { error } = await supabase.from('duty_shifts').update(payload).eq('id', editingShift.id);
         if (error) throw error;
+        
+        // Notify
+        const targetUser = users.find(u => u.user_id === formData.user_id);
+        await supabase.from('system_notifications').insert([{
+          title: 'Guardia Actualizada',
+          message: `${targetUser?.display_name || 'Un usuario'} tiene su guardia editada para el ${new Date(formData.start_date).toLocaleDateString()}.`,
+          type: 'info'
+        }]);
+
         await supabase.from('duty_audit_logs').insert({ shift_id: editingShift.id, user_id: currentUser?.id, action: 'update', new_value: payload });
-        toast.success('Guardia actualizada.');
+        toast.success('¡Listo! La guardia se ha actualizado correctamente.');
       } else {
         const { data, error } = await supabase.from('duty_shifts').insert([payload]).select().single();
         if (error) throw error;
+
+        // Notify
+        const targetUser = users.find(u => u.user_id === formData.user_id);
+        await supabase.from('system_notifications').insert([{
+          title: 'Nueva Guardia Programada',
+          message: `${targetUser?.display_name || 'Se'} ha sido asignado para una guardia el ${new Date(formData.start_date).toLocaleDateString()}.`,
+          type: 'success'
+        }]);
+
         await supabase.from('duty_audit_logs').insert({ shift_id: data.id, user_id: currentUser?.id, action: 'create', new_value: payload });
-        toast.success('Guardia programada.');
+        toast.success('¡Genial! El turno ha sido programado con éxito.');
       }
       setShowModal(false);
       setEditingShift(null);
       fetchData();
     } catch (err: any) {
-      toast.error('Error: ' + err.message);
+      toast.error('Lo sentimos, no pudimos procesar la solicitud. Por favor, intenta de nuevo.');
     }
   };
 
+  // Delete confirmation
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Eliminar esta guardia?')) return;
-    await supabase.from('duty_shifts').delete().eq('id', id);
-    await supabase.from('duty_audit_logs').insert({ user_id: currentUser?.id, action: 'delete' });
-    toast.info('Guardia eliminada.');
-    fetchData();
+    try {
+      const { error } = await supabase.from('duty_shifts').delete().eq('id', id);
+      if (error) throw error;
+      
+      // Notify (optional but good)
+      await supabase.from('system_notifications').insert([{
+        title: 'Guardia Eliminada',
+        message: `Un turno ha sido removido del calendario de guardias.`,
+        type: 'warning'
+      }]);
+
+      await supabase.from('duty_audit_logs').insert({ user_id: currentUser?.id, action: 'delete' });
+      toast.success('El turno ha sido eliminado del calendario correctamente.');
+      setShowDeleteConfirm(null);
+      fetchData();
+    } catch (err: any) {
+      toast.error('Vaya, no pudimos eliminar el turno. Inténtalo de nuevo en unos momentos.');
+    }
   };
 
   // Calendar generation
@@ -203,7 +277,78 @@ export default function SocialDutyPlanner() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <Toaster theme="dark" position="top-right" />
+      
+      <style>{`
+        .react-datepicker-wrapper { width: 100%; }
+        .react-datepicker {
+          font-family: inherit;
+          background-color: #0f172a !important;
+          border: 1px solid rgba(255,255,255,0.1) !important;
+          border-radius: 1rem !important;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+          color: white !important;
+        }
+        .react-datepicker__header {
+          background-color: #1e293b !important;
+          border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+          border-top-left-radius: 1rem !important;
+          border-top-right-radius: 1rem !important;
+          padding-top: 1rem !important;
+        }
+        .react-datepicker__current-month, .react-datepicker__day-name, .react-datepicker-time__header {
+          color: #94a3b8 !important;
+          font-weight: 800 !important;
+          text-transform: uppercase !important;
+          font-size: 0.7rem !important;
+          letter-spacing: 0.05em !important;
+        }
+        .react-datepicker__day {
+          color: #cbd5e1 !important;
+          border-radius: 0.5rem !important;
+          transition: all 0.2s !important;
+        }
+        .react-datepicker__day:hover {
+          background-color: rgba(59, 130, 246, 0.2) !important;
+          color: #60a5fa !important;
+        }
+        .react-datepicker__day--selected {
+          background-color: #2563eb !important;
+          color: white !important;
+          font-weight: bold !important;
+        }
+        .react-datepicker__day--today {
+          border: 1px solid #2563eb !important;
+          color: #2563eb !important;
+          font-weight: bold !important;
+        }
+        .react-datepicker__time-container {
+          border-left: 1px solid rgba(255,255,255,0.1) !important;
+          background-color: #0f172a !important;
+          width: 90px !important;
+        }
+        .react-datepicker__time-box { width: 90px !important; border-radius: 0 1rem 1rem 0 !important; }
+        .react-datepicker__time-list { 
+          background-color: #0f172a !important; 
+          padding: 0 !important;
+        }
+        .react-datepicker__time-list-item {
+          background-color: transparent !important;
+          color: #94a3b8 !important;
+          transition: all 0.2s !important;
+          border-radius: 0 !important;
+          padding: 10px 0 !important;
+        }
+        .react-datepicker__time-list-item:hover {
+          background-color: rgba(37, 99, 235, 0.2) !important;
+          color: #60a5fa !important;
+        }
+        .react-datepicker__time-list-item--selected {
+          background-color: #2563eb !important;
+          color: white !important;
+          font-weight: bold !important;
+        }
+        .react-datepicker__navigation--next--with-time:not(.react-datepicker__navigation--next--with-today-button) { right: 95px !important; }
+      `}</style>
 
       {/* Hero Header */}
       <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-700 to-indigo-900 rounded-3xl p-8 text-white shadow-2xl shadow-indigo-500/20">
@@ -303,35 +448,6 @@ export default function SocialDutyPlanner() {
 
         {/* ── Sidebar ── */}
         <div className="space-y-4">
-          {/* Active guard */}
-          <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-3xl p-5 backdrop-blur-xl shadow-xl">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Estado Actual</h3>
-            {activeShift ? (
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: (userColorMap[activeShift.user_id]?.customColorHex || userColorMap[activeShift.user_id]?.dot || '#3b82f6') + '20', border: `2px solid ${userColorMap[activeShift.user_id]?.customColorHex || userColorMap[activeShift.user_id]?.dot || '#3b82f6'}40` }}>
-                  <User className="w-6 h-6" style={{ color: userColorMap[activeShift.user_id]?.customColorHex || userColorMap[activeShift.user_id]?.dot || '#3b82f6' }} />
-                </div>
-                <div>
-                  <p className="text-xs text-green-500 font-bold uppercase">
-                    De Guardia {activeShift.notes?.startsWith('[Eventos]') ? ' (Eventos)' : ' (Redes)'}
-                  </p>
-                  <p className="font-bold dark:text-white">{activeShift.user_profiles?.display_name}</p>
-                  <p className="text-xs text-slate-500">{activeShift.user_profiles?.department}</p>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-slate-500/10 flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-slate-400" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-400 font-bold uppercase">Sin Guardia</p>
-                  <p className="font-bold dark:text-white">Nadie asignado ahora</p>
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Selected day detail */}
           {selectedDay && (
             <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-3xl p-5 backdrop-blur-xl shadow-xl">
@@ -358,8 +474,25 @@ export default function SocialDutyPlanner() {
                             {shift.notes?.startsWith('[Eventos]') && <span className="px-1.5 py-0.5 text-[9px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded uppercase font-bold shrink-0">Eventos</span>}
                             {shift.notes?.startsWith('[Redes Sociales]') && <span className="px-1.5 py-0.5 text-[9px] bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded uppercase font-bold shrink-0">Redes</span>}
                           </p>
-                          <p className="text-xs text-indigo-400 font-semibold">
+                          <p className="text-xs text-indigo-400 font-semibold flex items-center gap-2">
                             {new Date(shift.start_date).toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' })} — {new Date(shift.end_date).toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' })}
+                            <span className="text-[10px] text-slate-500 font-bold bg-slate-500/10 px-1.5 py-0.5 rounded tracking-tighter">
+                              {(() => {
+                                const s = new Date(shift.start_date);
+                                const e = new Date(shift.end_date);
+                                const total = differenceInHours(e, s);
+                                if (shift.notes?.includes('[Eventos]')) {
+                                  let normal = 0; let extra = 0; let cur = startOfHour(s);
+                                  while(cur < e) { 
+                                    const h = getHours(cur); const dayOff = isWeekend(cur);
+                                    if(!dayOff && h >= 8 && h < 17) normal++; else extra++;
+                                    cur = addHours(cur, 1);
+                                  }
+                                  return extra > 0 ? `${total}h (${extra} EXTRA)` : `${total}h`;
+                                }
+                                return `${total}h`;
+                              })()}
+                            </span>
                           </p>
                           <p className="text-xs text-slate-400">{shift.user_profiles?.department} · {shift.shift_type === 'day' ? 'Diario' : shift.shift_type === 'week' ? 'Semanal' : 'Fin de Semana'}</p>
                           {(() => {
@@ -386,7 +519,7 @@ export default function SocialDutyPlanner() {
                           }} className="p-1 text-slate-400 hover:text-blue-500 rounded-lg hover:bg-blue-500/10 transition-all">
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
-                          <button onClick={() => handleDelete(shift.id)} className="p-1 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-500/10 transition-all">
+                          <button onClick={() => setShowDeleteConfirm(shift.id)} className="p-1 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-500/10 transition-all">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -459,25 +592,43 @@ export default function SocialDutyPlanner() {
               </div>
 
               {/* Inicio */}
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 flex flex-col">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Inicio *</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                  <input required type="datetime-local" value={formData.start_date.substring(0, 16)}
-                    onChange={e => setFormData({...formData, start_date: e.target.value})}
-                    className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 pl-9 pr-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm dark:text-white [color-scheme:dark]" />
-                </div>
+                <DatePicker
+                  selected={formData.start_date ? new Date(formData.start_date) : null}
+                  onChange={(date: Date | null) => {
+                    if (date) {
+                      setFormData({...formData, start_date: date.toISOString()});
+                    }
+                  }}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  timeCaption="Hora"
+                  dateFormat="dd/MM/yyyy HH:mm"
+                  locale="es"
+                  customInput={<PremiumDateInput label="Inicio" icon={<Calendar className="w-5 h-5" />} />}
+                />
               </div>
 
               {/* Fin */}
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 flex flex-col">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Fin *</label>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                  <input required type="datetime-local" value={formData.end_date.substring(0, 16)}
-                    onChange={e => setFormData({...formData, end_date: e.target.value})}
-                    className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 pl-9 pr-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm dark:text-white [color-scheme:dark]" />
-                </div>
+                <DatePicker
+                  selected={formData.end_date ? new Date(formData.end_date) : null}
+                  onChange={(date: Date | null) => {
+                    if (date) {
+                      setFormData({...formData, end_date: date.toISOString()});
+                    }
+                  }}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  timeCaption="Hora"
+                  dateFormat="dd/MM/yyyy HH:mm"
+                  locale="es"
+                  customInput={<PremiumDateInput label="Fin" icon={<Clock className="w-5 h-5" />} />}
+                />
               </div>
 
               {/* Etiqueta / Rol */}
@@ -503,6 +654,39 @@ export default function SocialDutyPlanner() {
                 className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 px-4 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm dark:text-white resize-none placeholder:text-slate-400" />
             </div>
 
+            {/* Hours Counter Breakdown */}
+            <div className={`p-5 rounded-3xl border transition-all space-y-4 ${dutyBreakdown.total > 0 ? 'bg-blue-600/10 border-blue-500/20' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5'}`}>
+               <div className="flex items-center justify-between">
+                 <div className="flex items-center gap-3">
+                   <div className={`p-2.5 rounded-xl ${dutyBreakdown.total > 0 ? 'bg-blue-600/20 text-blue-400' : 'bg-slate-200 dark:bg-white/10 text-slate-500'}`}>
+                     <Clock className="w-6 h-6" />
+                   </div>
+                   <div>
+                     <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500">Duración Total</p>
+                     <p className={`text-2xl font-black ${dutyBreakdown.total > 0 ? 'text-blue-500' : 'text-slate-400'}`}>{dutyBreakdown.total} Horas</p>
+                   </div>
+                 </div>
+                 {dutyBreakdown.extra > 0 && (
+                   <div className="px-4 py-1.5 bg-amber-500 text-white rounded-full text-[10px] font-black uppercase shadow-lg shadow-amber-500/30 animate-pulse">
+                     {dutyBreakdown.extra}h EXTRA
+                   </div>
+                 )}
+               </div>
+
+               {dutyBreakdown.total > 0 && formData.tag === 'Eventos' && (
+                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 dark:border-white/5">
+                   <div className="text-center p-2 rounded-xl bg-white/50 dark:bg-black/20">
+                     <p className="text-[9px] uppercase font-bold text-slate-500">Normales</p>
+                     <p className="text-sm font-black dark:text-white">{dutyBreakdown.normal}h</p>
+                   </div>
+                   <div className="text-center p-2 rounded-xl bg-white/50 dark:bg-black/20">
+                     <p className="text-[9px] uppercase font-bold text-slate-500">Extras</p>
+                     <p className="text-sm font-black dark:text-blue-400">{dutyBreakdown.extra}h</p>
+                   </div>
+                 </div>
+               )}
+            </div>
+
             <DialogFooter className="pt-2">
               <Button type="button" variant="outline" onClick={() => setShowModal(false)} className="w-full sm:w-auto">
                 Cancelar
@@ -512,6 +696,27 @@ export default function SocialDutyPlanner() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Confirm Delete Modal ── */}
+      <Dialog open={!!showDeleteConfirm} onOpenChange={(open) => !open && setShowDeleteConfirm(null)}>
+        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950 border-slate-200 dark:border-white/10 rounded-[2.5rem] p-10 text-center">
+          <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Trash2 className="w-10 h-10" />
+          </div>
+          <DialogTitle className="text-2xl font-black dark:text-white mb-2">¿Eliminar Guardia?</DialogTitle>
+          <p className="text-slate-500 dark:text-slate-400 font-medium mb-8">
+            Esta acción es definitiva y podría afectar el cálculo de horas extra para este usuario.
+          </p>
+          <div className="flex gap-4">
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(null)} className="flex-1 py-6 rounded-2xl font-bold border-slate-200 dark:border-white/10 h-auto">
+              Cancelar
+            </Button>
+            <Button onClick={() => showDeleteConfirm && handleDelete(showDeleteConfirm)} className="flex-1 py-6 rounded-2xl font-bold bg-red-600 hover:bg-red-500 text-white h-auto shadow-lg shadow-red-500/20">
+              Sí, Eliminar
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
@@ -537,20 +742,20 @@ function CustomSelect({ value, onChange, options, placeholder }: {
   }, []);
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative w-full">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 py-3 px-3.5 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all"
+        className="w-full flex items-center justify-between bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 py-3 px-4 rounded-xl text-sm font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all shadow-sm"
       >
         <span className={selected ? '' : 'text-slate-400'}>{selected?.label || placeholder || 'Seleccionar...'}</span>
-        <svg className={`w-4 h-4 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        <svg className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
       </button>
       {open && (
-        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-56 overflow-y-auto">
+        <div className="absolute z-[100] w-full mt-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700/50 [&::-webkit-scrollbar-thumb]:rounded-full">
           {placeholder && (
             <button type="button" onClick={() => { onChange(''); setOpen(false); }}
-              className="w-full text-left px-4 py-2.5 text-sm text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+              className="w-full text-left px-4 py-3 text-sm text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-white/5">
               {placeholder}
             </button>
           )}
@@ -559,10 +764,10 @@ function CustomSelect({ value, onChange, options, placeholder }: {
               key={o.value}
               type="button"
               onClick={() => { onChange(o.value); setOpen(false); }}
-              className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+              className={`w-full text-left px-4 py-3 text-sm transition-colors ${
                 o.value === value
-                  ? 'bg-indigo-600/10 text-indigo-400 font-semibold'
-                  : 'text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5'
+                  ? 'bg-indigo-600/10 text-indigo-400 font-bold border-l-2 border-indigo-500'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 font-medium border-l-2 border-transparent'
               }`}
             >
               {o.label}
@@ -573,3 +778,20 @@ function CustomSelect({ value, onChange, options, placeholder }: {
     </div>
   );
 }
+// ─── Premium Custom input for DatePicker ────────────────
+const PremiumDateInput = ({ value, onClick, label, icon }: any) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="w-full group flex items-center gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 p-4 rounded-2xl transition-all hover:border-blue-500/50 hover:bg-slate-50 dark:hover:bg-blue-500/5 shadow-sm text-left"
+  >
+    <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 group-hover:text-blue-500 transition-colors">
+      {icon}
+    </div>
+    <div className="flex-1">
+      <p className="text-[9px] uppercase font-black text-slate-400 tracking-widest">{label}</p>
+      <p className="text-sm font-bold text-slate-900 dark:text-white">{value || 'Seleccionar...'}</p>
+    </div>
+    <Edit2 className="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition-colors" />
+  </button>
+);

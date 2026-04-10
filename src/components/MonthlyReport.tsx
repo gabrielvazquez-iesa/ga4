@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiFetch } from '../lib/api-fetch';
 import { supabase } from '../lib/supabase';
 import { Copy, Calendar, ShieldCheck, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 
 export default function MonthlyReport() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -93,7 +93,7 @@ export default function MonthlyReport() {
 
   return (
     <div className="space-y-6">
-      <Toaster position="top-right" theme="dark" />
+
       
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/80 dark:bg-slate-900/60 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-white/10 backdrop-blur-sm">
         <div className="flex items-center gap-3">

@@ -1,4 +1,10 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-brand: #2563eb;
+}
+
 @custom-variant dark (&:is(.dark *), &:is(.dark));
 
 :root {
@@ -6,5 +12,53 @@
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300;
+  @apply bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased;
+}
+
+/* Rediseño de React Datepicker para Dark Mode Premium */
+.dark .react-datepicker {
+  @apply bg-[#0f172a] border border-white/10 shadow-2xl text-slate-300 font-sans rounded-xl overflow-hidden;
+}
+.dark .react-datepicker__header {
+  @apply bg-slate-900/80 border-b border-white/10 pt-4 pb-2;
+}
+.dark .react-datepicker__current-month,
+.dark .react-datepicker-time__header,
+.dark .react-datepicker-year-header {
+  @apply text-white font-extrabold text-sm mb-2;
+}
+.dark .react-datepicker__day-name {
+  @apply text-slate-500 font-bold;
+}
+.dark .react-datepicker__day {
+  @apply text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors outline-none w-8 h-8 leading-8 m-1;
+}
+.dark .react-datepicker__day--selected,
+.dark .react-datepicker__day--keyboard-selected {
+  @apply bg-blue-600 text-white font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-500;
+}
+.dark .react-datepicker__day--outside-month {
+  @apply text-slate-600;
+}
+.dark .react-datepicker__time-container {
+  @apply border-l border-white/10 bg-[#0f172a];
+}
+.dark .react-datepicker__time {
+  @apply bg-[#0f172a] text-slate-300;
+}
+.dark .react-datepicker__time-box,
+.dark .react-datepicker__time-list {
+  @apply !bg-[#0f172a];
+}
+.dark .react-datepicker__time-list-item {
+  @apply hover:bg-slate-800 transition-colors py-2 text-sm;
+}
+.dark .react-datepicker__time-list-item--selected {
+  @apply !bg-blue-600 text-white font-bold hover:!bg-blue-500;
+}
+.dark .react-datepicker__navigation-icon::before {
+  @apply border-slate-400;
+}
+.dark .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  @apply border-white;
 }

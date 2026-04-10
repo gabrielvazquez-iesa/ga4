@@ -13,20 +13,42 @@ export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
   const days = parseInt(url.searchParams.get('days') || '30', 10);
   const pathFilter = url.searchParams.get('pathFilter');
+  const device = url.searchParams.get('device');
+  const channel = url.searchParams.get('channel');
 
   try {
+    const filters: any[] = [];
+    if (pathFilter) {
+      filters.push({
+        filter: {
+          fieldName: 'pagePathPlusQueryString',
+          stringFilter: { matchType: 'CONTAINS', value: pathFilter }
+        }
+      });
+    }
+    if (device) {
+      filters.push({
+        filter: {
+          fieldName: 'deviceCategory',
+          stringFilter: { matchType: 'EXACT', value: device }
+        }
+      });
+    }
+    if (channel) {
+      filters.push({
+        filter: {
+          fieldName: 'sessionDefaultChannelGroup',
+          stringFilter: { matchType: 'EXACT', value: channel }
+        }
+      });
+    }
+
     const [response] = await client.runReport({
       property: `properties/${propertyId}`,
       dateRanges: [{ startDate: `${days}daysAgo`, endDate: 'today' }],
       dimensions: [{ name: 'date' }],
-      dimensionFilter: pathFilter ? {
-        filter: {
-          fieldName: 'pagePathPlusQueryString',
-          stringFilter: {
-            matchType: 'CONTAINS',
-            value: pathFilter
-          }
-        }
+      dimensionFilter: filters.length > 0 ? {
+        andGroup: { expressions: filters }
       } : undefined,
       metrics: [
         { name: 'screenPageViews' },

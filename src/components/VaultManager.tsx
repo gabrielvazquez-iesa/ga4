@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { KeyRound, Plus, Edit2, Trash2, Eye, EyeOff, Search, ExternalLink, RefreshCw, AlertCircle, LayoutGrid, List, Shield, ShieldAlert, ShieldCheck, User } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+import { apiFetch } from '../lib/api-fetch';
+import { KeyRound, Plus, Edit2, Trash2, Eye, EyeOff, Search, ExternalLink, RefreshCw, AlertCircle, LayoutGrid, List, Shield, ShieldAlert, ShieldCheck, User, Clock, LogOut } from 'lucide-react';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 
@@ -27,6 +28,13 @@ export default function VaultManager() {
   const [visiblePasswords, setVisiblePasswords] = useState<Record<string, boolean>>({});
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
+  // Inactivity State
+  const [lastActivity, setLastActivity] = useState(Date.now());
+  const [showTimeoutWarning, setShowTimeoutWarning] = useState(false);
+  const [timeoutCountdown, setTimeoutCountdown] = useState(30);
+  const activityTimeoutRef = useRef<any>(null);
+  const warningCountdownRef = useRef<any>(null);
+
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -37,6 +45,68 @@ export default function VaultManager() {
     url: '',
     notes: ''
   });
+
+  // Reset activity on events
+  const resetActivity = useCallback(() => {
+    if (!showTimeoutWarning) {
+      setLastActivity(Date.now());
+    }
+  }, [showTimeoutWarning]);
+
+  useEffect(() => {
+    if (!hasAccess) return;
+
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(name => window.addEventListener(name, resetActivity));
+
+    const checkInactivity = setInterval(() => {
+      const now = Date.now();
+      const diffSinceLastActivity = now - lastActivity;
+      
+      // 5 minutes = 300,000 ms
+      if (diffSinceLastActivity > 300000 && !showTimeoutWarning) {
+        setShowTimeoutWarning(true);
+        setTimeoutCountdown(30);
+      }
+    }, 10000); // Check every 10s
+
+    return () => {
+      events.forEach(name => window.removeEventListener(name, resetActivity));
+      clearInterval(checkInactivity);
+    };
+  }, [lastActivity, hasAccess, showTimeoutWarning, resetActivity]);
+
+  // Warning countdown logic
+  useEffect(() => {
+    if (showTimeoutWarning) {
+      warningCountdownRef.current = setInterval(() => {
+        setTimeoutCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(warningCountdownRef.current);
+            handleTimeoutLogout();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      if (warningCountdownRef.current) clearInterval(warningCountdownRef.current);
+    }
+    return () => {
+      if (warningCountdownRef.current) clearInterval(warningCountdownRef.current);
+    };
+  }, [showTimeoutWarning]);
+
+  const handleTimeoutLogout = () => {
+    // We can either redirect to dashboard or just lock the vault
+    toast.error('Tu sesión en la bóveda ha expirado por inactividad para proteger tus datos.');
+    window.location.href = '/analytics'; // Redirect to a safe general page
+  };
+
+  const handleKeepPresent = () => {
+    setShowTimeoutWarning(false);
+    setLastActivity(Date.now());
+  };
 
   useEffect(() => {
     checkUserAndFetch();
@@ -58,7 +128,6 @@ export default function VaultManager() {
       const isSystemAdmin = adminEmails.includes(email.toLowerCase());
       setIsAdmin(isSystemAdmin);
 
-      // Fetch profile
       const { data: profile } = await supabase
         .from('user_profiles')
         .select('*')
@@ -85,23 +154,14 @@ export default function VaultManager() {
 
   const fetchCredentials = async () => {
     try {
-      const { data, error } = await supabase
-        .from('vault_credentials')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        if (error.code === '42P01') {
-          toast.error('La tabla vault_credentials no existe. Ejecuta el nuevo script SQL.');
-        } else {
-          throw error;
-        }
-      } else {
-        setCredentials(data || []);
-      }
+      const res = await apiFetch('/api/vault-secure');
+      const json = await res.json();
+      
+      if (json.error) throw new Error(json.error);
+      setCredentials(json.data || []);
     } catch (error: any) {
       console.error(error);
-      toast.error('Error al cargar las credenciales.');
+      toast.error('No pudimos cargar las credenciales en este momento. Por favor, intenta de nuevo más tarde.');
     }
   };
 
@@ -118,30 +178,29 @@ export default function VaultManager() {
   const submitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAdmin) {
-      toast.error('Solo los administradores pueden gestionar la bóveda.');
+      toast.error('Lo sentimos, solo los administradores pueden realizar cambios en la bóveda.');
       return;
     }
 
     try {
-      if (editingId) {
-        const { error } = await supabase
-          .from('vault_credentials')
-          .update(formData)
-          .eq('id', editingId);
-        if (error) throw error;
-        toast.success('Credencial actualizada.');
-      } else {
-        const { error } = await supabase
-          .from('vault_credentials')
-          .insert([{ ...formData, is_deleted: false }]);
-        if (error) throw error;
-        toast.success('Nueva credencial guardada con éxito.');
-      }
+      const method = editingId ? 'PATCH' : 'POST';
+      const url = editingId ? `/api/vault-secure?id=${editingId}` : '/api/vault-secure';
+      
+      const res = await apiFetch(url, {
+        method,
+        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+
+      toast.success(editingId ? '¡Listo! Los cambios se han guardado correctamente.' : '¡Genial! La nueva credencial ha sido registrada con éxito.');
       setIsModalOpen(false);
       resetForm();
       fetchCredentials();
     } catch (error: any) {
-      toast.error('Error: ' + error.message);
+      toast.error('Hubo un inconveniente al procesar la solicitud. Por favor, verifica los datos e intenta de nuevo.');
     }
   };
 
@@ -165,30 +224,32 @@ export default function VaultManager() {
   const handleSoftDelete = async (id: string) => {
     if (!isAdmin) return;
     try {
-      const { error } = await supabase
-        .from('vault_credentials')
-        .update({ is_deleted: true })
-        .eq('id', id);
-      if (error) throw error;
-      toast.info('Credencial enviada a la papelera.');
+      const res = await apiFetch(`/api/vault-secure?id=${id}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      
+      toast.info('La credencial se ha movido a la papelera correctamente.');
       fetchCredentials();
     } catch (error: any) {
-      toast.error('Error: ' + (error.message || 'No se pudo eliminar.'));
+      toast.error('No fue posible eliminar la credencial. Inténtalo de nuevo en unos momentos.');
     }
   };
 
   const handleRestore = async (id: string) => {
     if (!isAdmin) return;
     try {
-      const { error } = await supabase
-        .from('vault_credentials')
-        .update({ is_deleted: false })
-        .eq('id', id);
-      if (error) throw error;
-      toast.success('Credencial restaurada.');
+      const res = await apiFetch(`/api/vault-secure?id=${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ is_deleted: false }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      
+      toast.success('¡Hecho! La credencial ha sido restaurada con éxito.');
       fetchCredentials();
     } catch (error: any) {
-      toast.error('Error: ' + (error.message || 'No se pudo restaurar.'));
+      toast.error('No pudimos restaurar la credencial en este momento. Por favor, intenta de nuevo.');
     }
   };
 
@@ -201,8 +262,7 @@ export default function VaultManager() {
   }
 
   return (
-    <div className="space-y-6">
-      <Toaster theme="dark" position="top-right" />
+ <div className="space-y-6">
 
       {/* Security Status Bar */}
       <div className={`p-4 rounded-xl border flex flex-col md:flex-row items-center gap-4 transition-all ${
@@ -231,9 +291,13 @@ export default function VaultManager() {
         </div>
 
         {hasAccess && (
-          <div className="flex-1 text-right">
+          <div className="flex-1 text-right flex items-center justify-end gap-3">
+             <div className="flex items-center gap-2 text-[10px] text-blue-400 font-bold uppercase tracking-widest bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
+              <Clock className="w-3 h-3" />
+              Sesión activa (5m inactividad)
+            </div>
              <span className="text-[10px] text-green-500/80 font-bold uppercase tracking-widest bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
-              Seguridad por Rol Activa
+              Cifrado AES-256 Activo
             </span>
           </div>
         )}
@@ -302,7 +366,7 @@ export default function VaultManager() {
           {!isAdmin && (
             <div className="bg-blue-500/10 border border-blue-500/20 text-blue-400 p-4 rounded-xl flex gap-3 text-sm">
               <AlertCircle className="w-5 h-5 shrink-0" />
-              <p>Estás en modo visualizador. Solo administradores pueden gestionar las credenciales.</p>
+              <p>Estás en modo visualizador. Solo administradores pueden gestionar las credenciales. Cifrado AES activado por seguridad.</p>
             </div>
           )}
 
@@ -374,7 +438,7 @@ export default function VaultManager() {
                     <div key={cred.id} className="bg-white/95 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 p-6 rounded-2xl backdrop-blur-sm shadow-xl hover:border-white/20 transition-colors group relative flex flex-col">
                       <div className="flex justify-between items-start mb-4">
                         <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
-                          <KeyRound className="w-5 h-5" />
+                           <KeyRound className="w-5 h-5" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 dark:text-white flex-1 ml-4">{cred.service_name}</h3>
                       </div>
@@ -412,7 +476,30 @@ export default function VaultManager() {
         </>
       )}
 
-      {/* Modal Shadcn */}
+      {/* Timeout Warning Dialog */}
+      <Dialog open={showTimeoutWarning} onOpenChange={handleKeepPresent}>
+        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 border-red-500/20 rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-red-500 flex items-center gap-2">
+              <ShieldAlert className="w-6 h-6 border-none" />
+              ¿Sigues ahí?
+            </DialogTitle>
+            <DialogDescription className="py-4 font-medium dark:text-slate-300">
+              Por seguridad, la sesión de la bóveda se cerrará automáticamente en <span className="text-red-500 font-bold text-lg">{timeoutCountdown}s</span> por inactividad.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="ghost" className="w-full sm:w-auto" onClick={handleTimeoutLogout}>
+              Cerrar sesión ahora
+            </Button>
+            <Button className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white" onClick={handleKeepPresent}>
+              Seguir aquí
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Main Form Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-xl bg-slate-50 dark:bg-[#0d1425] border-slate-200 dark:border-white/10 rounded-2xl">
           <DialogHeader>
@@ -420,109 +507,65 @@ export default function VaultManager() {
               <KeyRound className="w-5 h-5 text-blue-500" />
               {editingId ? 'Editar Credencial' : 'Nueva Credencial'}
             </DialogTitle>
-            <DialogDescription>
-              Todos los campos marcados con * son requeridos.
-            </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={submitForm} className="space-y-4 pt-4">
-            {/* Service */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Servicio *</label>
-              <div className="relative">
-                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-500">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                </div>
-                <input 
-                  required type="text" placeholder="Instagram, Twitter, HubSpot..." 
-                  value={formData.service_name} onChange={e => setFormData({...formData, service_name: e.target.value})} 
-                  className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 pl-10 pr-4 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none text-slate-900 dark:text-white text-sm placeholder:text-slate-400" 
-                />
-              </div>
+              <input 
+                required type="text" placeholder="Instagram, Twitter, HubSpot..." 
+                value={formData.service_name} onChange={e => setFormData({...formData, service_name: e.target.value})} 
+                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 px-4 rounded-lg focus:ring-2 focus:ring-blue-500/50 outline-none text-slate-900 dark:text-white text-sm" 
+              />
             </div>
 
-            {/* Username */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Usuario / Correo *</label>
-              <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input 
-                  required type="text" placeholder="usuario@iesa.edu.ve" 
-                  value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} 
-                  className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 pl-10 pr-4 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none text-slate-900 dark:text-white text-sm placeholder:text-slate-400" 
-                />
-              </div>
+              <input 
+                required type="text" placeholder="usuario@iesa.edu.ve" 
+                value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} 
+                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 px-4 rounded-lg focus:ring-2 focus:ring-blue-500/50 outline-none text-slate-900 dark:text-white text-sm" 
+              />
             </div>
 
-            {/* Password */}
-            <PasswordField
-              value={formData.password_hash}
-              onChange={val => setFormData({...formData, password_hash: val})}
-            />
-
-            {/* URL */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">URL del Servicio</label>
-              <div className="relative">
-                <ExternalLink className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input 
-                  type="url" placeholder="https://..." 
-                  value={formData.url} onChange={e => setFormData({...formData, url: e.target.value})} 
-                  className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 pl-10 pr-4 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none text-slate-900 dark:text-white text-sm placeholder:text-slate-400" 
-                />
-              </div>
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Contraseña *</label>
+              <input 
+                required type="text" placeholder="••••••••••••" 
+                value={formData.password_hash} onChange={e => setFormData({...formData, password_hash: e.target.value})} 
+                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 px-4 rounded-lg focus:ring-2 focus:ring-blue-500/50 outline-none text-slate-900 dark:text-white text-sm font-mono" 
+              />
             </div>
 
-            {/* Notes */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">URL</label>
+              <input 
+                type="url" placeholder="https://..." 
+                value={formData.url} onChange={e => setFormData({...formData, url: e.target.value})} 
+                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 px-4 rounded-lg focus:ring-2 focus:ring-blue-500/50 outline-none text-slate-900 dark:text-white text-sm" 
+              />
+            </div>
+
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Notas</label>
               <textarea 
                 rows={2} placeholder="Observaciones adicionales..." 
                 value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} 
-                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 px-4 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none text-slate-900 dark:text-white text-sm placeholder:text-slate-400 resize-none" 
+                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 px-4 rounded-lg focus:ring-2 focus:ring-blue-500/50 outline-none text-slate-900 dark:text-white text-sm resize-none" 
               />
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} className="w-full sm:w-auto">
+              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white">
-                {editingId ? 'Guardar Cambios' : 'Guardar Credencial'}
+              <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                Guardar
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-// Extracted sub-component for password field
-function PasswordField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const [show, setShow] = useState(false);
-  return (
-    <div className="space-y-1.5">
-      <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Contraseña *</label>
-      <div className="relative">
-        <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-        <input 
-          required 
-          type={show ? 'text' : 'password'} 
-          placeholder="••••••••••••" 
-          value={value} 
-          onChange={e => onChange(e.target.value)}
-          className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 py-3 pl-10 pr-11 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none text-slate-900 dark:text-white text-sm placeholder:text-slate-400 transition-all font-mono tracking-wider" 
-        />
-        <button 
-          type="button" 
-          onClick={() => setShow(!show)}
-          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-500 transition-colors"
-          tabIndex={-1}
-        >
-          {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-        </button>
-      </div>
     </div>
   );
 }

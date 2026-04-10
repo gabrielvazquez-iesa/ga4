@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { apiFetch } from '../lib/api-fetch';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, LineChart, Line } from 'recharts';
-import { Eye, Users, MousePointerClick, Clock, ArrowUpRight, ArrowDownRight, RefreshCw, BarChart2, TrendingUp, Calendar, Download, ChevronDown } from 'lucide-react';
-import { toast, Toaster } from 'sonner';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { Eye, Users, MousePointerClick, Clock, ArrowUpRight, ArrowDownRight, RefreshCw, BarChart2, TrendingUp, Calendar, Download, ChevronDown, BookOpen, GraduationCap, X } from 'lucide-react';
+import { toast } from 'sonner';
 import MoMModule from './MoMModule';
 import EngagementModule from './EngagementModule';
 import PerformanceModule from './PerformanceModule';
@@ -16,7 +16,7 @@ const RANGES = [
 ];
 
 export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráfico y Audiencia (GA4)' }: { filterPath?: string; mainTitle?: string }) {
-  const [range, setRange] = useState(RANGES[1]);
+  const [range, setRange] = useState(RANGES[1]); // Default 30 days
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,7 +27,6 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
       const json = await res.json();
       if (json.error) throw new Error(json.error);
       
-      // Transform YYYY-MM-DD to short labels
       const formattedData = (json.data || []).map((row: any) => {
         const d = new Date(row.date);
         return {
@@ -38,7 +37,6 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
       setData(formattedData);
     } catch (error: any) {
       toast.error(error.message || 'Error al obtener métricas de GA4');
-      // Set some fallback empty data
       setData([]);
     } finally {
       setLoading(false);
@@ -47,7 +45,7 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
 
   useEffect(() => {
     fetchData(range.days);
-  }, [range]);
+  }, [range, filterPath]);
 
   const totals = useMemo(() => {
     if (!data.length) return { views: 0, users: 0, sessions: 0, bounceRate: 0, avgSession: 0 };
@@ -55,8 +53,8 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
       views: data.reduce((s, d) => s + d.views, 0),
       users: data.reduce((s, d) => s + d.users, 0),
       sessions: data.reduce((s, d) => s + d.sessions, 0),
-      bounceRate: data.reduce((s, d) => s + d.bounceRate, 0) / data.length, // Promedio
-      avgSession: data.reduce((s, d) => s + d.avgSession, 0) / data.length, // Promedio en segundos
+      bounceRate: data.reduce((s, d) => s + d.bounceRate, 0) / data.length,
+      avgSession: data.reduce((s, d) => s + d.avgSession, 0) / data.length,
     };
   }, [data]);
 
@@ -98,17 +96,25 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <Toaster position="top-right" theme="dark" />
-      
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-2 mb-2 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl w-fit">
-        <a href="/analytics" className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${!filterPath ? 'bg-white dark:bg-slate-800 shadow text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>Resumen General</a>
-        <a href="/analytics/blog" className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${filterPath === '/iesa-al-dia' ? 'bg-white dark:bg-slate-800 shadow text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>Blog (IESA al Día)</a>
-        <a href="/analytics/courses" className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${filterPath === '/cursos-y-programas' ? 'bg-white dark:bg-slate-800 shadow text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>Cursos y Programas</a>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
+          <div className="inline-flex gap-1 p-1.5 bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl backdrop-blur-sm shadow-sm transition-all duration-300 min-w-max">
+            <a href="/analytics" className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 ${!filterPath ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'}`}>
+              <BarChart2 className="w-4 h-4" />
+              Resumen General
+            </a>
+            <a href="/analytics/blog" className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 ${filterPath === '/iesa-al-dia' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'}`}>
+              <BookOpen className="w-4 h-4" />
+              Blog (IESA al Día)
+            </a>
+            <a href="/analytics/courses" className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 ${filterPath === '/cursos-y-programas' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'}`}>
+              <GraduationCap className="w-4 h-4" />
+              Cursos y Programas
+            </a>
+          </div>
+        </div>
       </div>
 
-      {/* Hero - Solo mostrar si no hay filtro de ruta (Resumen General) o si el usuario quiere verlo */}
-       {/* Pero el usuario pidió explícitamente "SOLO LA TABLA" para blog y cursos */}
       {!filterPath && (
         <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 rounded-3xl p-8 text-white shadow-2xl transition-all duration-500">
           <div className="relative z-10 flex flex-col md:flex-row justify-between gap-6 items-start md:items-center">
@@ -134,20 +140,20 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
         </div>
       )}
 
-      {/* Título simple para Blog/Cursos */}
       {filterPath && (
-        <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/80 dark:bg-slate-900 border border-slate-200 dark:border-white/10 p-6 rounded-3xl shadow-sm backdrop-blur-sm gap-4">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{mainTitle}</h1>
             <p className="text-sm text-slate-500">Listado detallado de comportamiento por página.</p>
           </div>
-          <button onClick={() => fetchData(range.days)} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-lg disabled:opacity-50">
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button onClick={() => fetchData(range.days)} disabled={loading} className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg active:scale-95 disabled:opacity-50">
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Actualizar
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Range selector */}
       <div className="flex flex-wrap gap-2 items-center">
         <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider mr-2">Período:</span>
         {RANGES.map(r => (
@@ -165,11 +171,10 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
         ))}
       </div>
 
-      {/* KPI Cards - Solo mostrar si NO es blog/cursos */}
       {!filterPath && (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {kpis.map(kpi => (
-            <div key={kpi.label} className={`bg-white/80 dark:bg-slate-900/60 border ${kpi.bg} rounded-2xl p-5 backdrop-blur-sm shadow-sm relative overflow-hidden group`}>
+            <div key={kpi.label} className={`bg-white/80 dark:bg-slate-900/60 border ${kpi.bg} rounded-2xl p-5 backdrop-blur-sm shadow-sm relative overflow-hidden group transition-all duration-300 hover:shadow-md`}>
               <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity ${kpi.bg.split(' ')[0]}`} />
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-3">
@@ -187,65 +192,57 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
         </div>
       )}
 
-      {/* Charts row - Solo mostrar si NO es blog/cursos */}
-      {!filterPath && (
-        <>
-          {loading ? (
-            <div className="h-64 flex items-center justify-center border border-slate-200 dark:border-white/10 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
-              <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Vistas vs Usuarios */}
-              <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
-                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Vistas vs Usuarios</h3>
-                <p className="text-xs text-slate-500 mb-4">Páginas vistas frente a la cantidad de usuarios activos</p>
-                <ResponsiveContainer width="100%" height={250}>
-                  <AreaChart data={data}>
-                    <defs>
-                      <linearGradient id="colViews" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="colUsers" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
-                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
-                    <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
-                    <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
-                    <RechartsTooltip content={<CustomTooltip />} />
-                    <Area type="monotone" dataKey="views" name="Vistas" stroke="#3b82f6" fill="url(#colViews)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
-                    <Area type="monotone" dataKey="users" name="Usuarios" stroke="#8b5cf6" fill="url(#colUsers)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+      {loading ? (
+        <div className="h-64 flex items-center justify-center border border-slate-200 dark:border-white/10 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+          <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+            <h3 className="font-bold text-slate-900 dark:text-white mb-1">Vistas vs Usuarios</h3>
+            <p className="text-xs text-slate-500 mb-4">Páginas vistas frente a la cantidad de usuarios activos</p>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={data}>
+                <defs>
+                  <linearGradient id="colViews" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="colUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
+                <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
+                <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={50} />
+                <RechartsTooltip content={<CustomTooltip />} />
+                <Area type="monotone" dataKey="views" name="Vistas" stroke="#3b82f6" fill="url(#colViews)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                <Area type="monotone" dataKey="users" name="Usuarios" stroke="#8b5cf6" fill="url(#colUsers)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
 
-              {/* Sesiones y Rebote */}
-              <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
-                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Sesiones vs Tasa de Rebote</h3>
-                <p className="text-xs text-slate-500 mb-4">Cantidad de sesiones y el porcentaje de abandono</p>
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
-                    <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
-                    <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
-                    <YAxis yAxisId="right" orientation="right" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
-                    <RechartsTooltip content={<CustomTooltip />} />
-                    <Line yAxisId="left" type="monotone" dataKey="sessions" name="Sesiones" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
-                    <Line yAxisId="right" type="step" dataKey="bounceRate" name="Tasa de Rebote (%)" stroke="#f43f5e" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          )}
-        </>
+          <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+            <h3 className="font-bold text-slate-900 dark:text-white mb-1">Sesiones vs Tasa de Rebote</h3>
+            <p className="text-xs text-slate-500 mb-4">Cantidad de sesiones y el porcentaje de abandono</p>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
+                <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
+                <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} width={40} />
+                <RechartsTooltip content={<CustomTooltip />} />
+                <Line yAxisId="left" type="monotone" dataKey="sessions" name="Sesiones" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                <Line yAxisId="right" type="step" dataKey="bounceRate" name="Tasa de Rebote (%)" stroke="#f43f5e" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       )}
 
-      {/* Nuevos Módulos GA4 */}
       {filterPath ? (
-        <div className="pt-6 mt-8 space-y-6">
+        <div className="pt-6 mt-8 space-y-6 animate-in fade-in slide-in-from-bottom-8">
           <ContentListModule days={range.days} filterPath={filterPath} />
         </div>
       ) : (
@@ -256,9 +253,9 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
           
           <MoMModule days={range.days} filterPath={filterPath} />
           
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <PerformanceModule days={range.days} filterPath={filterPath} />
+          <div className="flex flex-col gap-8">
             <EngagementModule days={range.days} filterPath={filterPath} />
+            <PerformanceModule days={range.days} filterPath={filterPath} />
           </div>
         </div>
       )}
