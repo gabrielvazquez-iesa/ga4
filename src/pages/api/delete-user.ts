@@ -22,21 +22,40 @@ function getServerSupabase(request: Request) {
 async function isAdmin(request: Request) {
   const authHeader = request.headers.get('Authorization');
   const token = authHeader?.split(' ')[1];
-  if (!token) return false;
+  if (!token || token === 'undefined') {
+    console.error('Admin Check: No token provided');
+    return false;
+  }
 
-  const client = getServerSupabase(request);
-  const { data: { user }, error } = await client.auth.getUser(token);
-  
-  if (error || !user) return false;
+  try {
+    const client = getServerSupabase(request);
+    const { data: { user }, error } = await client.auth.getUser(token);
+    
+    if (error || !user) {
+      console.error('Admin Check: User fetch error', error?.message);
+      return false;
+    }
 
-  const email = user.email?.toLowerCase() || '';
-  return ['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email);
+    const email = user.email?.toLowerCase() || '';
+    console.log('Admin Check: Authenticated as', email);
+    
+    const isAllowed = ['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email);
+    if (!isAllowed) console.warn('Admin Check: Access denied for', email);
+    
+    return isAllowed;
+  } catch (e) {
+    console.error('Admin Check: Crash', e);
+    return false;
+  }
 }
 
 export const DELETE: APIRoute = async ({ request }) => {
   // 1. Verificar Autenticación y Rol
-  if (!(await verifyApiAuth(request)) || !(await isAdmin(request))) {
-    return new Response(JSON.stringify({ error: 'No autorizado. Se cargan permisos de administrador.' }), { status: 401 });
+  const authenticated = await verifyApiAuth(request);
+  const admin = await isAdmin(request);
+
+  if (!authenticated || !admin) {
+    return new Response(JSON.stringify({ error: 'Acceso denegado: Se requieren permisos de administrador de alto nivel.' }), { status: 403 });
   }
 
   const urlParams = new URL(request.url).searchParams;

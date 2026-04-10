@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { User, UserX, ShieldCheck, Search, KeyRound } from 'lucide-react';
+import { User, UserX, ShieldCheck, Search, KeyRound, AlertTriangle } from 'lucide-react';
 import { nativeToast as toast } from './NativeToaster';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
+import { Button } from './ui/button';
 
 interface UserProfile {
   user_id: string;
@@ -24,6 +26,10 @@ export default function UsersManager() {
   // Edit logic
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
   const [newDept, setNewDept] = useState('');
+  
+  // Delete confirm state
+  const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => { checkAdminAndFetch(); }, []);
 
@@ -77,13 +83,14 @@ export default function UsersManager() {
     }
   };
   
-  const deleteUserPermanently = async (userId: string, name: string) => {
-    if (!window.confirm(`⚠️ ADVERTENCIA CRÍTICA: ¿Estás ABSOLUTAMENTE SEGURO de eliminar definitivamente a ${name}? \n\nEsta acción NO se puede deshacer y borrará permanentemente su cuenta de acceso y todo su perfil del sistema.`)) return;
-
+  const deleteUserPermanently = async () => {
+    if (!userToDelete) return;
+    
+    setDeleting(true);
     const { data: { session } } = await supabase.auth.getSession();
     
     try {
-      const resp = await fetch(`/api/delete-user?userId=${userId}`, {
+      const resp = await fetch(`/api/delete-user?userId=${userToDelete.user_id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session?.access_token}`,
@@ -96,9 +103,12 @@ export default function UsersManager() {
       if (!resp.ok) throw new Error(resData.error || 'Error al eliminar');
 
       toast.success('¡Usuario eliminado permanentemente del sistema!');
+      setUserToDelete(null);
       fetchUsers();
     } catch (err: any) {
       toast.error(err.message || 'Error al procesar la eliminación definitiva.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -255,7 +265,7 @@ export default function UsersManager() {
 
                       {user.is_banned && (
                         <button
-                          onClick={() => deleteUserPermanently(user.user_id, user.display_name)}
+                          onClick={() => setUserToDelete(user)}
                           className="p-1.5 bg-rose-600/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-600/20 rounded-lg transition-all"
                           title="ELIMINACIÓN DEFINITIVA"
                         >
@@ -303,6 +313,51 @@ export default function UsersManager() {
           </form>
         </div>
       )}
+
+      {/* Modal Confirmación Borrado Definitivo */}
+      <Dialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+        <DialogContent className="max-w-md bg-white dark:bg-slate-950 border-slate-200 dark:border-white/10 rounded-[2rem] p-0 overflow-hidden shadow-2xl">
+          <div className="bg-rose-600 h-2 w-full"></div>
+          
+          <div className="p-8">
+            <DialogHeader className="space-y-4">
+              <div className="mx-auto w-16 h-16 bg-rose-500/10 rounded-full flex items-center justify-center border border-rose-500/20 mb-2">
+                <AlertTriangle className="w-8 h-8 text-rose-500" />
+              </div>
+              <DialogTitle className="text-2xl font-black text-center text-slate-900 dark:text-white">
+                ADVERTENCIA CRÍTICA
+              </DialogTitle>
+              <DialogDescription className="text-center text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                ¿Estás <span className="font-bold text-slate-900 dark:text-white">ABSOLUTAMENTE SEGURO</span> de eliminar definitivamente a <span className="font-bold text-rose-500 break-all">{userToDelete?.display_name || userToDelete?.email || 'este usuario'}</span>?
+                <br /><br />
+                Esta acción <span className="underline decoration-rose-500">no se puede deshacer</span>. Se borrará su cuenta de acceso de Supabase y todo su perfil del sistema de forma permanente.
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter className="mt-8 flex gap-3 sm:justify-center">
+              <Button
+                variant="outline"
+                onClick={() => setUserToDelete(null)}
+                disabled={deleting}
+                className="flex-1 py-6 rounded-2xl border-slate-200 dark:border-white/10 dark:text-white font-bold hover:bg-slate-100 dark:hover:bg-white/5"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={deleteUserPermanently}
+                disabled={deleting}
+                className="flex-2 py-6 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-lg shadow-rose-500/20"
+              >
+                {deleting ? (
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                ) : (
+                  'Eliminar Permanentemente'
+                )}
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
