@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { Users, MousePointerClick, Clock, ArrowUpRight, ArrowDownRight, Eye, Download, X, RefreshCw, Activity, Target } from 'lucide-react';
 import { apiFetch } from '../lib/api-fetch';
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 
 // Import New UI Components
 import { PremiumKPI } from './ui/PremiumKPI';

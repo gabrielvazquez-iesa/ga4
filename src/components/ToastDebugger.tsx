@@ -1,4 +1,4 @@
-import { toast } from 'sonner';
+import { nativeToast as toast } from './NativeToaster';
 
 export default function ToastDebugger() {
   return (
@@ -16,8 +16,7 @@ export default function ToastDebugger() {
           console.log('Botón React clickeado');
           window.alert('¡React está vivo! El evento de clic funciona.');
           toast.success('Prueba de React: ¡Funcionando!', {
-            description: 'Si ves esta burbuja, React y Sonner están vinculados correctamente.',
-            duration: 5000,
+            description: 'Si ves esta burbuja, el sistema de alertas está vinculado correctamente.',
           });
         }}
         style={{
@@ -33,7 +32,7 @@ export default function ToastDebugger() {
       >
         DIAGNÓSTICO REACT
       </button>
-      <p style={{ fontSize: '10px', color: '#666', textAlign: 'center' }}>React 19 + Sonner 2.0</p>
+      <p style={{ fontSize: '10px', color: '#666', textAlign: 'center' }}>React 19 + NativeToaster</p>
     </div>
   );
 }
