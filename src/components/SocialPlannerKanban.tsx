@@ -256,12 +256,12 @@ export default function SocialPlannerKanban() {
           background-color: var(--accent-color, #4f46e5) !important; 
         }
         .kanban-column {
-          width: calc((100% / 5) - 1rem); /* Fluid columns based on grid */
-          min-width: 250px;
+          flex-shrink: 0;
+          transition: all 0.3s ease-in-out;
         }
         .zoom-container {
-             --base-width: 320px;
-             --actual-width: calc(var(--base-width) * (${zoom} / 100));
+             --col-base-width: 320px;
+             --col-actual-width: calc(var(--col-base-width) * (${zoom} / 100));
         }
       `}</style>
 
@@ -349,16 +349,15 @@ export default function SocialPlannerKanban() {
 
       {/* --- KANBAN BOARD --- */}
       <div 
-        className="flex gap-6 overflow-x-auto pb-12 scrollbar-none"
-        style={{ '--col-width': `calc((100% / 5) * (${zoom}/100))` } as any}
+        className="flex gap-6 overflow-x-auto pb-12 scrollbar-none zoom-container"
       >
         {COLUMNS.map(col => {
           const colPosts = filteredPosts.filter(p => p.status === col.id);
           return (
             <div 
               key={col.id} 
-              className="flex-shrink-0"
-              style={{ width: 'var(--col-width)', minWidth: '220px' }}
+              className="kanban-column"
+              style={{ width: 'var(--col-actual-width)' }}
               onDragOver={(e) => handleDragOver(e, col.id)}
               onDragLeave={() => setDragOverCol(null)}
               onDrop={(e) => handleDrop(e, col.id)}

@@ -21,9 +21,24 @@ export default function Sidebar({ currentPath }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Sync with global layout state (set in DashboardLayout.astro)
-    const isAttrCollapsed = document.documentElement.hasAttribute('data-sidebar-collapsed');
-    setIsCollapsed(isAttrCollapsed);
+    // Sync with global layout state
+    const syncSidebar = () => {
+      const isAttrCollapsed = document.documentElement.hasAttribute('data-sidebar-collapsed');
+      setIsCollapsed(isAttrCollapsed);
+    };
+
+    syncSidebar();
+
+    // Listener para cambios externos (ej. desde el Topbar en modo Pantalla Completa)
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-sidebar-collapsed') {
+          syncSidebar();
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
 
     supabase.auth.getSession().then(({ data }) => {
       const user = data.session?.user;
@@ -33,14 +48,16 @@ export default function Sidebar({ currentPath }: SidebarProps) {
           if (res.data?.custom_color) {
             const color = res.data.custom_color;
             setCustomColor(color);
-            // Propagar color a todo el sistema
             document.documentElement.style.setProperty('--accent-color', color);
             document.documentElement.style.setProperty('--accent-color-rgb', hexToRgb(color));
           }
         });
       }
     });
+
+    return () => observer.disconnect();
   }, []);
+
 
   // Helper para convertir HEX a RGB (para opacidades en Tailwind/CSS)
   function hexToRgb(hex: string) {
@@ -135,12 +152,13 @@ export default function Sidebar({ currentPath }: SidebarProps) {
                 title={isCollapsed ? undefined : undefined} // Removed native title, using custom tooltip
                 className={`group relative flex items-center gap-3 py-3 rounded-xl transition-all font-medium ${isCollapsed ? 'justify-center px-0' : 'px-4'} ${
                   isActive 
-                  ? 'bg-blue-600/10 text-blue-500 dark:text-blue-400 border border-blue-500/20 shadow-sm' 
+                  ? 'bg-accent/10 text-accent border-accent/20 shadow-sm' 
                   : 'hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:text-white border border-transparent'
                 }`}
               >
-                <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-blue-500 dark:text-blue-400' : 'text-slate-500'}`} />
+                <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-accent' : 'text-slate-500'}`} />
                 {!isCollapsed && <span className="truncate">{item.name}</span>}
+
 
                 {/* Animated Tooltip */}
                 {isCollapsed && (
@@ -190,10 +208,11 @@ export default function Sidebar({ currentPath }: SidebarProps) {
         <div className="mx-2 shrink-0">
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="relative flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-lg shadow-blue-500/40 transform transition-all active:scale-95 hover:shadow-blue-500/60"
+            className="relative flex items-center justify-center w-14 h-14 bg-accent text-white rounded-full shadow-lg shadow-accent/40 transform transition-all active:scale-95 hover:shadow-accent/60"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <LayoutGrid className="w-6 h-6" />}
           </button>
+
         </div>
 
         {/* Atajos Rápidos Derecha */}
@@ -220,11 +239,12 @@ export default function Sidebar({ currentPath }: SidebarProps) {
                 const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
                 return (
                   <a key={item.path} href={item.path} onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2.5 group">
-                    <div className={`w-16 h-16 flex items-center justify-center rounded-2xl transition-all ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-slate-100/80 dark:bg-white/8 text-slate-600 dark:text-slate-300 group-hover:bg-blue-50 dark:group-hover:bg-white/15 border border-slate-200/50 dark:border-white/5'}`}>
+                    <div className={`w-16 h-16 flex items-center justify-center rounded-2xl transition-all ${isActive ? 'bg-accent text-white shadow-lg shadow-accent/30' : 'bg-slate-100/80 dark:bg-white/8 text-slate-600 dark:text-slate-300 group-hover:bg-blue-50 dark:group-hover:bg-white/15 border border-slate-200/50 dark:border-white/5'}`}>
                       <item.icon className="w-7 h-7" />
                     </div>
                     <span className="text-[11px] font-semibold text-center leading-tight text-slate-600 dark:text-slate-300">{item.name}</span>
                   </a>
+
                 );
               })}
             </div>
