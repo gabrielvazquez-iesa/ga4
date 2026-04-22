@@ -48,6 +48,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
           if (res.data?.custom_color) {
             const color = res.data.custom_color;
             setCustomColor(color);
+            localStorage.setItem('accent_color', color);
             document.documentElement.style.setProperty('--accent-color', color);
             document.documentElement.style.setProperty('--accent-color-rgb', hexToRgb(color));
           }

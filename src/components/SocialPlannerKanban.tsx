@@ -373,7 +373,7 @@ export default function SocialPlannerKanban() {
               </div>
 
               <div className={`flex flex-col gap-5 p-5 rounded-[2.5rem] border-2 border-dashed transition-all duration-300 min-h-[700px] ${
-                dragOverCol === col.id ? `${col.border} bg-accent/5 scale-[1.01]` : 'border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/10'
+                dragOverCol === col.id ? `${col.border} bg-accent/5 scale-[1.01]` : 'border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/10'
               }`}>
                 <AnimatePresence mode="popLayout" initial={false}>
                   {colPosts.map(post => (

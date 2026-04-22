@@ -59,15 +59,31 @@ const currentPath = Astro.url.pathname;
         }
       };
 
+      const applyAccentColor = () => {
+        const color = localStorage.getItem('accent_color');
+        if (color) {
+          document.documentElement.style.setProperty('--accent-color', color);
+          // Helper para RGB
+          const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
+          if (result) {
+            const rgb = `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`;
+            document.documentElement.style.setProperty('--accent-color-rgb', rgb);
+          }
+        }
+      };
+
       // Aplicación inmediata (Pre-render)
       applyTheme();
       applySidebarState();
+      applyAccentColor();
 
       // Persistencia en transiciones de Astro (SPA-like)
       document.addEventListener('astro:after-swap', () => {
         applyTheme();
         applySidebarState();
+        applyAccentColor();
       });
+
     </script>
     <style is:global>
       /* --- Estilos Globales de Layout (Prevención de Jumps) --- */
@@ -129,9 +145,21 @@ const currentPath = Astro.url.pathname;
       :fullscreen header {
         position: sticky !important;
         top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
         z-index: 10000 !important;
-        background-color: rgb(var(--accent-color-rgb) / 0.05); /* Toque de color en fullscreen */
+        background-color: var(--accent-color) !important;
+        color: white !important;
       }
+      :fullscreen header * { color: white !important; }
+
+      /* Ajuste de Topbar para no solapar con Sidebar */
+      header {
+        left: var(--sidebar-width) !important;
+        width: calc(100% - var(--sidebar-width)) !important;
+        transition: left var(--transition-speed) ease-in-out, width var(--transition-speed) ease-in-out;
+      }
+
 
       /* --- Overrides Globales para compatibilidad con el resto de páginas --- */
 

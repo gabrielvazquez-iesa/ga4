@@ -252,9 +252,7 @@ export default function Topbar() {
           </a>
         )}
         
-        <a href="/duty" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800" title="Planificador de Guardias">
-          <Calendar className="w-5 h-5" />
-        </a>
+
 
         <button 
           onClick={toggleFullscreen}
