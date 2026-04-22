@@ -122,7 +122,7 @@ const currentPath = Astro.url.pathname;
     </script>
 
 		<!-- Sidebar for Desktop -->
-		<Sidebar client:load currentPath={currentPath} />
+		<Sidebar client:load currentPath={currentPath} transition:persist />
 
 		<!-- Main Content Wrapper -->
 		<div id="main-content" class="flex flex-col min-h-screen w-full overflow-x-hidden">

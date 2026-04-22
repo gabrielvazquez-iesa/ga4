@@ -9,7 +9,15 @@ interface SidebarProps {
 export default function Sidebar({ currentPath }: SidebarProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [customColor, setCustomColor] = useState<string | null>(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  // Inicialización instantánea para evitar el parpadeo
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('sidebar_collapsed') === 'true' || document.documentElement.hasAttribute('data-sidebar-collapsed');
+    }
+    return false;
+  });
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
