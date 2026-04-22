@@ -161,28 +161,40 @@ const currentPath = Astro.url.pathname;
 
 
 
-      /* --- Overrides Globales para compatibilidad con el resto de páginas --- */
-
-      /* Forzamos que las clases comunes de Indigo/Blue sigan el acento personalizado */
+      /* --- Overrides Globales Masivos para Tematización Instantánea --- */
+      /* Capturamos las gamas de Indigo, Blue y Violet para redirigirlas al acento */
       
       :is(.dark .dark\:bg-indigo-600, .bg-indigo-600, 
           .dark .dark\:bg-blue-600, .bg-blue-600,
-          .dark .dark\:bg-indigo-500, .bg-indigo-500) {
+          .dark .dark\:bg-indigo-500, .bg-indigo-500,
+          .dark .dark\:bg-blue-500, .bg-blue-500,
+          .dark .dark\:bg-violet-600, .bg-violet-600) {
         background-color: var(--accent-color) !important;
       }
 
       :is(.dark .dark\:text-indigo-400, .text-indigo-600,
-          .dark .dark\:text-blue-400, .text-blue-600) {
+          .dark .dark\:text-blue-400, .text-blue-600,
+          .dark .dark\:text-indigo-500, .text-indigo-500,
+          .dark .dark\:text-blue-500, .text-blue-500) {
         color: var(--accent-color) !important;
       }
 
-      :is(.dark .dark\:border-indigo-500, .border-indigo-600) {
+      :is(.dark .dark\:border-indigo-500, .border-indigo-600,
+          .dark .dark\:border-blue-500, .border-blue-600,
+          .dark .dark\:border-indigo-400, .border-indigo-400) {
         border-color: var(--accent-color) !important;
       }
 
-      :is(.shadow-indigo-500\/20, .shadow-blue-500\/20) {
+      :is(.shadow-indigo-500\/20, .shadow-blue-500\/20, .shadow-indigo-500\/10) {
         --tw-shadow-color: rgba(var(--accent-color-rgb), 0.2) !important;
       }
+
+      :is(.from-blue-600, .from-indigo-600) { 
+        --tw-gradient-from: var(--accent-color) !important; 
+        --tw-gradient-to: rgb(var(--accent-color-rgb) / 0.8) !important;
+        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+      }
+
 
       /* Asegurar visibilidad total de las alertas de Sonner */
       [data-sonner-toaster] {

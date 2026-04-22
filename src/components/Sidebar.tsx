@@ -131,10 +131,11 @@ export default function Sidebar({ currentPath }: SidebarProps) {
         <div className={`p-6 flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
           <div 
             className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white shadow-lg overflow-hidden shrink-0 transition-colors"
-            style={customColor ? { backgroundColor: customColor } : { backgroundImage: 'linear-gradient(to bottom right, #3b82f6, #9333ea)' }}
+            style={{ backgroundColor: 'var(--accent-color)' }}
           >
             GA
           </div>
+
           {!isCollapsed && (
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 truncate">
               GA4Dash

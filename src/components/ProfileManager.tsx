@@ -243,7 +243,8 @@ export default function ProfileManager() {
                       type="button"
                       onClick={() => {
                         setProfile({...profile, custom_color: color});
-                        // Vista previa en vivo
+                        // Vista previa en vivo inmediata
+                        localStorage.setItem('accent_color', color);
                         document.documentElement.style.setProperty('--accent-color', color);
                         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
                         if (result) {
