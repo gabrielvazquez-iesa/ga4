@@ -75,6 +75,14 @@ const currentPath = Astro.url.pathname;
       :root {
         --sidebar-width: 16rem; /* 64 */
         --transition-speed: 0.3s;
+        /* Colores dinámicos */
+        --accent-color: #4f46e5; /* Indigo-600 default */
+        --accent-color-rgb: 79, 70, 229;
+      }
+
+      /* Transiciones globales suaves para cambios de tema y colores */
+      body {
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
 
       html[data-sidebar-collapsed="true"] {
@@ -95,7 +103,7 @@ const currentPath = Astro.url.pathname;
 
       /* Transición para el sidebar */
       aside {
-        transition: width var(--transition-speed) ease-in-out !important;
+        transition: width var(--transition-speed) ease-in-out, background-color 0.3s ease !important;
         will-change: width;
       }
 
@@ -105,6 +113,13 @@ const currentPath = Astro.url.pathname;
       html.astro-is-transitioning aside {
         transition: none !important;
       }
+
+      /* Utilidades de colores dinámicos */
+      .bg-accent { background-color: var(--accent-color) !important; }
+      .text-accent { color: var(--accent-color) !important; }
+      .border-accent { border-color: var(--accent-color) !important; }
+      .ring-accent { --tw-ring-color: var(--accent-color) !important; }
+      .shadow-accent { --tw-shadow-color: rgba(var(--accent-color-rgb), 0.3) !important; }
 
       /* Asegurar visibilidad total de las alertas de Sonner */
       [data-sonner-toaster] {

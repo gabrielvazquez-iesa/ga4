@@ -1,4 +1,4 @@
-import { Bell, Search, User, Check, Trash2, X, Calendar, ShieldCheck } from 'lucide-react';
+import { Bell, Search, User, Check, Trash2, X, Calendar, ShieldCheck, Maximize2, Minimize2 } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { nativeToast as toast } from './NativeToaster';
@@ -18,7 +18,10 @@ export default function Topbar() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [onDuty, setOnDuty] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [preFullscreenSidebarState, setPreFullscreenSidebarState] = useState<boolean | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
   const searchRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -74,20 +77,32 @@ export default function Topbar() {
         }
       });
 
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowNotifications(false);
-      }
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setShowSearchResults(false);
+    const handleFullscreenChange = () => {
+      const isFull = !!document.fullscreenElement;
+      setIsFullscreen(isFull);
+      
+      if (!isFull && preFullscreenSidebarState !== null) {
+        // Al salir de pantalla completa, restaurar estado del sidebar
+        if (preFullscreenSidebarState) {
+          document.documentElement.setAttribute('data-sidebar-collapsed', 'true');
+          localStorage.setItem('sidebar_collapsed', 'true');
+        } else {
+          document.documentElement.removeAttribute('data-sidebar-collapsed');
+          localStorage.setItem('sidebar_collapsed', 'false');
+        }
+        setPreFullscreenSidebarState(null);
       }
     };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [preFullscreenSidebarState]);
+
 
   const fetchInitialData = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -125,6 +140,24 @@ export default function Topbar() {
       .limit(10);
         
     if (notifs) setNotifications(notifs);
+  };
+
+  const toggleFullscreen = async () => {
+    if (!document.fullscreenElement) {
+      // Guardar estado actual del sidebar antes de colapsar para pantalla completa
+      const isCurrentCollapsed = document.documentElement.hasAttribute('data-sidebar-collapsed');
+      setPreFullscreenSidebarState(isCurrentCollapsed);
+      
+      // Colapsar sidebar para maximizar espacio
+      document.documentElement.setAttribute('data-sidebar-collapsed', 'true');
+      localStorage.setItem('sidebar_collapsed', 'true');
+
+      await document.documentElement.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
   };
 
   const searchResults = searchQuery.trim() === '' ? [] : searchableRoutes.filter(route => 
@@ -212,6 +245,14 @@ export default function Topbar() {
         <a href="/duty" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800" title="Planificador de Guardias">
           <Calendar className="w-5 h-5" />
         </a>
+
+        <button 
+          onClick={toggleFullscreen}
+          className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+          title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+        >
+          {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+        </button>
 
         <ThemeToggle />
 

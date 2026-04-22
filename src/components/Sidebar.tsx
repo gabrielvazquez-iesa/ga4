@@ -30,11 +30,24 @@ export default function Sidebar({ currentPath }: SidebarProps) {
       if (user) {
         setIsAdmin(['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes((user.email || '').toLowerCase()));
         supabase.from('user_profiles').select('custom_color').eq('user_id', user.id).maybeSingle().then((res) => {
-          if (res.data?.custom_color) setCustomColor(res.data.custom_color);
+          if (res.data?.custom_color) {
+            const color = res.data.custom_color;
+            setCustomColor(color);
+            // Propagar color a todo el sistema
+            document.documentElement.style.setProperty('--accent-color', color);
+            document.documentElement.style.setProperty('--accent-color-rgb', hexToRgb(color));
+          }
         });
       }
     });
   }, []);
+
+  // Helper para convertir HEX a RGB (para opacidades en Tailwind/CSS)
+  function hexToRgb(hex: string) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '79, 70, 229';
+  }
+
 
   // Padding management is now handled via CSS in DashboardLayout.astro
     // This allows for layout persistence without flashes.
