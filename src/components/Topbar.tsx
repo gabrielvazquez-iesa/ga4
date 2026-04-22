@@ -77,6 +77,15 @@ export default function Topbar() {
         }
       });
 
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearchResults(false);
+      }
+    };
+
     const handleFullscreenChange = () => {
       const isFull = !!document.fullscreenElement;
       setIsFullscreen(isFull);
@@ -102,6 +111,7 @@ export default function Topbar() {
       supabase.removeChannel(channel);
     };
   }, [preFullscreenSidebarState]);
+
 
 
   const fetchInitialData = async () => {
