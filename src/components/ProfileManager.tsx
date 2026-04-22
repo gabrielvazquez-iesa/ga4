@@ -236,16 +236,22 @@ export default function ProfileManager() {
               <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Color de Guardia Personalizado</label>
               <p className="text-xs text-slate-500 mb-3">Este color te identificará en el Planificador de Guardias.</p>
               <div className="bg-slate-100/50 dark:bg-slate-800/40 rounded-2xl p-4 overflow-hidden border border-slate-200 dark:border-white/5">
-                <div className="flex gap-4 overflow-x-auto pb-1 snap-x items-center [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+                <div className="flex flex-wrap gap-4 items-center">
                   {['#94a3b8', '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#f43f5e'].map(color => (
                     <button
                       key={color}
                       type="button"
                       onClick={() => {
                         setProfile({...profile, custom_color: color});
-                        toast.info(`Color seleccionado. No olvides guardar los cambios.`);
+                        // Vista previa en vivo
+                        document.documentElement.style.setProperty('--accent-color', color);
+                        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
+                        if (result) {
+                          const rgb = `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`;
+                          document.documentElement.style.setProperty('--accent-color-rgb', rgb);
+                        }
                       }}
-                      className={`shrink-0 transition-all duration-300 ease-out snap-center focus:outline-none
+                      className={`shrink-0 transition-all duration-300 ease-out focus:outline-none
                         ${profile.custom_color === color 
                           ? 'w-14 h-14 rounded-[16px] shadow-lg scale-105 border-2 border-slate-900/10 dark:border-white/20' 
                           : 'w-10 h-10 rounded-[12px] opacity-80 hover:opacity-100 hover:scale-110'}`}

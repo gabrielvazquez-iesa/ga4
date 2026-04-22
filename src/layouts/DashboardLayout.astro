@@ -153,12 +153,12 @@ const currentPath = Astro.url.pathname;
       }
       :fullscreen header * { color: white !important; }
 
-      /* Ajuste de Topbar para no solapar con Sidebar */
+      /* Asegurar que el header fluya con el contenedor sin desplazamientos dobles */
       header {
-        left: var(--sidebar-width) !important;
-        width: calc(100% - var(--sidebar-width)) !important;
-        transition: left var(--transition-speed) ease-in-out, width var(--transition-speed) ease-in-out;
+        width: 100% !important;
+        z-index: 30;
       }
+
 
 
       /* --- Overrides Globales para compatibilidad con el resto de páginas --- */
