@@ -59,7 +59,8 @@ export default function Sidebar({ currentPath }: SidebarProps) {
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Analítica GA4', path: '/analytics', icon: BarChart3 },
-    { name: 'Planificador', path: '/duty', icon: Calendar },
+    { name: 'Guardias', path: '/duty', icon: Calendar },
+    { name: 'Contenidos', path: '/social-planner', icon: Layout },
     { name: 'Redes Sociales', path: '/social-reports', icon: Instagram },
     { name: 'Notificaciones', path: '/notifications', icon: Bell },
     { name: 'Bóveda', path: '/vault', icon: KeyRound },

@@ -1,0 +1,30 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import SocialPlannerKanban from '../components/SocialPlannerKanban';
+---
+
+<DashboardLayout title="Planificador de Redes Sociales | IESA Dashboard">
+  <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+    <SocialPlannerKanban client:only="react" />
+  </div>
+</DashboardLayout>
+
+<style is:global>
+  /* Personalización extra para el scroll horizontal del Kanban */
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.2);
+    border-radius: 10px;
+  }
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.4);
+  }
+</style>
