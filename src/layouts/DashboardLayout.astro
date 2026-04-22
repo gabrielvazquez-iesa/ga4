@@ -50,10 +50,59 @@ const currentPath = Astro.url.pathname;
         }
       };
 
+      const applySidebarState = () => {
+        const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+        if (isCollapsed) {
+          document.documentElement.setAttribute('data-sidebar-collapsed', 'true');
+        } else {
+          document.documentElement.removeAttribute('data-sidebar-collapsed');
+        }
+      };
+
+      // Aplicación inmediata (Pre-render)
       applyTheme();
-      document.addEventListener('astro:after-swap', applyTheme);
+      applySidebarState();
+
+      // Persistencia en transiciones de Astro (SPA-like)
+      document.addEventListener('astro:after-swap', () => {
+        applyTheme();
+        applySidebarState();
+      });
     </script>
     <style is:global>
+      /* --- Estilos Globales de Layout (Prevención de Jumps) --- */
+      
+      /* Ancho por defecto (Expandido) */
+      :root {
+        --sidebar-width: 16rem; /* 64 */
+      }
+
+      /* Ancho Contraído */
+      html[data-sidebar-collapsed="true"] {
+        --sidebar-width: 5rem; /* 20 */
+      }
+
+      #main-content {
+        padding-left: 0; /* Móvil */
+      }
+
+      @media (min-width: 768px) {
+        #main-content {
+          padding-left: var(--sidebar-width);
+        }
+      }
+
+      /* Animaciones solo cuando el usuario interactúa (no al cargar) */
+      html.hydrated #main-content,
+      html.hydrated .sidebar-transition {
+        transition: all 300s ease-in-out; /* Note: reduced to extreme for layout but usually 300ms */
+      }
+      
+      /* Ajuste real de velocidad para fluidez */
+      #main-content, aside {
+        transition: padding-left 0.3s ease-in-out, width 0.3s ease-in-out !important;
+      }
+
       /* Asegurar visibilidad total de las alertas de Sonner */
       [data-sonner-toaster] {
         z-index: 1000000 !important;
@@ -64,11 +113,16 @@ const currentPath = Astro.url.pathname;
     </style>
 	</head>
 	<body class="bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased min-h-screen">
+    <script is:inline>
+      // Marcador para habilitar transiciones suaves después de la carga inicial
+      document.documentElement.classList.add('hydrated');
+    </script>
+
 		<!-- Sidebar for Desktop -->
 		<Sidebar client:load currentPath={currentPath} />
 
 		<!-- Main Content Wrapper -->
-		<div id="main-content" class="md:pl-64 flex flex-col min-h-screen transition-all duration-300 ease-in-out w-full overflow-x-hidden">
+		<div id="main-content" class="flex flex-col min-h-screen w-full overflow-x-hidden">
 			<PresenceManager client:load />
 			<Topbar client:load />
 			

@@ -13,9 +13,9 @@ export default function Sidebar({ currentPath }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Check local storage for preference
-    const storedState = localStorage.getItem('sidebar_collapsed');
-    if (storedState) setIsCollapsed(storedState === 'true');
+    // Sync with global layout state (set in DashboardLayout.astro)
+    const isAttrCollapsed = document.documentElement.hasAttribute('data-sidebar-collapsed');
+    setIsCollapsed(isAttrCollapsed);
 
     supabase.auth.getSession().then(({ data }) => {
       const user = data.session?.user;
@@ -28,23 +28,21 @@ export default function Sidebar({ currentPath }: SidebarProps) {
     });
   }, []);
 
-  useEffect(() => {
-    const mainWrapper = document.getElementById('main-content');
-    if (mainWrapper) {
-      if (isCollapsed) {
-        mainWrapper.classList.remove('md:pl-64');
-        mainWrapper.classList.add('md:pl-20');
-      } else {
-        mainWrapper.classList.remove('md:pl-20');
-        mainWrapper.classList.add('md:pl-64');
-      }
-    }
-  }, [isCollapsed]);
+  // Padding management is now handled via CSS in DashboardLayout.astro
+    // This allows for layout persistence without flashes.
+
 
   const toggleSidebar = () => {
     const newState = !isCollapsed;
     setIsCollapsed(newState);
     localStorage.setItem('sidebar_collapsed', String(newState));
+    
+    // Update global attribute for instant CSS response
+    if (newState) {
+      document.documentElement.setAttribute('data-sidebar-collapsed', 'true');
+    } else {
+      document.documentElement.removeAttribute('data-sidebar-collapsed');
+    }
   };
 
   const handleLogout = async () => {
