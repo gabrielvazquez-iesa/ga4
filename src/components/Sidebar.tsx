@@ -144,7 +144,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
           )}
         </div>
 
-        <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-800 scrollbar-track-transparent hover:scrollbar-thumb-slate-400 dark:hover:scrollbar-thumb-slate-700">
+        <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto">
           {menuItems.map((item) => {
             const path = currentPath || '';
             const isActive = path === item.path || path.startsWith(item.path + '/');

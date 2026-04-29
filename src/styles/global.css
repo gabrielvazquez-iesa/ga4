@@ -15,6 +15,40 @@ body {
   @apply bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased;
 }
 
+/* Custom Sutil Scrollbar - Adapts to Theme */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Firefox Support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.2) transparent;
+}
+
 /* Rediseño de React Datepicker para Dark Mode Premium */
 .dark .react-datepicker {
   @apply bg-[#0f172a] border border-white/10 shadow-2xl text-slate-300 font-sans rounded-xl overflow-hidden;
