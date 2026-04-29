@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { apiFetch } from '../lib/api-fetch';
 import { supabase } from '../lib/supabase';
-import { Copy, Globe, RefreshCw, AlertTriangle, ExternalLink, Search, Download, Calendar, Settings, X, Plus, Trash2, Eye, EyeOff, Check } from 'lucide-react';
+import { Copy, Globe, RefreshCw, AlertTriangle, ExternalLink, Search, Download, Calendar, Settings, X, Plus, Trash2, Eye, EyeOff, Check, Filter } from 'lucide-react';
 import { nativeToast as toast } from './NativeToaster';
 
 interface YearData {
@@ -38,6 +38,7 @@ export default function EcosystemReport() {
   
   // UI State
   const [showSettings, setShowSettings] = useState(false);
+  const [showVisibilityModal, setShowVisibilityModal] = useState(false);
   const [dbProperties, setDbProperties] = useState<DBProperty[]>([]);
   const [newPropName, setNewPropName] = useState('');
   const [newPropId, setNewPropId] = useState('');
@@ -64,10 +65,6 @@ export default function EcosystemReport() {
       const json = await res.json();
       if (json.error) throw new Error(json.error);
       setData(json.data || []);
-      // Auto-select all visible items by default if none selected
-      if (selectedIds.length === 0 && json.data) {
-        // We'll let the user decide selection
-      }
     } catch (e: any) {
       setError(e.message);
       toast.error("Error al cargar el ecosistema digital");
@@ -217,6 +214,13 @@ export default function EcosystemReport() {
            </div>
            
            <button 
+            onClick={() => setShowVisibilityModal(true)}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-4 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-black rounded-2xl border border-slate-200 dark:border-white/10 transition-all"
+          >
+            <Filter className="w-4 h-4" /> Mostrar/Ocultar
+          </button>
+
+           <button 
             onClick={copyToClipboard}
             disabled={loading || exportData.length === 0}
             className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl transition-all shadow-xl shadow-emerald-600/20 disabled:opacity-50 active:scale-95"
@@ -226,121 +230,127 @@ export default function EcosystemReport() {
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-        
-        {/* Visibility Sidebar (Quick Filters) */}
-        <div className="xl:col-span-1 space-y-4">
-          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-sm backdrop-blur-md">
-            <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-between">
-              Visibilidad de Sitios
-              <span className="text-[10px] bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">{data.length} total</span>
-            </h3>
-            <div className="max-h-[500px] overflow-y-auto space-y-1 pr-2">
-              {data.map(item => (
-                <button 
-                  key={item.id}
-                  onClick={() => toggleVisibility(item.id)}
-                  className={`w-full flex items-center justify-between p-3 rounded-xl transition-all text-left group ${hiddenHostnames.includes(item.id) ? 'opacity-40 grayscale' : 'hover:bg-slate-100 dark:hover:bg-white/5'}`}
-                >
-                  <div className="truncate pr-2">
-                    <p className={`text-xs font-bold truncate ${hiddenHostnames.includes(item.id) ? 'line-through' : 'text-slate-900 dark:text-slate-200'}`}>{item.hostname}</p>
-                    <p className="text-[10px] text-slate-400 font-medium truncate">{item.propertyName}</p>
-                  </div>
-                  {hiddenHostnames.includes(item.id) ? <EyeOff className="w-3.5 h-3.5 shrink-0" /> : <Eye className="w-3.5 h-3.5 shrink-0 text-indigo-500 opacity-0 group-hover:opacity-100" />}
-                </button>
-              ))}
-            </div>
-            {hiddenHostnames.length > 0 && (
-              <button onClick={() => { setHiddenHostnames([]); localStorage.removeItem('ecosystem_hidden_ids'); }} className="w-full mt-4 text-[10px] font-black uppercase text-indigo-500 hover:underline">Mostrar todos</button>
-            )}
-          </div>
-        </div>
-
-        {/* Table View */}
-        <div className="xl:col-span-3">
-          <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-[2rem] overflow-hidden shadow-2xl backdrop-blur-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-[11px] border-collapse min-w-[1000px]">
-                <thead>
-                  <tr className="bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-white/5">
-                    <th rowSpan={2} className="w-12 px-6 py-4"></th>
-                    <th rowSpan={2} className="px-6 py-4 font-black text-slate-900 dark:text-white uppercase tracking-wider border-r border-slate-200 dark:border-white/5 sticky left-0 z-20 bg-inherit">Sitio / Propiedad</th>
-                    <th colSpan={5} className="px-6 py-3 font-black text-center text-indigo-600 dark:text-indigo-400 uppercase tracking-widest border-r border-slate-200 dark:border-white/5 bg-indigo-500/5">Rendimiento 2025</th>
-                    <th colSpan={5} className="px-6 py-3 font-black text-center text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-500/5">Rendimiento 2026 (Hoy)</th>
-                  </tr>
-                  <tr className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-white/10">
-                    <th className="px-4 py-3 font-bold text-slate-400 text-right border-r border-slate-200 dark:border-white/5">Users</th>
-                    <th className="px-4 py-3 font-bold text-slate-400 text-right border-r border-slate-200 dark:border-white/5">Time</th>
-                    <th className="px-4 py-3 font-bold text-slate-400 text-right border-r border-slate-200 dark:border-white/5">Org</th>
-                    <th className="px-4 py-3 font-bold text-slate-400 text-right border-r border-slate-200 dark:border-white/5">Dir</th>
-                    <th className="px-4 py-3 font-bold text-slate-400 text-right border-r border-slate-200 dark:border-white/5">Ref</th>
-                    
-                    <th className="px-4 py-3 font-bold text-emerald-600/60 text-right border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">Users</th>
-                    <th className="px-4 py-3 font-bold text-emerald-600/60 text-right border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">Time</th>
-                    <th className="px-4 py-3 font-bold text-emerald-600/60 text-right border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">Org</th>
-                    <th className="px-4 py-3 font-bold text-emerald-600/60 text-right border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">Dir</th>
-                    <th className="px-4 py-3 font-bold text-emerald-600/60 text-right bg-emerald-500/5">Ref</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                  {loading ? (
-                    Array(8).fill(0).map((_, i) => (
-                      <tr key={i} className="animate-pulse">
-                        <td colSpan={12} className="px-6 py-6"><div className="h-4 bg-slate-100 dark:bg-slate-800 rounded-full w-full"></div></td>
-                      </tr>
-                    ))
-                  ) : filteredData.length > 0 ? (
-                    filteredData.map((item) => (
-                      <tr 
-                        key={item.id} 
-                        className={`hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group ${selectedIds.includes(item.id) ? 'bg-indigo-50/50 dark:bg-indigo-500/10' : ''}`}
-                      >
-                        <td className="px-6 py-4">
-                          <button 
-                            onClick={() => toggleSelection(item.id)}
-                            className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${selectedIds.includes(item.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 dark:border-white/10'}`}
-                          >
-                            {selectedIds.includes(item.id) && <Check className="w-3.5 h-3.5" />}
-                          </button>
-                        </td>
-                        <td className="px-6 py-4 border-r border-slate-200 dark:border-white/5 sticky left-0 z-10 bg-inherit group-hover:bg-slate-50 dark:group-hover:bg-slate-800/40 transition-colors">
-                          <div className="flex flex-col">
-                            <span className="font-black text-slate-900 dark:text-white truncate max-w-[200px] leading-tight mb-0.5">{item.hostname}</span>
-                            <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-tighter opacity-70">{item.propertyName}</span>
-                          </div>
-                        </td>
-                        
-                        {/* 2025 Data */}
-                        <td className="px-4 py-4 text-right font-mono text-slate-500 border-r border-slate-200 dark:border-white/5">{item.y2025.users.toLocaleString()}</td>
-                        <td className="px-4 py-4 text-right font-mono text-slate-500 border-r border-slate-200 dark:border-white/5">{item.y2025.avgDurationFormatted}</td>
-                        <td className="px-4 py-4 text-right font-mono text-slate-500 border-r border-slate-200 dark:border-white/5">{item.y2025.organic.toLocaleString()}</td>
-                        <td className="px-4 py-4 text-right font-mono text-slate-500 border-r border-slate-200 dark:border-white/5">{item.y2025.direct.toLocaleString()}</td>
-                        <td className="px-4 py-4 text-right font-mono text-slate-500 border-r border-slate-200 dark:border-white/5">{item.y2025.referral.toLocaleString()}</td>
-                        
-                        {/* 2026 Data */}
-                        <td className="px-4 py-4 text-right font-mono font-black text-emerald-600 dark:text-emerald-400 border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">{item.y2026.users.toLocaleString()}</td>
-                        <td className="px-4 py-4 text-right font-mono font-black text-emerald-600 dark:text-emerald-400 border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">{item.y2026.avgDurationFormatted}</td>
-                        <td className="px-4 py-4 text-right font-mono font-black text-emerald-600 dark:text-emerald-400 border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">{item.y2026.organic.toLocaleString()}</td>
-                        <td className="px-4 py-4 text-right font-mono font-black text-emerald-600 dark:text-emerald-400 border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">{item.y2026.direct.toLocaleString()}</td>
-                        <td className="px-4 py-4 text-right font-mono font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/5">{item.y2026.referral.toLocaleString()}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={12} className="px-6 py-32 text-center">
-                         <Globe className="w-16 h-16 mx-auto text-slate-200 dark:text-slate-800 mb-4" />
-                         <p className="text-slate-500 dark:text-slate-400 font-bold">No hay sitios visibles para mostrar.</p>
-                         <button onClick={() => { setSearchTerm(''); setHiddenHostnames([]); }} className="mt-4 text-indigo-500 text-xs font-black underline">Restablecer filtros</button>
-                      </td>
+      {/* Main Content Area - Full Width Table */}
+      <div className="w-full">
+        <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-[2rem] overflow-hidden shadow-2xl backdrop-blur-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-[11px] border-collapse min-w-[1000px]">
+              <thead>
+                <tr className="bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-white/5">
+                  <th rowSpan={2} className="w-12 px-6 py-4"></th>
+                  <th rowSpan={2} className="px-6 py-4 font-black text-slate-900 dark:text-white uppercase tracking-wider border-r border-slate-200 dark:border-white/5 sticky left-0 z-20 bg-inherit">Sitio / Propiedad</th>
+                  <th colSpan={5} className="px-6 py-3 font-black text-center text-indigo-600 dark:text-indigo-400 uppercase tracking-widest border-r border-slate-200 dark:border-white/5 bg-indigo-500/5">Rendimiento 2025</th>
+                  <th colSpan={5} className="px-6 py-3 font-black text-center text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-500/5">Rendimiento 2026 (Hoy)</th>
+                </tr>
+                <tr className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-white/10">
+                  <th className="px-4 py-3 font-bold text-slate-400 text-right border-r border-slate-200 dark:border-white/5">Users</th>
+                  <th className="px-4 py-3 font-bold text-slate-400 text-right border-r border-slate-200 dark:border-white/5">Time</th>
+                  <th className="px-4 py-3 font-bold text-slate-400 text-right border-r border-slate-200 dark:border-white/5">Org</th>
+                  <th className="px-4 py-3 font-bold text-slate-400 text-right border-r border-slate-200 dark:border-white/5">Dir</th>
+                  <th className="px-4 py-3 font-bold text-slate-400 text-right border-r border-slate-200 dark:border-white/5">Ref</th>
+                  
+                  <th className="px-4 py-3 font-bold text-emerald-600/60 text-right border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">Users</th>
+                  <th className="px-4 py-3 font-bold text-emerald-600/60 text-right border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">Time</th>
+                  <th className="px-4 py-3 font-bold text-emerald-600/60 text-right border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">Org</th>
+                  <th className="px-4 py-3 font-bold text-emerald-600/60 text-right border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">Dir</th>
+                  <th className="px-4 py-3 font-bold text-emerald-600/60 text-right bg-emerald-500/5">Ref</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                {loading ? (
+                  Array(8).fill(0).map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td colSpan={12} className="px-6 py-6"><div className="h-4 bg-slate-100 dark:bg-slate-800 rounded-full w-full"></div></td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                ) : filteredData.length > 0 ? (
+                  filteredData.map((item) => (
+                    <tr 
+                      key={item.id} 
+                      className={`hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group ${selectedIds.includes(item.id) ? 'bg-indigo-50/50 dark:bg-indigo-500/10' : ''}`}
+                    >
+                      <td className="px-6 py-4">
+                        <button 
+                          onClick={() => toggleSelection(item.id)}
+                          className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${selectedIds.includes(item.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 dark:border-white/10'}`}
+                        >
+                          {selectedIds.includes(item.id) && <Check className="w-3.5 h-3.5" />}
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 border-r border-slate-200 dark:border-white/5 sticky left-0 z-10 bg-inherit group-hover:bg-slate-50 dark:group-hover:bg-slate-800/40 transition-colors">
+                        <div className="flex flex-col">
+                          <span className="font-black text-slate-900 dark:text-white truncate max-w-[300px] leading-tight mb-0.5">{item.hostname}</span>
+                          <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-tighter opacity-70">{item.propertyName}</span>
+                        </div>
+                      </td>
+                      
+                      {/* 2025 Data */}
+                      <td className="px-4 py-4 text-right font-mono text-slate-500 border-r border-slate-200 dark:border-white/5">{item.y2025.users.toLocaleString()}</td>
+                      <td className="px-4 py-4 text-right font-mono text-slate-500 border-r border-slate-200 dark:border-white/5">{item.y2025.avgDurationFormatted}</td>
+                      <td className="px-4 py-4 text-right font-mono text-slate-500 border-r border-slate-200 dark:border-white/5">{item.y2025.organic.toLocaleString()}</td>
+                      <td className="px-4 py-4 text-right font-mono text-slate-500 border-r border-slate-200 dark:border-white/5">{item.y2025.direct.toLocaleString()}</td>
+                      <td className="px-4 py-4 text-right font-mono text-slate-500 border-r border-slate-200 dark:border-white/5">{item.y2025.referral.toLocaleString()}</td>
+                      
+                      {/* 2026 Data */}
+                      <td className="px-4 py-4 text-right font-mono font-black text-emerald-600 dark:text-emerald-400 border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">{item.y2026.users.toLocaleString()}</td>
+                      <td className="px-4 py-4 text-right font-mono font-black text-emerald-600 dark:text-emerald-400 border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">{item.y2026.avgDurationFormatted}</td>
+                      <td className="px-4 py-4 text-right font-mono font-black text-emerald-600 dark:text-emerald-400 border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">{item.y2026.organic.toLocaleString()}</td>
+                      <td className="px-4 py-4 text-right font-mono font-black text-emerald-600 dark:text-emerald-400 border-r border-slate-200 dark:border-white/5 bg-emerald-500/5">{item.y2026.direct.toLocaleString()}</td>
+                      <td className="px-4 py-4 text-right font-mono font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/5">{item.y2026.referral.toLocaleString()}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={12} className="px-6 py-32 text-center">
+                       <Globe className="w-16 h-16 mx-auto text-slate-200 dark:text-slate-800 mb-4" />
+                       <p className="text-slate-500 dark:text-slate-400 font-bold">No hay sitios visibles para mostrar.</p>
+                       <button onClick={() => { setSearchTerm(''); setHiddenHostnames([]); }} className="mt-4 text-indigo-500 text-xs font-black underline">Restablecer filtros</button>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
+
+      {/* Visibility Modal */}
+      {showVisibilityModal && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in">
+           <div className="bg-white dark:bg-slate-900 border border-white/10 w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+              <div className="p-8 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                 <div>
+                   <h2 className="text-xl font-black text-slate-900 dark:text-white">Visibilidad de Sitios</h2>
+                   <p className="text-slate-500 text-[10px] uppercase tracking-widest font-black mt-1">Oculta los dominios que no deseas medir</p>
+                 </div>
+                 <button onClick={() => setShowVisibilityModal(false)} className="w-10 h-10 flex items-center justify-center bg-white dark:bg-white/5 rounded-2xl hover:shadow-md transition-all">
+                    <X className="w-5 h-5" />
+                 </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-6 space-y-1">
+                 {data.map(item => (
+                  <button 
+                    key={item.id}
+                    onClick={() => toggleVisibility(item.id)}
+                    className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all text-left group ${hiddenHostnames.includes(item.id) ? 'bg-slate-50 dark:bg-white/5 opacity-50' : 'hover:bg-indigo-50 dark:hover:bg-indigo-500/10'}`}
+                  >
+                    <div className="truncate pr-4">
+                      <p className={`text-sm font-bold truncate ${hiddenHostnames.includes(item.id) ? 'line-through text-slate-400' : 'text-slate-900 dark:text-slate-200'}`}>{item.hostname}</p>
+                      <p className="text-[10px] text-slate-500 font-medium truncate uppercase">{item.propertyName}</p>
+                    </div>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${hiddenHostnames.includes(item.id) ? 'bg-slate-200 dark:bg-white/10 text-slate-500' : 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-500'}`}>
+                      {hiddenHostnames.includes(item.id) ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div className="p-6 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center">
+                 <button onClick={() => { setHiddenHostnames([]); localStorage.removeItem('ecosystem_hidden_ids'); }} className="text-xs font-black text-indigo-500 hover:underline">Mostrar todos</button>
+                 <button onClick={() => setShowVisibilityModal(false)} className="px-8 py-3 bg-indigo-600 text-white font-black rounded-xl shadow-lg shadow-indigo-600/20">Listo</button>
+              </div>
+           </div>
+        </div>
+      )}
 
       {/* Settings Modal */}
       {showSettings && (
@@ -357,6 +367,21 @@ export default function EcosystemReport() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-8 space-y-8">
+                {/* Important Notice for permissions */}
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-3xl p-6 flex gap-4 text-amber-600 dark:text-amber-400">
+                   <AlertTriangle className="w-6 h-6 shrink-0" />
+                   <div className="text-xs">
+                      <p className="font-black mb-1 text-sm">IMPORTANTE: Permisos de Google Analytics</p>
+                      <p className="opacity-90 leading-relaxed">
+                        Para ver la data de una nueva propiedad, debes entrar a Google Analytics y otorgar permiso de **"Analista"** o **"Lector"** al siguiente correo de servicio técnico:
+                      </p>
+                      <code className="block mt-2 p-2 bg-white/10 rounded-lg font-mono text-center text-amber-500 select-all border border-amber-500/20">
+                         {import.meta.env.GA4_CLIENT_EMAIL || 'Configurando email...'}
+                      </code>
+                      <p className="mt-2 opacity-90 italic">Sin este paso, la tabla no podrá jalar los datos aunque pongas el ID correcto.</p>
+                   </div>
+                </div>
+
                 {/* Add Form */}
                 <div className="bg-slate-50 dark:bg-white/5 p-6 rounded-3xl space-y-4">
                   <h4 className="text-xs font-black uppercase tracking-widest text-indigo-500">Añadir nueva propiedad</h4>
