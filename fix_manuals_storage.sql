@@ -12,7 +12,6 @@ ON CONFLICT (id) DO NOTHING;
 -- 2. Enable RLS on storage (should be enabled by default)
 
 -- 3. Clear existing policies to avoid conflicts
-DELETE FROM storage.objects WHERE bucket_id = 'manuals'; -- Optional: clean start or skip if you have data
 DROP POLICY IF EXISTS "Public Access" ON storage.objects;
 DROP POLICY IF EXISTS "Authenticated Upload" ON storage.objects;
 DROP POLICY IF EXISTS "Admin Delete" ON storage.objects;
