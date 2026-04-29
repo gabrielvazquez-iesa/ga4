@@ -13,12 +13,18 @@ export const GET: APIRoute = async ({ request }) => {
 
   try {
     // 1. Fetch additional properties from DB
-    const { data: dbProperties } = await supabase.from('ga4_properties').select('name, property_id');
+    const { data: dbProperties, error: dbError } = await supabase.from('ga4_properties').select('name, property_id');
     
+    if (dbError) {
+      console.error("Supabase Error fetching properties:", dbError);
+    }
+
     const propertiesToQuery = [
       { name: 'IESA Principal', property_id: mainPropertyId },
       ...(dbProperties || [])
     ];
+    
+    console.log(`Ecosystem API: Loading data for ${propertiesToQuery.length} properties.`);
 
     const ecosystemData: Record<string, any> = {};
     const propertyErrors: string[] = [];
