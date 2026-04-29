@@ -3,8 +3,7 @@ import { apiFetch } from '../lib/api-fetch';
 import { supabase } from '../lib/supabase';
 import { Copy, Globe, RefreshCw, AlertTriangle, ExternalLink, Search, Download, Calendar, Settings, X, Plus, Trash2, Eye, EyeOff, Check, Filter, FileSpreadsheet } from 'lucide-react';
 import { nativeToast as toast } from './NativeToaster';
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
+// Excel and file-saver are imported dynamically to avoid SSR issues
 
 interface YearData {
   organic: number;
@@ -143,8 +142,14 @@ export default function EcosystemReport() {
     ? filteredData.filter(item => selectedIds.includes(item.id))
     : filteredData;
 
-  const downloadExcel = () => {
+  const downloadExcel = async () => {
     if (exportData.length === 0) return;
+
+    // Dynamically import libraries to avoid SSR issues
+    const [XLSX, { saveAs }] = await Promise.all([
+      import('xlsx'),
+      import('file-saver')
+    ]);
 
     // Build worksheet data
     const wsData = [
