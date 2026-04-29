@@ -1,0 +1,15 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import EcosystemReport from '../components/EcosystemReport';
+import { supabase } from '../lib/supabase';
+
+// Server-side check for admin (optional but recommended)
+// In Astro, we can't easily check auth on the server without a middleware or SSR mode.
+// Since this project seems to be static/client-side heavy, we rely on the client-side check.
+---
+
+<DashboardLayout title="Ecosistema Digital | GA4 Dashboard">
+  <div class="max-w-7xl mx-auto py-4">
+    <EcosystemReport client:load />
+  </div>
+</DashboardLayout>

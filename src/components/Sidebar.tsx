@@ -1,4 +1,4 @@
-import { LogOut, LayoutDashboard, BarChart3, KeyRound, User, Calendar, Instagram, ChevronLeft, ChevronRight, Bell, FileSpreadsheet, BookOpen, LayoutGrid, Layout, X } from 'lucide-react';
+import { LogOut, LayoutDashboard, BarChart3, KeyRound, User, Calendar, Instagram, ChevronLeft, ChevronRight, Bell, FileSpreadsheet, BookOpen, LayoutGrid, Layout, X, Globe } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useState, useEffect } from 'react';
 
@@ -106,6 +106,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
 
   if (isAdmin) {
     menuItems.push({ name: 'Usuarios', path: '/users', icon: User });
+    menuItems.push({ name: 'Ecosistema Digital', path: '/ecosistema', icon: Globe });
     menuItems.push({ name: 'Reporte Gerencial', path: '/reporte-mensual', icon: FileSpreadsheet });
   }
 
@@ -143,7 +144,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
           )}
         </div>
 
-        <nav className="flex-1 px-4 py-8 space-y-2 overflow-visible">
+        <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-800 scrollbar-track-transparent hover:scrollbar-thumb-slate-400 dark:hover:scrollbar-thumb-slate-700">
           {menuItems.map((item) => {
             const path = currentPath || '';
             const isActive = path === item.path || path.startsWith(item.path + '/');
