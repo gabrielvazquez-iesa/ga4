@@ -14,6 +14,10 @@ CREATE TABLE IF NOT EXISTS public.ga4_properties (
 ALTER TABLE public.ga4_properties ENABLE ROW LEVEL SECURITY;
 
 -- Policies
+DROP POLICY IF EXISTS "Properties are visible to all" ON public.ga4_properties;
+DROP POLICY IF EXISTS "Admins can manage properties" ON public.ga4_properties;
+DROP POLICY IF EXISTS "Public properties are visible to authenticated users" ON public.ga4_properties;
+
 CREATE POLICY "Properties are visible to all" 
 ON public.ga4_properties FOR SELECT USING (true);
 
