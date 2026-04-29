@@ -64,6 +64,13 @@ export default function EcosystemReport() {
       const res = await apiFetch('/api/ga4-ecosystem');
       const json = await res.json();
       if (json.error) throw new Error(json.error);
+      
+      if (json.errors && json.errors.length > 0) {
+        json.errors.forEach((err: string) => {
+          toast.error(`Problema con cuenta: ${err}`);
+        });
+      }
+
       setData(json.data || []);
     } catch (e: any) {
       setError(e.message);

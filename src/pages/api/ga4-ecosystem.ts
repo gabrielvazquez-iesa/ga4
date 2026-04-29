@@ -15,13 +15,13 @@ export const GET: APIRoute = async ({ request }) => {
     // 1. Fetch additional properties from DB
     const { data: dbProperties } = await supabase.from('ga4_properties').select('name, property_id');
     
-    // 2. Prepare list of properties to query
     const propertiesToQuery = [
       { name: 'IESA Principal', property_id: mainPropertyId },
       ...(dbProperties || [])
     ];
 
     const ecosystemData: Record<string, any> = {};
+    const propertyErrors: string[] = [];
 
     // 3. Run reports for each property
     // We use Promise.all to run them in parallel
@@ -41,15 +41,25 @@ export const GET: APIRoute = async ({ request }) => {
             { name: 'averageSessionDuration' }
           ],
         });
-        return { prop, response };
-      } catch (err) {
+        
+        // If response has no rows, it might be that there's no data for the range
+        if (!response.rows || response.rows.length === 0) {
+          console.warn(`No data for property ${prop.name} (${prop.property_id}) in 2025-2026.`);
+        }
+
+        return { prop, response, error: null };
+      } catch (err: any) {
         console.error(`Error querying property ${prop.name} (${prop.property_id}):`, err);
-        return { prop, response: null };
+        return { prop, response: null, error: `${prop.name}: ${err.message}` };
       }
     }));
 
     // 4. Process all reports
-    reports.forEach(({ prop, response }) => {
+    reports.forEach(({ prop, response, error }) => {
+      if (error) {
+        propertyErrors.push(error);
+        return;
+      }
       if (!response) return;
 
       response.rows?.forEach(row => {
@@ -110,7 +120,7 @@ export const GET: APIRoute = async ({ request }) => {
       y2026: { ...item.y2026, avgDurationFormatted: formatTime(item.y2026.avgDuration) }
     })).sort((a, b) => (b.y2026.totalSessions + b.y2025.totalSessions) - (a.y2026.totalSessions + a.y2025.totalSessions));
 
-    return new Response(JSON.stringify({ success: true, data: result }), {
+    return new Response(JSON.stringify({ success: true, data: result, errors: propertyErrors }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
