@@ -113,7 +113,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-white/5 hidden md:flex flex-col text-slate-600 dark:text-slate-300 z-40 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}>
+      <aside className={`fixed inset-y-0 left-0 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-white/5 hidden md:flex flex-col text-slate-600 dark:text-slate-300 z-40 transition-all duration-300 ease-in-out overflow-x-hidden ${isCollapsed ? 'w-20' : 'w-64'}`}>
         
         {/* Floating Toggle Button */}
         <button
@@ -144,7 +144,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
           )}
         </div>
 
-        <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto overflow-x-hidden">
           {menuItems.map((item) => {
             const path = currentPath || '';
             const isActive = path === item.path || path.startsWith(item.path + '/');

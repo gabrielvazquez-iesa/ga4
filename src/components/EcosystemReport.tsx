@@ -35,6 +35,7 @@ export default function EcosystemReport() {
   const [data, setData] = useState<EcosystemItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [syncErrors, setSyncErrors] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   
   // UI State
@@ -66,9 +67,9 @@ export default function EcosystemReport() {
       if (json.error) throw new Error(json.error);
       
       if (json.errors && json.errors.length > 0) {
-        json.errors.forEach((err: string) => {
-          toast.error(`Error en cuenta: ${err}`, { duration: 5000 });
-        });
+        setSyncErrors(json.errors);
+      } else {
+        setSyncErrors([]);
       }
 
       setData(json.data || []);
@@ -286,6 +287,35 @@ export default function EcosystemReport() {
         <div className="absolute -top-32 -right-32 w-[30rem] h-[30rem] bg-blue-600/10 rounded-full blur-[120px]" />
         <div className="absolute -bottom-32 -left-32 w-[30rem] h-[30rem] bg-indigo-600/10 rounded-full blur-[120px]" />
       </div>
+      
+      {/* Sync Error Banner */}
+      {syncErrors.length > 0 && (
+        <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-[2rem] flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-sm animate-in slide-in-from-top duration-500">
+           <div className="flex items-center gap-4 text-amber-600 dark:text-amber-400">
+              <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-black uppercase tracking-tight">Problemas de Sincronización</p>
+                <p className="text-xs font-medium opacity-80">{syncErrors.length} cuenta(s) presentan errores. Puedes eliminarlas desde configuración.</p>
+              </div>
+           </div>
+           <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setSyncErrors([])}
+                className="px-4 py-2.5 text-amber-600 dark:text-amber-400 text-xs font-black rounded-xl hover:bg-amber-500/10 transition-colors"
+              >
+                Ignorar
+              </button>
+              <button 
+                onClick={() => setShowSettings(true)}
+                className="px-6 py-2.5 bg-amber-500 text-white text-xs font-black rounded-xl hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/20"
+              >
+                Gestionar Cuentas
+              </button>
+           </div>
+        </div>
+      )}
 
       {/* Controls */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
