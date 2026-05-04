@@ -158,8 +158,16 @@ const currentPath = Astro.url.pathname;
       /* Hide redundant page-level headers in fullscreen */
       :fullscreen main > header,
       :fullscreen main > .hero-section,
-      :fullscreen .space-y-8 > div:first-child[class*="bg-white"] {
+      :fullscreen main > div[class*="bg-white/50"],
+      :fullscreen .space-y-8 > div:first-child[class*="bg-white"],
+      :fullscreen .space-y-6 > div:first-child[class*="bg-white"] {
         display: none !important;
+      }
+      
+      /* Reset sticky headers on pages to avoid overlap in fullscreen */
+      :fullscreen .sticky {
+        position: relative !important;
+        top: auto !important;
       }
 
       /* Asegurar que el header fluya con el contenedor sin desplazamientos dobles */
