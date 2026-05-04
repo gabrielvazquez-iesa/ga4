@@ -6,10 +6,13 @@ import DashboardVisual from '../components/DashboardVisual';
 <DashboardLayout title="Dashboard Principal | GA4">
   
   <div class="max-w-7xl mx-auto space-y-8">
-    <header class="mb-4">
-      <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Visión General</h1>
-      <p class="text-slate-500 dark:text-slate-400 text-sm">Resumen gerencial del rendimiento de tu sitio web.</p>
-    </header>
+    <div class="page-header-unified relative overflow-hidden bg-white/80 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-3xl p-8 shadow-sm backdrop-blur-md mb-6">
+      <div class="relative z-10">
+        <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Visión General</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Resumen gerencial del rendimiento de tu sitio web.</p>
+      </div>
+      <div class="absolute -top-24 -right-24 w-64 h-64 bg-accent/5 rounded-full blur-3xl"></div>
+    </div>
 
     {/* The visual react dashboard */}
     <DashboardVisual client:idle />

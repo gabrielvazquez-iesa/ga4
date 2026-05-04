@@ -142,7 +142,8 @@ const currentPath = Astro.url.pathname;
         padding-left: 0 !important;
         background-color: transparent;
       }
-      :fullscreen header:first-of-type {
+      /* SOLO el Topbar principal se vuelve púrpura/accent en fullscreen */
+      :fullscreen #main-content > header {
         position: sticky !important;
         top: 0 !important;
         left: 0 !important;
@@ -152,16 +153,19 @@ const currentPath = Astro.url.pathname;
         color: white !important;
         border-bottom: none !important;
       }
-      :fullscreen header:first-of-type * { color: white !important; }
-      :fullscreen header:first-of-type input { color: #333 !important; } /* Search input text readable */
+      :fullscreen #main-content > header * { color: white !important; }
+      :fullscreen #main-content > header input { color: #333 !important; } /* Search input text readable */
 
-      /* Hide redundant page-level headers in fullscreen */
-      :fullscreen main > header,
-      :fullscreen main > .hero-section,
-      :fullscreen main > div[class*="bg-white/50"],
-      :fullscreen .space-y-8 > div:first-child[class*="bg-white"],
-      :fullscreen .space-y-6 > div:first-child[class*="bg-white"] {
+      /* Hide ONLY the Unified Page Headers in fullscreen */
+      :fullscreen .page-header-unified,
+      :fullscreen .hero-section {
         display: none !important;
+      }
+      
+      /* Ensure no overlap with sticky headers on pages */
+      :fullscreen .sticky:not(#main-content > header) {
+        position: relative !important;
+        top: auto !important;
       }
       
       /* Reset sticky headers on pages to avoid overlap in fullscreen */

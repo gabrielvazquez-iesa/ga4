@@ -5,10 +5,13 @@ import VaultManager from '../components/VaultManager';
 
 <DashboardLayout title="Bóveda de Contraseñas | GA4">
   <div class="max-w-7xl mx-auto space-y-6">
-    <header>
-      <h1 class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-1">Bóveda de Credenciales</h1>
-      <p class="text-slate-500 dark:text-slate-400 text-sm">Gestiona de forma segura los accesos a los distintos servicios relacionados al proyecto.</p>
-    </header>
+    <div class="page-header-unified relative overflow-hidden bg-white/80 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-3xl p-8 shadow-sm backdrop-blur-md mb-6">
+      <div class="relative z-10">
+        <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Bóveda de Credenciales</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Gestiona de forma segura los accesos a los distintos servicios relacionados al proyecto.</p>
+      </div>
+      <div class="absolute -top-24 -right-24 w-64 h-64 bg-accent/5 rounded-full blur-3xl"></div>
+    </div>
 
     <VaultManager client:idle />
   </div>
