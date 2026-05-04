@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { 
   Search, Plus, BookOpen, Trash2, ExternalLink, Tag, 
   Edit3, Folder, FileText, ChevronRight, Clock, MoreVertical,
-  ArrowUpRight, Download, Filter, X, LayoutGrid, List
+  ArrowUpRight, Download, Filter, X, LayoutGrid, List, Eye
 } from 'lucide-react';
 import { nativeToast as toast } from './NativeToaster';
 
