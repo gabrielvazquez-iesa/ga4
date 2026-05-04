@@ -212,16 +212,7 @@ export default function Topbar() {
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 md:px-8 md:py-4 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
       <div className="flex items-center gap-4 flex-1">
-        {/* Logo shows ONLY in true fullscreen (when sidebar is hidden) */}
-        <div className={`flex items-center gap-2 mr-4 transition-all duration-300 ${isFullscreen ? 'opacity-100 translate-x-0 w-auto' : 'opacity-0 -translate-x-4 pointer-events-none w-0 overflow-hidden'}`}>
-          <div 
-            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shrink-0 transition-colors"
-            style={{ backgroundColor: 'var(--accent-color)' }}
-          >
-            GA
-          </div>
-          <span className="text-lg font-black tracking-tighter text-slate-900 dark:text-white hidden sm:block">GA4Dash</span>
-        </div>
+        <div className="hidden"></div>
         
         <div className="relative w-full max-w-sm" ref={searchRef}>
         <div className="flex bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-full items-center px-4 py-2 w-full focus-within:ring-1 focus-within:ring-blue-500/50 focus-within:border-blue-500/50 transition-all">
