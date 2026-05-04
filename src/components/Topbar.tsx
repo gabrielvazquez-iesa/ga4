@@ -212,8 +212,8 @@ export default function Topbar() {
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 md:px-8 md:py-4 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
       <div className="flex items-center gap-4 flex-1">
-        {/* Logo shows in fullscreen, mobile, or when sidebar is collapsed */}
-        <div className={`flex items-center gap-2 mr-4 transition-all duration-300 ${isFullscreen || isCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none w-0'}`}>
+        {/* Logo shows ONLY in fullscreen to replace the hidden sidebar */}
+        <div className={`flex items-center gap-2 mr-4 transition-all duration-300 ${isFullscreen ? 'opacity-100 translate-x-0 w-auto' : 'opacity-0 -translate-x-4 pointer-events-none w-0 overflow-hidden'}`}>
           <div 
             className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shrink-0 transition-colors"
             style={{ backgroundColor: 'var(--accent-color)' }}

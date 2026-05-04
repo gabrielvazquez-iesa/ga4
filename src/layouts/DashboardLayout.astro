@@ -17,7 +17,7 @@ const currentPath = Astro.url.pathname;
 ---
 
 <!doctype html>
-<html lang="es" class="max-w-full">
+<html lang="es" class="max-w-full overflow-x-clip">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
@@ -137,25 +137,29 @@ const currentPath = Astro.url.pathname;
       .ring-accent { --tw-ring-color: var(--accent-color) !important; }
       .shadow-accent { --tw-shadow-color: rgba(var(--accent-color-rgb), 0.3) !important; }
 
-      /* Soporte para Pantalla Completa - Estilo Limpio */
+      /* Soporte para Pantalla Completa - Estilo Premium */
       :fullscreen #main-content {
         padding-left: 0 !important;
         background-color: transparent;
       }
-      :fullscreen header {
+      :fullscreen header:first-of-type {
         position: sticky !important;
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
         z-index: 10000 !important;
-        background-color: rgba(255, 255, 255, 0.8) !important;
-        backdrop-filter: blur(12px) !important;
-        border-bottom: 1px border rgba(0,0,0,0.1) !important;
-        color: inherit !important;
+        background-color: var(--accent-color) !important;
+        color: white !important;
+        border-bottom: none !important;
       }
-      .dark :fullscreen header {
-        background-color: rgba(15, 23, 42, 0.8) !important;
-        border-bottom: 1px border rgba(255,255,255,0.05) !important;
+      :fullscreen header:first-of-type * { color: white !important; }
+      :fullscreen header:first-of-type input { color: #333 !important; } /* Search input text readable */
+
+      /* Hide redundant page-level headers in fullscreen */
+      :fullscreen main > header,
+      :fullscreen main > .hero-section,
+      :fullscreen .space-y-8 > div:first-child[class*="bg-white"] {
+        display: none !important;
       }
 
       /* Asegurar que el header fluya con el contenedor sin desplazamientos dobles */
