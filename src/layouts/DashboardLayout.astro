@@ -17,7 +17,7 @@ const currentPath = Astro.url.pathname;
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es" class="max-w-full overflow-x-hidden">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
@@ -205,7 +205,7 @@ const currentPath = Astro.url.pathname;
       }
     </style>
 	</head>
-	<body class="bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased min-h-screen">
+	<body class="bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased min-h-screen max-w-full overflow-x-hidden">
     <script is:inline>
       // Marcador para habilitar transiciones suaves después de la carga inicial
       document.documentElement.classList.add('hydrated');
@@ -215,7 +215,7 @@ const currentPath = Astro.url.pathname;
 		<Sidebar client:load currentPath={currentPath} transition:persist />
 
 		<!-- Main Content Wrapper -->
-		<div id="main-content" class="flex flex-col min-h-screen w-full overflow-x-hidden">
+		<div id="main-content" class="flex flex-col min-h-screen overflow-x-hidden">
 			<PresenceManager client:load />
 			<Topbar client:load />
 			
