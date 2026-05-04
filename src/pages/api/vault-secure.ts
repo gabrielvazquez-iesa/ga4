@@ -14,18 +14,21 @@ function getServerSupabase(request: Request, useServiceRole = false) {
   const authHeader = request.headers.get('Authorization');
   const token = authHeader?.split(' ')[1];
 
+  // Prioridad: Variable de entorno del sistema (Vercel/Node) > Variable de Astro > Fallback vacío
+  const serviceEnv = process.env.SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY || '';
   const publicEnv = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
-  const serviceEnv = (process.env.SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY || 'sb_secret_yWNHuyC9OVzr_c8rzBrvXA_OJpzmgIN');
   
-  // MODO SEGURO: Si la llave de servicio no existe en .env, usa el fallback compartido
-  const activeKey = useServiceRole && serviceEnv ? serviceEnv : publicEnv;
+  // Si pedimos service role pero no hay llave, usamos anon como último recurso (RLS aplicará)
+  const activeKey = (useServiceRole && serviceEnv) ? serviceEnv : publicEnv;
 
   return createClient(
     import.meta.env.PUBLIC_SUPABASE_URL || '',
     activeKey,
     {
       global: {
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
+        // IMPORTANTE: Si usamos service_role, NO enviamos el token en los headers globales.
+        // Esto asegura que PostgREST use el rol 'service_role' y bypass de RLS.
+        headers: (token && !useServiceRole) ? { Authorization: `Bearer ${token}` } : {}
       }
     }
   );
@@ -36,25 +39,41 @@ async function checkVaultPermission(request: Request) {
   const token = authHeader?.split(' ')[1];
   if (!token) return false;
 
-  const client = getServerSupabase(request, true); // Usar service role para verificar el perfil
-  const { data: { user }, error: userError } = await client.auth.getUser(token);
+  // Creamos un cliente anon para verificar la identidad del usuario primero
+  const authClient = createClient(
+    import.meta.env.PUBLIC_SUPABASE_URL || '',
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY || ''
+  );
   
+  const { data: { user }, error: userError } = await authClient.auth.getUser(token);
   if (userError || !user) return false;
 
-  // Los admins tienen acceso total siempre
   const email = user.email?.toLowerCase() || '';
+  
+  // 1. Admins hardcodeados siempre entran
   if (['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email)) return true;
 
-  // Verificar perfil
-  const { data: profile } = await client
+  // 2. Otros usuarios: Consultar perfil usando Service Role para saltar RLS de perfiles
+  const adminClient = getServerSupabase(request, true);
+  const { data: profile, error: profileError } = await adminClient
     .from('user_profiles')
     .select('department, has_vault_access')
     .eq('user_id', user.id)
     .single();
 
-  if (!profile) return false;
+  if (profileError || !profile) {
+    console.error(`Vault Auth: No se encontró perfil para ${email}`, profileError);
+    return false;
+  }
 
-  return profile.has_vault_access === true || ['Mercadeo', 'Comunicaciones'].includes(profile.department);
+  const hasAccess = profile.has_vault_access === true || 
+                   ['Mercadeo', 'Comunicaciones'].includes(profile.department);
+                   
+  if (!hasAccess) {
+    console.warn(`Vault Auth: Usuario ${email} denegado. Dept: ${profile.department}, Access: ${profile.has_vault_access}`);
+  }
+
+  return hasAccess;
 }
 
 function encrypt(text: string) {
@@ -97,28 +116,39 @@ function decrypt(text: string) {
 }
 
 export const GET: APIRoute = async ({ request }) => {
-  if (!(await verifyApiAuth(request)) || !(await checkVaultPermission(request))) {
+  const isAuthorized = await verifyApiAuth(request);
+  const hasPermission = await checkVaultPermission(request);
+
+  if (!isAuthorized || !hasPermission) {
     return new Response(JSON.stringify({ error: 'No autorizado o sin permisos de bóveda' }), { status: 401 });
   }
 
-  const serverSupabase = getServerSupabase(request, true); // Usamos Service Role para lectura autorizada
+  try {
+    const serverSupabase = getServerSupabase(request, true); // Bypass RLS
 
-  const { data, error } = await serverSupabase
-    .from('vault_credentials')
-    .select('*')
-    .order('created_at', { ascending: false });
+    const { data, error } = await serverSupabase
+      .from('vault_credentials')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    if (error) {
+      console.error("Vault GET Error:", error);
+      return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    }
 
-  const decryptedData = (data || []).map(row => ({
-    ...row,
-    password_hash: decrypt(row.password_hash)
-  }));
+    const decryptedData = (data || []).map(row => ({
+      ...row,
+      password_hash: decrypt(row.password_hash)
+    }));
 
-  return new Response(JSON.stringify({ data: decryptedData }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' }
-  });
+    return new Response(JSON.stringify({ data: decryptedData }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (err) {
+    console.error("Vault API Crash:", err);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+  }
 };
 
 export const POST: APIRoute = async ({ request }) => {
