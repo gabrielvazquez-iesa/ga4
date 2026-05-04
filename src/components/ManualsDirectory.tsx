@@ -72,7 +72,15 @@ export default function ManualsDirectory() {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `${newCategory.trim()}/${fileName}`;
+      
+      // Sanitize category for storage path (remove accents, spaces, etc)
+      const safeCategory = newCategory.trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '_')
+        .replace(/[^\w.-]/g, '');
+        
+      const filePath = `${safeCategory}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage.from('manuals').upload(filePath, file);
       
