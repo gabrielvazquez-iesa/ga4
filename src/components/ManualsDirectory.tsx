@@ -25,6 +25,8 @@ export default function ManualsDirectory() {
   const [editTitle, setEditTitle] = useState('');
   const [editCategory, setEditCategory] = useState('');
 
+  const [viewingManual, setViewingManual] = useState<any | null>(null);
+
   useEffect(() => {
     checkContext();
     fetchManuals();
@@ -252,7 +254,7 @@ export default function ManualsDirectory() {
                        <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                           <FileText className="w-6 h-6 text-indigo-500" />
                        </div>
-                       <div className="flex-1 min-w-0">
+                       <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setViewingManual(m)}>
                          <p className="text-sm font-black text-slate-900 dark:text-white truncate">{m.title}</p>
                          <p className="text-[10px] font-bold text-slate-500 uppercase">{m.category}</p>
                        </div>
@@ -300,12 +302,12 @@ export default function ManualsDirectory() {
                       filtered.map(m => (
                         <tr key={m.id} className="group hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                           <td className="px-6 py-4">
-                            <a href={m.file_url} target="_blank" className="flex items-center gap-4 group/link">
+                            <div onClick={() => setViewingManual(m)} className="flex items-center gap-4 group/link cursor-pointer">
                               <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-500 group-hover/link:bg-indigo-500 group-hover/link:text-white transition-all">
                                 <FileText className="w-5 h-5" />
                               </div>
                               <span className="font-bold text-slate-700 dark:text-slate-300 group-hover/link:text-indigo-600 dark:group-hover/link:text-indigo-400 transition-colors">{m.title}</span>
-                            </a>
+                            </div>
                           </td>
                           <td className="px-6 py-4 hidden md:table-cell">
                             <span className="px-3 py-1 bg-slate-100 dark:bg-white/5 text-slate-500 text-[10px] font-black uppercase rounded-lg border border-slate-200 dark:border-white/5">
@@ -314,14 +316,13 @@ export default function ManualsDirectory() {
                           </td>
                           <td className="px-6 py-4 text-right">
                             <div className="flex items-center justify-end gap-2">
-                               <a 
-                                 href={m.file_url} 
-                                 target="_blank" 
+                               <button 
+                                 onClick={() => setViewingManual(m)} 
                                  className="p-2 text-slate-400 hover:text-indigo-500 transition-colors"
                                  title="Ver Documento"
                                >
-                                 <ExternalLink className="w-4 h-4" />
-                               </a>
+                                 <Eye className="w-4 h-4" />
+                               </button>
                                {isAdmin && (
                                  <>
                                    <button 
@@ -426,6 +427,43 @@ export default function ManualsDirectory() {
                 )}
              </button>
           </form>
+        </div>
+      )}
+
+      {/* Viewer Modal */}
+      {viewingManual && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in">
+          <div className="bg-white dark:bg-slate-950 w-full max-w-6xl h-[90vh] rounded-[2.5rem] flex flex-col shadow-2xl relative overflow-hidden border dark:border-white/10">
+             <div className="p-6 border-b dark:border-white/5 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
+                <div className="flex items-center gap-4">
+                   <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-500">
+                      <FileText className="w-5 h-5" />
+                   </div>
+                   <div>
+                      <h3 className="text-xl font-black text-slate-900 dark:text-white">{viewingManual.title}</h3>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{viewingManual.category}</p>
+                   </div>
+                </div>
+                <div className="flex items-center gap-2">
+                   <a href={viewingManual.file_url} target="_blank" className="p-3 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors text-slate-500" title="Abrir en pestaña nueva">
+                      <ExternalLink className="w-5 h-5" />
+                   </a>
+                   <a href={viewingManual.file_url} download className="p-3 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors text-slate-500" title="Descargar">
+                      <Download className="w-5 h-5" />
+                   </a>
+                   <button onClick={() => setViewingManual(null)} className="p-3 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors text-slate-500 font-bold" title="Cerrar">
+                      <X className="w-6 h-6" />
+                   </button>
+                </div>
+             </div>
+             <div className="flex-1 bg-slate-100 dark:bg-slate-900 overflow-hidden">
+                <iframe 
+                  src={`${viewingManual.file_url}#toolbar=0`} 
+                  className="w-full h-full border-none"
+                  title={viewingManual.title}
+                />
+             </div>
+          </div>
         </div>
       )}
 
