@@ -165,7 +165,12 @@ export default function ProfileManager() {
         <div className="relative group shrink-0">
           <div className="w-32 h-32 rounded-full border-4 border-slate-200 dark:border-slate-950 bg-slate-100 dark:bg-slate-800 shadow-xl overflow-hidden flex items-center justify-center relative">
             {profile.avatar_url ? (
-              <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+              <img 
+                src={profile.avatar_url} 
+                alt="Avatar" 
+                className="w-full h-full object-cover" 
+                referrerPolicy="no-referrer"
+              />
             ) : (
               <User className="w-16 h-16 text-slate-500" />
             )}

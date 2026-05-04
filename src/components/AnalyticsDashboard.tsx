@@ -116,27 +116,27 @@ export default function AnalyticsDashboard({ filterPath = '', mainTitle = 'Tráf
       </div>
 
       {!filterPath && (
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 rounded-3xl p-8 text-white shadow-2xl transition-all duration-500">
+        <div className="relative overflow-hidden bg-white/50 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-3xl p-8 shadow-xl backdrop-blur-md">
           <div className="relative z-10 flex flex-col md:flex-row justify-between gap-6 items-start md:items-center">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                  <BarChart2 className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 bg-blue-600/10 dark:bg-blue-500/20 rounded-xl flex items-center justify-center border border-blue-600/20">
+                  <BarChart2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h1 className="text-3xl font-extrabold tracking-tight">{mainTitle}</h1>
+                <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">{mainTitle}</h1>
               </div>
-              <p className="text-blue-100/80">Estadísticas en tiempo real obtenidas mediante la API oficial de Google Analytics 4.</p>
+              <p className="text-slate-500 dark:text-slate-400">Estadísticas en tiempo real obtenidas mediante la API oficial de Google Analytics 4.</p>
             </div>
             <div className="flex gap-2 flex-wrap">
-              <button onClick={handleExport} disabled={data.length === 0} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition-colors border border-white/10 disabled:opacity-50">
+              <button onClick={handleExport} disabled={data.length === 0} className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-xl text-sm font-semibold transition-colors border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 disabled:opacity-50">
                 <Download className="w-4 h-4" /> Exportar CSV
               </button>
-              <button onClick={() => fetchData(range.days)} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-white text-indigo-700 font-bold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg disabled:opacity-50">
+              <button onClick={() => fetchData(range.days)} disabled={loading} className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50 active:scale-95">
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Actualizar
               </button>
             </div>
           </div>
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl" />
         </div>
       )}
 

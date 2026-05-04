@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Copy, Calendar, ShieldCheck, AlertTriangle, CheckCircle2, Download, FileSpreadsheet, RefreshCw, X, Search } from 'lucide-react';
 import { nativeToast as toast } from './NativeToaster';
 
@@ -160,41 +161,40 @@ export default function MonthlyReport() {
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-black rounded-[3rem] p-12 text-white shadow-2xl border border-white/5">
+      <div className="relative overflow-hidden bg-white/50 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-[3rem] p-10 shadow-xl backdrop-blur-md">
         <div className="relative z-10 flex flex-col lg:flex-row justify-between gap-8 items-start lg:items-center">
           <div className="flex items-center gap-7">
-            <div className="w-20 h-20 bg-emerald-500/20 rounded-[2rem] flex items-center justify-center backdrop-blur-2xl border border-emerald-500/30 shadow-inner">
-              <FileSpreadsheet className="w-10 h-10 text-emerald-400" />
+            <div className="w-16 h-16 bg-blue-600/10 dark:bg-blue-500/20 rounded-[1.5rem] flex items-center justify-center border border-blue-600/20 shadow-inner">
+              <FileSpreadsheet className="w-8 h-8 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h1 className="text-4xl font-black tracking-tight leading-none mb-2">Reporte Gerencial</h1>
-              <p className="text-slate-400 font-medium flex items-center gap-2">
+              <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white leading-none mb-2">Reporte Gerencial</h1>
+              <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2">
                  <Calendar className="w-4 h-4" /> Integración GA4 + Search Console
               </p>
             </div>
           </div>
           
           <div className="flex flex-wrap gap-3">
-             <div className="flex items-center gap-4 bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-3.5 rounded-2xl transition-all">
-                <Calendar className="w-5 h-5 text-emerald-400" />
+             <div className="flex items-center gap-4 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-6 py-3 rounded-2xl transition-all shadow-sm">
+                <Calendar className="w-5 h-5 text-blue-500" />
                 <input 
                   type="month" 
                   value={month} 
                   onChange={e => setMonth(e.target.value)} 
-                  className="bg-transparent text-lg font-black outline-none text-white cursor-pointer"
+                  className="bg-transparent text-lg font-black outline-none text-slate-900 dark:text-white cursor-pointer"
                 />
              </div>
              <button 
               onClick={fetchData}
               disabled={loading}
-              className="flex items-center gap-2 px-7 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all shadow-xl shadow-indigo-600/30 active:scale-95 disabled:opacity-50"
+              className="flex items-center gap-2 px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl transition-all shadow-xl shadow-blue-600/20 active:scale-95 disabled:opacity-50"
             >
               <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} /> Actualizar
             </button>
           </div>
         </div>
-        <div className="absolute -top-32 -right-32 w-[30rem] h-[30rem] bg-emerald-600/10 rounded-full blur-[120px]" />
-        <div className="absolute -bottom-32 -left-32 w-[30rem] h-[30rem] bg-indigo-600/10 rounded-full blur-[120px]" />
+        <div className="absolute -top-32 -right-32 w-[30rem] h-[30rem] bg-blue-600/5 rounded-full blur-[120px]" />
       </div>
 
       {errorMsg && (

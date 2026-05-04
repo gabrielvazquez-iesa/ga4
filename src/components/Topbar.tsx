@@ -193,7 +193,16 @@ export default function Topbar() {
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 md:px-8 md:py-4 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
-      <div className="relative w-full max-w-sm" ref={searchRef}>
+      <div className="flex items-center gap-4 flex-1">
+        {/* Logo shows only in fullscreen or potentially mobile */}
+        {isFullscreen && (
+          <div className="flex items-center gap-2 mr-4 animate-in fade-in slide-in-from-left duration-300">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shrink-0 bg-blue-600">GA</div>
+            <span className="text-lg font-black tracking-tighter text-slate-900 dark:text-white hidden sm:block">GA4Dash</span>
+          </div>
+        )}
+        
+        <div className="relative w-full max-w-sm" ref={searchRef}>
         <div className="flex bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-full items-center px-4 py-2 w-full focus-within:ring-1 focus-within:ring-blue-500/50 focus-within:border-blue-500/50 transition-all">
           <Search className="w-4 h-4 text-slate-500 shrink-0" />
           <input 
@@ -323,7 +332,16 @@ export default function Topbar() {
             <div className="text-xs text-slate-500">Mi Perfil</div>
           </div>
           <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 overflow-hidden shrink-0">
-            {avatarUrl ? <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" /> : <User className="w-5 h-5" />}
+            {avatarUrl ? (
+              <img 
+                src={avatarUrl} 
+                alt="Avatar" 
+                className="w-full h-full object-cover" 
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <User className="w-5 h-5" />
+            )}
           </div>
         </a>
       </div>
