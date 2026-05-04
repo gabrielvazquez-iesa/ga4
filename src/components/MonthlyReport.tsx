@@ -381,4 +381,3 @@ export default function MonthlyReport() {
     </div>
   );
 }
-}
