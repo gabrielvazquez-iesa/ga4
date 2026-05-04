@@ -17,7 +17,7 @@ const currentPath = Astro.url.pathname;
 ---
 
 <!doctype html>
-<html lang="es" class="max-w-full overflow-x-hidden">
+<html lang="es" class="max-w-full">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
@@ -137,7 +137,7 @@ const currentPath = Astro.url.pathname;
       .ring-accent { --tw-ring-color: var(--accent-color) !important; }
       .shadow-accent { --tw-shadow-color: rgba(var(--accent-color-rgb), 0.3) !important; }
 
-      /* Soporte para Pantalla Completa */
+      /* Soporte para Pantalla Completa - Estilo Limpio */
       :fullscreen #main-content {
         padding-left: 0 !important;
         background-color: transparent;
@@ -148,10 +148,15 @@ const currentPath = Astro.url.pathname;
         left: 0 !important;
         width: 100% !important;
         z-index: 10000 !important;
-        background-color: var(--accent-color) !important;
-        color: white !important;
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: blur(12px) !important;
+        border-bottom: 1px border rgba(0,0,0,0.1) !important;
+        color: inherit !important;
       }
-      :fullscreen header * { color: white !important; }
+      .dark :fullscreen header {
+        background-color: rgba(15, 23, 42, 0.8) !important;
+        border-bottom: 1px border rgba(255,255,255,0.05) !important;
+      }
 
       /* Asegurar que el header fluya con el contenedor sin desplazamientos dobles */
       header {
@@ -205,7 +210,7 @@ const currentPath = Astro.url.pathname;
       }
     </style>
 	</head>
-	<body class="bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased min-h-screen max-w-full overflow-x-hidden">
+	<body class="bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased min-h-screen max-w-full overflow-x-clip">
     <script is:inline>
       // Marcador para habilitar transiciones suaves después de la carga inicial
       document.documentElement.classList.add('hydrated');
@@ -215,9 +220,9 @@ const currentPath = Astro.url.pathname;
 		<Sidebar client:load currentPath={currentPath} transition:persist />
 
 		<!-- Main Content Wrapper -->
-		<div id="main-content" class="flex flex-col min-h-screen overflow-x-hidden">
+		<div id="main-content" class="flex flex-col min-h-screen overflow-x-clip">
 			<PresenceManager client:load />
-			<Topbar client:load />
+			<Topbar client:load transition:persist />
 			
 			<main class="flex-1 p-4 pb-40 md:p-8 md:pb-8 max-w-full">
 				<slot />
