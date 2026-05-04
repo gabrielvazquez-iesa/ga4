@@ -19,6 +19,7 @@ export default function Topbar() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [onDuty, setOnDuty] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [preFullscreenSidebarState, setPreFullscreenSidebarState] = useState<boolean | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -103,11 +104,28 @@ export default function Topbar() {
       }
     };
 
+    const syncSidebar = () => {
+      setIsCollapsed(document.documentElement.hasAttribute('data-sidebar-collapsed'));
+    };
+
+    syncSidebar();
+
+    const sidebarObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-sidebar-collapsed') {
+          syncSidebar();
+        }
+      });
+    });
+
+    sidebarObserver.observe(document.documentElement, { attributes: true });
+
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      sidebarObserver.disconnect();
       supabase.removeChannel(channel);
     };
   }, [preFullscreenSidebarState]);
