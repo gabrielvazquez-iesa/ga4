@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import { Copy, Calendar, ShieldCheck, AlertTriangle, CheckCircle2, Download, FileSpreadsheet, RefreshCw, X, Search } from 'lucide-react';
 import { nativeToast as toast } from './NativeToaster';
 
