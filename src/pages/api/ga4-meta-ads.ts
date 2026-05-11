@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ request }) => {
         filter: {
           fieldName: 'pagePath',
           stringFilter: {
-            matchType: 'EXACT',
+            matchType: 'CONTAINS',
             value: '/publish/comunicaciones/meta-ads.html'
           }
         }
