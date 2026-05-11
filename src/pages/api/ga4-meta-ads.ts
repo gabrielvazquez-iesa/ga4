@@ -55,6 +55,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       return {
         curso: curso,
+        fullPath: fullPath,
         source: row.dimensionValues?.[1]?.value || '(not set)',
         medium: row.dimensionValues?.[2]?.value || '(not set)',
         campaign: row.dimensionValues?.[3]?.value || '(not set)',

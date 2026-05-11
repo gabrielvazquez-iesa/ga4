@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { apiFetch } from '../lib/api-fetch';
-import { MousePointer2, RefreshCw, Download, Copy, FileSpreadsheet, Filter, Search, Calendar, Facebook } from 'lucide-react';
+import { MousePointer2, RefreshCw, Download, Copy, FileSpreadsheet, Filter, Search, Calendar, Facebook, ExternalLink } from 'lucide-react';
 import { nativeToast as toast } from './NativeToaster';
 
 interface MetaAdsRow {
   curso: string;
+  fullPath: string;
   source: string;
   medium: string;
   campaign: string;
@@ -198,7 +199,10 @@ export default function MetaAdsReport() {
                      <p className="text-lg font-black text-blue-600 dark:text-blue-400">{course.sessions.toLocaleString()}</p>
                    </div>
                 </div>
-                <h4 className="text-xs font-black text-slate-900 dark:text-white line-clamp-2 leading-tight h-8 mb-2 group-hover:text-blue-500 transition-colors">
+                <h4 
+                  className="text-xs font-black text-slate-900 dark:text-white line-clamp-2 leading-tight h-8 mb-2 group-hover:text-blue-500 transition-colors cursor-help"
+                  title={course.details[0]?.fullPath}
+                >
                   {course.curso}
                 </h4>
                 <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-white/5">
@@ -259,7 +263,12 @@ export default function MetaAdsReport() {
                       <td className="px-6 py-5 bg-blue-500/5">
                         <div className="flex items-center gap-3">
                            <div className={`w-2 h-2 rounded-full ${idx < 3 ? 'bg-blue-500 animate-pulse' : 'bg-slate-400'}`} />
-                           <span className="font-black text-blue-600 dark:text-blue-400 text-sm">{group.curso}</span>
+                           <span 
+                             className="font-black text-blue-600 dark:text-blue-400 text-sm cursor-help"
+                             title={group.details[0]?.fullPath}
+                           >
+                             {group.curso}
+                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-5 text-center">
@@ -283,9 +292,10 @@ export default function MetaAdsReport() {
                             <table className="w-full text-[10px] border-t border-slate-200 dark:border-white/10">
                                <thead className="bg-slate-100/50 dark:bg-white/5">
                                  <tr>
-                                   <th className="px-10 py-3 font-bold text-slate-400 uppercase tracking-tighter">Campaign</th>
-                                   <th className="px-6 py-3 font-bold text-slate-400 uppercase tracking-tighter">Source / Medium</th>
-                                   <th className="px-6 py-3 font-bold text-slate-400 uppercase tracking-tighter">Ad Content</th>
+                                   <th className="px-10 py-3 font-bold text-slate-400 uppercase tracking-tighter text-left">URL / UTM Literal</th>
+                                   <th className="px-6 py-3 font-bold text-slate-400 uppercase tracking-tighter text-left">Campaign</th>
+                                   <th className="px-6 py-3 font-bold text-slate-400 uppercase tracking-tighter text-left">Source / Medium</th>
+                                   <th className="px-6 py-3 font-bold text-slate-400 uppercase tracking-tighter text-left">Ad Content</th>
                                    <th className="px-6 py-3 font-bold text-slate-400 uppercase tracking-tighter text-right">Users</th>
                                    <th className="px-6 py-3 font-bold text-slate-400 uppercase tracking-tighter text-right">Sessions</th>
                                  </tr>
@@ -293,7 +303,22 @@ export default function MetaAdsReport() {
                                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                  {group.details.map((detail, dIdx) => (
                                    <tr key={dIdx} className="hover:bg-white dark:hover:bg-white/5 transition-colors">
-                                     <td className="px-10 py-3 font-black text-slate-700 dark:text-slate-300 max-w-[250px] truncate">{detail.campaign}</td>
+                                     <td className="px-10 py-3">
+                                       <div className="flex items-center gap-2 group/url">
+                                         <span className="font-mono text-blue-500 truncate max-w-[200px]" title={detail.fullPath}>
+                                           {detail.fullPath.split('?')[1] || detail.fullPath}
+                                         </span>
+                                         <a 
+                                           href={`https://www.iesa.edu.ve${detail.fullPath}`} 
+                                           target="_blank" 
+                                           rel="noopener noreferrer"
+                                           className="opacity-0 group-hover/url:opacity-100 transition-opacity p-1 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded text-blue-600"
+                                         >
+                                           <ExternalLink className="w-3 h-3" />
+                                         </a>
+                                       </div>
+                                     </td>
+                                     <td className="px-6 py-3 font-black text-slate-700 dark:text-slate-300 max-w-[150px] truncate">{detail.campaign}</td>
                                      <td className="px-6 py-3">
                                         <span className="font-bold text-slate-900 dark:text-white">{detail.source}</span>
                                         <span className="ml-2 text-slate-400 opacity-60">/ {detail.medium}</span>
