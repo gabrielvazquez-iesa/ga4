@@ -19,6 +19,7 @@ export const GET: APIRoute = async ({ request }) => {
       property: `properties/${metaAdsPropertyId}`,
       dateRanges: [{ startDate: '2025-01-01', endDate: 'today' }],
       dimensions: [
+        { name: 'pagePathPlusQueryString' },
         { name: 'sessionSource' },
         { name: 'sessionMedium' },
         { name: 'sessionCampaignName' },
@@ -40,15 +41,29 @@ export const GET: APIRoute = async ({ request }) => {
       }
     });
 
-    const rows = response.rows?.map(row => ({
-      source: row.dimensionValues?.[0]?.value || '(not set)',
-      medium: row.dimensionValues?.[1]?.value || '(not set)',
-      campaign: row.dimensionValues?.[2]?.value || '(not set)',
-      content: row.dimensionValues?.[3]?.value || '(not set)',
-      term: row.dimensionValues?.[4]?.value || '(not set)',
-      sessions: Number(row.metricValues?.[0]?.value || 0),
-      users: Number(row.metricValues?.[1]?.value || 0),
-    })) || [];
+    const rows = response.rows?.map(row => {
+      const fullPath = row.dimensionValues?.[0]?.value || '';
+      
+      // Extraer codigo_curso de la URL
+      let curso = '(no especificado)';
+      if (fullPath.includes('codigo_curso=')) {
+        const parts = fullPath.split('codigo_curso=');
+        if (parts[1]) {
+          curso = decodeURIComponent(parts[1].split('&')[0]);
+        }
+      }
+
+      return {
+        curso: curso,
+        source: row.dimensionValues?.[1]?.value || '(not set)',
+        medium: row.dimensionValues?.[2]?.value || '(not set)',
+        campaign: row.dimensionValues?.[3]?.value || '(not set)',
+        content: row.dimensionValues?.[4]?.value || '(not set)',
+        term: row.dimensionValues?.[5]?.value || '(not set)',
+        sessions: Number(row.metricValues?.[0]?.value || 0),
+        users: Number(row.metricValues?.[1]?.value || 0),
+      };
+    }) || [];
 
     // Sort by sessions descending
     rows.sort((a, b) => b.sessions - a.sessions);

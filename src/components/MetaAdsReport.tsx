@@ -156,11 +156,11 @@ export default function MetaAdsReport() {
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-white/5">
+                <th className="px-6 py-4 font-black text-slate-900 dark:text-white uppercase tracking-wider bg-blue-500/5">Curso / Actividad</th>
                 <th className="px-6 py-4 font-black text-slate-400 uppercase tracking-wider">Source / Medium</th>
                 <th className="px-6 py-4 font-black text-slate-400 uppercase tracking-wider">Campaign</th>
                 <th className="px-6 py-4 font-black text-slate-400 uppercase tracking-wider">Ad Content</th>
-                <th className="px-6 py-4 font-black text-slate-400 uppercase tracking-wider">Term</th>
-                <th className="px-6 py-4 font-black text-slate-900 dark:text-white uppercase tracking-wider text-right bg-blue-500/5">Users</th>
+                <th className="px-6 py-4 font-black text-slate-900 dark:text-white uppercase tracking-wider text-right bg-blue-500/5 border-l border-slate-200 dark:border-white/5">Users</th>
                 <th className="px-6 py-4 font-black text-slate-900 dark:text-white uppercase tracking-wider text-right bg-blue-500/10">Sessions</th>
               </tr>
             </thead>
@@ -174,16 +174,21 @@ export default function MetaAdsReport() {
               ) : filteredData.length > 0 ? (
                 filteredData.map((item, idx) => (
                   <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+                    <td className="px-6 py-4 bg-blue-500/5">
+                      <div className="flex items-center gap-3">
+                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                         <span className="font-black text-blue-600 dark:text-blue-400 text-sm">{item.curso}</span>
+                      </div>
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="font-black text-slate-900 dark:text-white">{item.source}</span>
                         <span className="text-[10px] text-slate-400 font-bold uppercase">{item.medium}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-slate-600 dark:text-slate-300 font-medium">{item.campaign}</td>
-                    <td className="px-6 py-4 text-slate-500 dark:text-slate-400 text-[10px] font-bold italic">{item.content}</td>
-                    <td className="px-6 py-4 text-slate-500 dark:text-slate-400 text-[10px]">{item.term}</td>
-                    <td className="px-6 py-4 text-right font-mono font-black text-blue-600 dark:text-blue-400 bg-blue-500/5">{item.users.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-300 font-medium truncate max-w-[150px]">{item.campaign}</td>
+                    <td className="px-6 py-4 text-slate-500 dark:text-slate-400 text-[10px] font-bold italic truncate max-w-[150px]">{item.content}</td>
+                    <td className="px-6 py-4 text-right font-mono font-black text-blue-600 dark:text-blue-400 bg-blue-500/5 border-l border-slate-200 dark:border-white/5">{item.users.toLocaleString()}</td>
                     <td className="px-6 py-4 text-right font-mono font-black text-blue-700 dark:text-blue-300 bg-blue-500/10">{item.sessions.toLocaleString()}</td>
                   </tr>
                 ))
