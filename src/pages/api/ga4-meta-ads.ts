@@ -8,13 +8,15 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   const client = getGa4Client();
-  if (!client || !propertyId) {
-    return new Response(JSON.stringify({ error: 'Configuración de GA4 faltante' }), { status: 500 });
+  const metaAdsPropertyId = import.meta.env.GA4_META_ADS_PROPERTY_ID || propertyId;
+
+  if (!client || !metaAdsPropertyId) {
+    return new Response(JSON.stringify({ error: 'Configuración de GA4 (Property ID) faltante' }), { status: 500 });
   }
 
   try {
     const [response] = await client.runReport({
-      property: `properties/${propertyId}`,
+      property: `properties/${metaAdsPropertyId}`,
       dateRanges: [{ startDate: '2025-01-01', endDate: 'today' }],
       dimensions: [
         { name: 'sessionSource' },
