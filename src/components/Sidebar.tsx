@@ -98,6 +98,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
     menuItems.push({ name: 'Usuarios', path: '/users', icon: User });
     menuItems.push({ name: 'Ecosistema Digital', path: '/ecosistema', icon: Globe });
     menuItems.push({ name: 'Reporte Gerencial', path: '/reporte-mensual', icon: FileSpreadsheet });
+    menuItems.push({ name: 'Mapa del Sistema', path: '/system-map', icon: LayoutGrid });
   }
 
   return (
