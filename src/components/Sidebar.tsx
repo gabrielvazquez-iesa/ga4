@@ -163,9 +163,9 @@ export default function Sidebar({ currentPath }: SidebarProps) {
                 {!isCollapsed && <span className="truncate">{item.name}</span>}
 
 
-                {/* Animated Tooltip */}
+                {/* Animated Tooltip - Using fixed to prevent clipping by overflow-y-auto */}
                 {isCollapsed && (
-                  <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 dark:bg-slate-800 text-white text-sm font-semibold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap shadow-xl border border-white/10 flex items-center">
+                  <div className="fixed left-20 ml-2 px-3 py-2 bg-slate-900 dark:bg-slate-800 text-white text-sm font-semibold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] whitespace-nowrap shadow-xl border border-white/10 flex items-center pointer-events-none">
                     <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-slate-900 dark:bg-slate-800 rotate-45 border-l border-b border-white/10"></div>
                     {item.name}
                   </div>
@@ -183,9 +183,9 @@ export default function Sidebar({ currentPath }: SidebarProps) {
             <LogOut className="w-5 h-5 shrink-0" />
             {!isCollapsed && <span className="truncate">Cerrar sesión</span>}
 
-            {/* Logout Tooltip */}
+            {/* Logout Tooltip - Fixed positioning */}
             {isCollapsed && (
-              <div className="absolute left-full ml-4 px-3 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap shadow-xl flex items-center">
+              <div className="fixed left-20 ml-2 px-3 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] whitespace-nowrap shadow-xl flex items-center pointer-events-none">
                 <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-red-600 rotate-45"></div>
                 Cerrar sesión
               </div>
@@ -193,67 +193,6 @@ export default function Sidebar({ currentPath }: SidebarProps) {
           </button>
         </div>
       </aside>
-
-      {/* Mobile Floating Dock */}
-      <nav className="md:hidden fixed bottom-4 left-4 right-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-full px-4 py-2 flex items-center justify-between z-50">
-        
-        {/* Atajos Rápidos Izquierda */}
-        <div className="flex items-center gap-1 flex-1 justify-start">
-          <a href="/analytics" className={`p-3 rounded-2xl transition-all active:scale-90 ${currentPath === '/analytics' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
-            <BarChart3 className="w-6 h-6" />
-          </a>
-          <a href="/social-reports" className={`p-3 rounded-2xl transition-all active:scale-90 ${currentPath === '/social-reports' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
-            <Instagram className="w-6 h-6" />
-          </a>
-        </div>
-
-        {/* Central Menu Button */}
-        <div className="mx-2 shrink-0">
-          <button 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="relative flex items-center justify-center w-14 h-14 bg-accent text-white rounded-full shadow-lg shadow-accent/40 transform transition-all active:scale-95 hover:shadow-accent/60"
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <LayoutGrid className="w-6 h-6" />}
-          </button>
-
-        </div>
-
-        {/* Atajos Rápidos Derecha */}
-        <div className="flex items-center gap-1 flex-1 justify-end">
-          <a href="/vault" className={`p-3 rounded-2xl transition-all active:scale-90 ${currentPath === '/vault' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}>
-            <KeyRound className="w-6 h-6" />
-          </a>
-          <button onClick={handleLogout} className="p-3 text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all active:scale-90">
-            <LogOut className="w-6 h-6" />
-          </button>
-        </div>
-      </nav>
-
-      {/* Expanded Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setIsMobileMenuOpen(false)}>
-          <div 
-            className="absolute bottom-24 left-4 right-4 bg-white/70 dark:bg-[#0f172a]/80 backdrop-blur-2xl border border-white/50 dark:border-white/10 p-6 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] animate-in slide-in-from-bottom-8 fade-in duration-300"
-            onClick={e => e.stopPropagation()}
-          >
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-5">Todas las aplicaciones</h3>
-            <div className="grid grid-cols-3 gap-4">
-              {menuItems.map(item => {
-                const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
-                return (
-                  <a key={item.path} href={item.path} onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2.5 group">
-                    <div className={`w-16 h-16 flex items-center justify-center rounded-2xl transition-all ${isActive ? 'bg-accent text-white shadow-lg shadow-accent/30' : 'bg-slate-100/80 dark:bg-white/8 text-slate-600 dark:text-slate-300 group-hover:bg-blue-50 dark:group-hover:bg-white/15 border border-slate-200/50 dark:border-white/5'}`}>
-                      <item.icon className="w-7 h-7" />
-                    </div>
-                    <span className="text-[11px] font-semibold text-center leading-tight text-slate-600 dark:text-slate-300">{item.name}</span>
-                  </a>
-
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
