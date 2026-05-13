@@ -25,11 +25,17 @@ import Layout from '../layouts/Layout.astro';
       <div class="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay"></div>
     </div>
 
+    <style>
+      .logo-white { display: none; }
+      :global(.dark) .logo-white { display: block; }
+      :global(.dark) .logo-black { display: none; }
+    </style>
+
     <!-- Navigation (Simple) -->
     <nav class="absolute top-0 w-full z-20 flex justify-between items-center py-4 px-4 md:py-6 md:px-8 lg:px-16">
       <div class="flex items-center gap-2">
-        <img src="/img/logo-black.png" alt="Logo" class="w-10 h-10 object-contain dark:hidden" />
-        <img src="/img/logo-white.png" alt="Logo" class="w-10 h-10 object-contain hidden dark:block" />
+        <img src="/img/logo-black.png" alt="Logo" class="w-10 h-10 object-contain logo-black" />
+        <img src="/img/logo-white.png" alt="Logo" class="w-10 h-10 object-contain logo-white" />
         <div class="text-xl md:text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400">
           GA4<span class="text-blue-600 dark:text-blue-500">Dash</span>
         </div>
