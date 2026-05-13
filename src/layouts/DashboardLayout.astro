@@ -5,6 +5,7 @@ import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
 import PresenceManager from '../components/PresenceManager';
 import NativeToaster from '../components/NativeToaster';
+import AppLauncher from '../components/AppLauncher';
 
 interface Props {
   title: string;
@@ -243,6 +244,9 @@ const currentPath = Astro.url.pathname;
 				<slot />
 			</main>
 		</div>
+
+    <!-- Floating Mega Menu (Launchpad) -->
+    <AppLauncher client:load currentPath={currentPath} transition:persist />
 
     <!-- Script to protect routes (Redirect if not logged in) -->
     <script>
