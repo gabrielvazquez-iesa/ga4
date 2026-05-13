@@ -125,7 +125,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
 
         <div className={`p-6 flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
           <img 
-            src="/src/assets/img/logo-white.png" 
+            src="/img/logo-white.png" 
             alt="Logo"
             className="w-10 h-10 object-contain transition-transform hover:scale-110"
           />
