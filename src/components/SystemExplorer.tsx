@@ -23,71 +23,90 @@ export default function SystemExplorer() {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const [nodes, setNodes] = useState<Node[]>([
     { 
       id: 'ga4', name: 'Google Analytics 4', type: 'input', icon: BarChart3, 
       desc: 'Fuente principal de métricas web y tráfico UTM.',
-      x: 100, y: 100, connections: ['api_routes', 'ecosystem'] 
+      x: 50, y: 50, connections: ['api_routes', 'ecosystem'] 
     },
     { 
       id: 'meta_api', name: 'Meta Ads API', type: 'input', icon: Instagram, 
       desc: 'Provee datos de gasto y rendimiento de campañas sociales.',
-      x: 100, y: 300, connections: ['api_routes'] 
+      x: 50, y: 250, connections: ['api_routes'] 
     },
     { 
       id: 'api_routes', name: 'Astro API Routes', type: 'core', icon: Cpu, 
       desc: 'Procesamiento de datos y puentes hacia APIs externas.',
-      x: 350, y: 200, connections: ['supabase', 'dashboard', 'meta_report'] 
+      x: 300, y: 150, connections: ['supabase', 'dashboard', 'meta_report'] 
     },
     { 
       id: 'auth', name: 'Supabase Auth', type: 'security', icon: ShieldCheck, 
       desc: 'Gestión de sesiones y políticas de seguridad (RLS).',
-      x: 350, y: 450, connections: ['supabase', 'vault'] 
+      x: 300, y: 400, connections: ['supabase', 'vault'] 
     },
     { 
       id: 'supabase', name: 'Supabase DB', type: 'core', icon: Database, 
       desc: 'Almacenamiento central de perfiles, bóveda y metadatos.',
-      x: 600, y: 325, connections: ['dashboard', 'vault', 'manuals', 'ecosystem'] 
+      x: 550, y: 275, connections: ['dashboard', 'vault', 'manuals', 'ecosystem'] 
     },
     { 
       id: 'dashboard', name: 'GA4 Dashboard', type: 'module', icon: LayoutDashboard, 
       desc: 'Visualización general de KPIs y salud digital.',
-      x: 850, y: 100, connections: [] 
+      x: 800, y: 50, connections: [] 
     },
     { 
       id: 'meta_report', name: 'Reporte Meta Ads', type: 'module', icon: Globe, 
       desc: 'Análisis detallado de UTMs y conversiones de pago.',
-      x: 850, y: 250, connections: [] 
+      x: 800, y: 200, connections: [] 
     },
     { 
       id: 'vault', name: 'Bóveda', type: 'module', icon: KeyRound, 
       desc: 'Gestión encriptada de accesos y credenciales.',
-      x: 850, y: 400, connections: [] 
+      x: 800, y: 350, connections: [] 
     },
     { 
       id: 'manuals', name: 'Manuales', type: 'module', icon: BookOpen, 
       desc: 'Base de conocimientos y guías de operación.',
-      x: 850, y: 550, connections: [] 
+      x: 800, y: 500, connections: [] 
     },
     { 
       id: 'ecosystem', name: 'Ecosistema', type: 'module', icon: Globe, 
       desc: 'Monitoreo de propiedades digitales externas.',
-      x: 600, y: 100, connections: [] 
+      x: 550, y: 50, connections: [] 
     }
   ]);
 
   useEffect(() => {
     const checkAdmin = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const isAdminUser = ['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes((session.user.email || '').toLowerCase());
-        setIsAdmin(isAdminUser);
-      } else {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const email = (session.user.email || '').toLowerCase();
+          const isAdminUser = ['admin@iesa.edu.ve', 'gabriel.vazquez@iesa.edu.ve'].includes(email);
+          setIsAdmin(isAdminUser);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (err) {
+        console.error("Error checking admin status:", err);
         setIsAdmin(false);
+      } finally {
+        setIsLoading(false);
       }
     };
     checkAdmin();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full space-y-4">
+        <div className="w-12 h-12 border-4 border-accent/20 border-t-accent rounded-full animate-spin"></div>
+        <p className="text-slate-500 font-bold text-sm">Cargando mapa del sistema...</p>
+      </div>
+    );
+  }
 
   if (isAdmin === false) {
     return (
@@ -100,8 +119,6 @@ export default function SystemExplorer() {
       </div>
     );
   }
-
-  if (isAdmin === null) return null;
 
   return (
     <div className="w-full h-full relative cursor-grab active:cursor-grabbing overflow-hidden" ref={containerRef}>
