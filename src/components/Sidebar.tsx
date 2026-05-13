@@ -10,6 +10,7 @@ interface SidebarProps {
 export default function Sidebar({ currentPath }: SidebarProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [hoveredItemTop, setHoveredItemTop] = useState<number | null>(null);
   const [customColor, setCustomColor] = useState<string | null>(null);
   
@@ -74,7 +75,11 @@ export default function Sidebar({ currentPath }: SidebarProps) {
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogoutClick = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const executeLogout = async () => {
     await supabase.auth.signOut();
     sessionStorage.setItem('pending_toast', JSON.stringify({
       message: 'Has cerrado sesión correctamente. ¡Vuelve pronto!',
@@ -164,7 +169,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
 
         <div className="p-4 border-t border-slate-200 dark:border-white/5 space-y-2 flex flex-col items-center">
           <button 
-            onClick={handleLogout}
+            onClick={handleLogoutClick}
             onMouseEnter={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               setHoveredItemTop(rect.top + (rect.height / 2));
@@ -201,7 +206,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
         </div>
         <div className="flex items-center gap-1">
           <a href="/vault" title="Bóveda" className={`p-3 rounded-2xl transition-all active:scale-90 ${currentPath === '/vault' ? 'bg-accent/20 text-accent' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'}`}><KeyRound className="w-6 h-6" /></a>
-          <button onClick={handleLogout} title="Salir" className="p-3 text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><LogOut className="w-6 h-6" /></button>
+          <button onClick={handleLogoutClick} title="Salir" className="p-3 text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><LogOut className="w-6 h-6" /></button>
         </div>
       </nav>
 
@@ -250,6 +255,47 @@ export default function Sidebar({ currentPath }: SidebarProps) {
                     </motion.a>
                   );
                 })}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {isLogoutModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-2xl border border-slate-200 dark:border-white/10"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mb-6">
+                <LogOut className="w-8 h-8" />
+              </div>
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">¿Cerrar sesión?</h2>
+              <p className="text-slate-500 dark:text-slate-400 mt-3 font-medium">Estás a punto de salir del sistema. Tendrás que ingresar tus credenciales la próxima vez.</p>
+              
+              <div className="mt-8 grid grid-cols-2 gap-3">
+                <button 
+                  onClick={() => setIsLogoutModalOpen(false)}
+                  className="py-4 rounded-2xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  onClick={executeLogout}
+                  className="py-4 rounded-2xl font-bold text-white bg-red-600 hover:bg-red-500 shadow-lg shadow-red-500/30 transition-all hover:-translate-y-1"
+                >
+                  Sí, salir
+                </button>
               </div>
             </motion.div>
           </motion.div>
