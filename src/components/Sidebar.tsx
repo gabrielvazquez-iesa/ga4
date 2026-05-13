@@ -124,12 +124,11 @@ export default function Sidebar({ currentPath }: SidebarProps) {
         </button>
 
         <div className={`p-6 flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
-          <div 
-            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white shadow-lg overflow-hidden shrink-0 transition-colors"
-            style={{ backgroundColor: 'var(--accent-color)' }}
-          >
-            GA
-          </div>
+          <img 
+            src="/src/assets/img/logo-white.png" 
+            alt="Logo"
+            className="w-10 h-10 object-contain transition-transform hover:scale-110"
+          />
           {!isCollapsed && <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 truncate">GA4Dash</span>}
         </div>
 
