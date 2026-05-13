@@ -239,10 +239,8 @@ const currentPath = Astro.url.pathname;
 			<PresenceManager client:load />
 			<Topbar client:load transition:persist />
 			
-			<main class="flex-1 p-4 pb-32 md:p-8 md:pb-32 max-w-full">
+			<main class="flex-1 p-4 md:p-8 max-w-full" style="padding-bottom: calc(var(--spacing) * 10);">
 				<slot />
-				{/* Spacer to ensure the floating dock doesn't cover content at the bottom */}
-				<div class="h-20 md:h-32 pointer-events-none"></div>
 			</main>
 		</div>
 

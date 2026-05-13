@@ -1,6 +1,7 @@
 import { LogOut, LayoutDashboard, BarChart3, KeyRound, User, Calendar, Instagram, ChevronLeft, ChevronRight, Bell, FileSpreadsheet, BookOpen, LayoutGrid, Layout, X, Globe } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarProps {
   currentPath: string;
@@ -204,41 +205,55 @@ export default function Sidebar({ currentPath }: SidebarProps) {
       </nav>
 
       {/* Expanded Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[2px] transition-opacity" onClick={() => setIsMobileMenuOpen(false)}>
-          <div 
-            className="absolute bottom-[100px] left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-white/80 dark:bg-[#0f172a]/90 backdrop-blur-2xl border border-white/50 dark:border-white/10 p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] animate-in fade-in slide-in-from-bottom-12 duration-500 ease-out"
-            onClick={e => e.stopPropagation()}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[2px]" 
+            onClick={() => setIsMobileMenuOpen(false)}
           >
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Todas las aplicaciones</h3>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-colors group/close">
-                <X className="w-4 h-4 text-slate-400 group-hover/close:rotate-90 transition-transform duration-300" />
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-6">
-              {menuItems.map((item, idx) => {
-                const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
-                return (
-                  <a 
-                    key={item.path} 
-                    href={item.path} 
-                    onClick={() => setIsMobileMenuOpen(false)} 
-                    className="flex flex-col items-center gap-3 group transition-transform active:scale-90"
-                    style={{ animationDelay: `${idx * 50}ms` }}
-                  >
-                    <div className={`w-16 h-16 flex items-center justify-center rounded-[1.5rem] transition-all duration-300 ${isActive ? 'bg-accent text-white shadow-xl shadow-accent/40 scale-110' : 'bg-slate-100/50 dark:bg-white/5 text-slate-500 dark:text-slate-400 group-hover:bg-accent/10 group-hover:text-accent border border-slate-200/50 dark:border-white/5 shadow-sm group-hover:scale-105'}`}>
-                      <item.icon className="w-7 h-7" />
-                    </div>
-                    <span className={`text-[11px] font-bold text-center leading-tight transition-colors ${isActive ? 'text-accent' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'}`}>{item.name}</span>
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
+            <motion.div 
+              initial={{ opacity: 0, y: 50, x: '-50%', scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, x: '-50%', scale: 1 }}
+              exit={{ opacity: 0, y: 20, x: '-50%', scale: 0.95 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="absolute bottom-[100px] left-1/2 w-[calc(100%-2rem)] max-w-md bg-white/80 dark:bg-[#0f172a]/90 backdrop-blur-2xl border border-white/50 dark:border-white/10 p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Todas las aplicaciones</h3>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-colors group/close">
+                  <X className="w-4 h-4 text-slate-400 group-hover/close:rotate-90 transition-transform duration-300" />
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-6">
+                {menuItems.map((item, idx) => {
+                  const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
+                  return (
+                    <motion.a 
+                      key={item.path} 
+                      href={item.path} 
+                      onClick={() => setIsMobileMenuOpen(false)} 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="flex flex-col items-center gap-3 group transition-transform active:scale-90"
+                    >
+                      <div className={`w-16 h-16 flex items-center justify-center rounded-[1.5rem] transition-all duration-300 ${isActive ? 'bg-accent text-white shadow-xl shadow-accent/40 scale-110' : 'bg-slate-100/50 dark:bg-white/5 text-slate-500 dark:text-slate-400 group-hover:bg-accent/10 group-hover:text-accent border border-slate-200/50 dark:border-white/5 shadow-sm group-hover:scale-105'}`}>
+                        <item.icon className="w-7 h-7" />
+                      </div>
+                      <span className={`text-[11px] font-bold text-center leading-tight transition-colors ${isActive ? 'text-accent' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'}`}>{item.name}</span>
+                    </motion.a>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
