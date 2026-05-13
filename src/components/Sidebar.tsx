@@ -8,6 +8,8 @@ interface SidebarProps {
 
 export default function Sidebar({ currentPath }: SidebarProps) {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hoveredItemTop, setHoveredItemTop] = useState<number | null>(null);
   const [customColor, setCustomColor] = useState<string | null>(null);
   
   const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -16,8 +18,6 @@ export default function Sidebar({ currentPath }: SidebarProps) {
     }
     return false;
   });
-
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const syncSidebar = () => {
@@ -133,6 +133,10 @@ export default function Sidebar({ currentPath }: SidebarProps) {
               <a
                 key={item.path}
                 href={item.path}
+                onMouseEnter={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setHoveredItemTop(rect.top + (rect.height / 2));
+                }}
                 className={`group relative flex items-center gap-3 py-3 rounded-xl transition-all font-medium ${isCollapsed ? 'justify-center px-0' : 'px-4'} ${
                   isActive 
                   ? 'bg-accent/10 text-accent border-accent/20 shadow-sm' 
@@ -143,7 +147,10 @@ export default function Sidebar({ currentPath }: SidebarProps) {
                 {!isCollapsed && <span className="truncate">{item.name}</span>}
 
                 {isCollapsed && (
-                  <div className="fixed left-20 ml-2 px-3 py-2 bg-slate-900 dark:bg-slate-800 text-white text-sm font-semibold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] whitespace-nowrap shadow-xl border border-white/10 flex items-center pointer-events-none">
+                  <div 
+                    className="fixed left-20 px-3 py-2 bg-slate-900 dark:bg-slate-800 text-white text-sm font-semibold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] whitespace-nowrap shadow-xl border border-white/10 flex items-center pointer-events-none -translate-y-1/2"
+                    style={{ top: hoveredItemTop || 0 }}
+                  >
                     <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-slate-900 dark:bg-slate-800 rotate-45 border-l border-b border-white/10"></div>
                     {item.name}
                   </div>
@@ -156,13 +163,20 @@ export default function Sidebar({ currentPath }: SidebarProps) {
         <div className="p-4 border-t border-slate-200 dark:border-white/5 space-y-2 flex flex-col items-center">
           <button 
             onClick={handleLogout}
+            onMouseEnter={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              setHoveredItemTop(rect.top + (rect.height / 2));
+            }}
             className={`group relative flex items-center w-full rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-colors font-medium py-3 ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-4'}`}
           >
             <LogOut className="w-5 h-5 shrink-0" />
             {!isCollapsed && <span className="truncate">Cerrar sesión</span>}
 
             {isCollapsed && (
-              <div className="fixed left-20 ml-2 px-3 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] whitespace-nowrap shadow-xl flex items-center pointer-events-none">
+              <div 
+                className="fixed left-20 px-3 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] whitespace-nowrap shadow-xl flex items-center pointer-events-none -translate-y-1/2"
+                style={{ top: hoveredItemTop || 0 }}
+              >
                 <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-red-600 rotate-45"></div>
                 Cerrar sesión
               </div>
