@@ -3,7 +3,7 @@ import {
   Globe, TrendingUp, TrendingDown, ExternalLink, CheckCircle2, 
   Clock, Maximize2, X, ChevronRight, RefreshCw,
   Sun, Moon, ArrowDown, Sparkles, Search, 
-  Bot, Palette, MousePointerClick, Check, Wrench
+  Bot, Palette, Check, Wrench
 } from 'lucide-react';
 import TiltedGridHero from './ui/tilted-grid-hero';
 
@@ -490,7 +490,6 @@ export default function StandalonePresentation() {
   const [isLiveGA4, setIsLiveGA4] = useState<boolean>(false);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<string>('3 de noviembre de 2026');
-  const [isModalHovering, setIsModalHovering] = useState<boolean>(false);
   const modalScrollRef = useRef<HTMLDivElement>(null);
 
   // Inicialización y persistencia garantizada del tema claro/oscuro
@@ -583,32 +582,25 @@ export default function StandalonePresentation() {
     fetchLiveMetrics();
   }, []);
 
-  // Auto-scroll continuo y suave al pasar el cursor sobre la captura en el modal
+  // Cerrar modal con la tecla Escape y resetear scroll al abrir
   useEffect(() => {
-    let animationFrameId: number;
-    let isCancelled = false;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedProject(null);
+      }
+    };
 
-    if (isModalHovering && modalScrollRef.current) {
-      const el = modalScrollRef.current;
-      const speed = 0.9;
-
-      const scrollStep = () => {
-        if (!isCancelled && el) {
-          el.scrollTop += speed;
-          if (el.scrollTop < el.scrollHeight - el.clientHeight) {
-            animationFrameId = requestAnimationFrame(scrollStep);
-          }
-        }
-      };
-
-      animationFrameId = requestAnimationFrame(scrollStep);
+    if (selectedProject) {
+      window.addEventListener('keydown', handleKeyDown);
+      if (modalScrollRef.current) {
+        modalScrollRef.current.scrollTop = 0;
+      }
     }
 
     return () => {
-      isCancelled = true;
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isModalHovering]);
+  }, [selectedProject]);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -1609,83 +1601,129 @@ export default function StandalonePresentation() {
       </main>
 
       {/* =================================================================
-          MODAL DE PANTALLA COMPLETA CON AUTO-SCROLL SUAVE EN HOVER
+          MODAL DE VISTA PREVIA DETALLADA DE LA PÁGINA
           ================================================================= */}
       {selectedProject && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 md:p-8 animate-in fade-in duration-200">
-          <div className={`w-full max-w-5xl max-h-[92vh] rounded-3xl border flex flex-col shadow-2xl overflow-hidden ${
-            isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
-          }`}>
+        <div 
+          onClick={() => setSelectedProject(null)}
+          className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 md:p-8 animate-in fade-in duration-200 cursor-pointer"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className={`w-full max-w-5xl max-h-[92vh] rounded-3xl border flex flex-col shadow-2xl overflow-hidden cursor-default transition-colors ${
+              isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
             
-            {/* Cabecera del Modal */}
-            <div className={`px-6 py-4 flex items-center justify-between border-b ${
-              isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+            {/* Cabecera del Modal con URL Clickeable */}
+            <div className={`px-6 py-4 flex items-center justify-between border-b shrink-0 ${
+              isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
             }`}>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
                   <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
                   <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
                 </div>
-                <div>
-                  <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <div className="min-w-0">
+                  <h3 className={`font-bold text-sm sm:text-base truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {selectedProject.name}
                   </h3>
-                  <p className={`text-[11px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    {selectedProject.urlPath}
-                  </p>
+                  <a 
+                    href={selectedProject.urlPath}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[11px] font-mono text-indigo-500 hover:underline flex items-center gap-1 truncate mt-0.5"
+                    title={`Abrir ${selectedProject.urlPath} en nueva pestaña`}
+                  >
+                    <span>{selectedProject.urlPath}</span>
+                    <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                  </a>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className={`hidden sm:flex items-center gap-1 text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  <MousePointerClick className="w-3.5 h-3.5" />
-                  <span>Pasa el cursor sobre la imagen para auto-scroll lento</span>
-                </div>
+              <div className="flex items-center gap-3 shrink-0 ml-4">
+                <a
+                  href={selectedProject.urlPath}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-xs"
+                >
+                  <span>Visitar página</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+
                 <button
                   onClick={() => setSelectedProject(null)}
                   className={`p-2 rounded-xl border transition cursor-pointer ${
-                    isDark ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300' : 'bg-white hover:bg-slate-100 border-slate-300 text-slate-700'
+                    isDark 
+                      ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300 hover:text-white' 
+                      : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900 shadow-xs'
                   }`}
                   aria-label="Cerrar modal"
+                  title="Cerrar (Esc)"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Contenedor de la Imagen con Scroll Suave */}
+            {/* Contenedor de la Imagen con Scroll Vertical Fluido y Legible */}
             <div 
               ref={modalScrollRef}
-              onMouseEnter={() => setIsModalHovering(true)}
-              onMouseLeave={() => setIsModalHovering(false)}
-              className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-950/95 flex justify-center cursor-ns-resize"
-              style={{ maxHeight: 'calc(92vh - 130px)' }}
+              className={`flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-8 ${
+                isDark ? 'bg-slate-950/90' : 'bg-slate-100/90'
+              }`}
+              style={{ maxHeight: 'calc(92vh - 135px)' }}
             >
-              <img 
-                src={selectedProject.image} 
-                alt={selectedProject.name} 
-                className="w-full max-w-4xl rounded-xl shadow-2xl object-top h-auto"
-              />
+              <div className="max-w-4xl mx-auto w-full flex flex-col items-center">
+                <img 
+                  src={selectedProject.image} 
+                  alt={selectedProject.name} 
+                  className={`w-full h-auto block rounded-2xl shadow-2xl border transition-all ${
+                    isDark ? 'border-slate-800/80 shadow-slate-950/80' : 'border-slate-200/90 shadow-slate-300/60'
+                  }`}
+                />
+              </div>
             </div>
 
-            {/* Pie del Modal */}
-            <div className={`px-6 py-3 border-t text-xs flex flex-wrap items-center justify-between gap-3 ${
+            {/* Pie del Modal con Metadatos y Enlace */}
+            <div className={`px-6 py-3.5 border-t text-xs flex flex-wrap items-center justify-between gap-3 shrink-0 ${
               isDark ? 'bg-slate-950 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
             }`}>
-              <div className="flex items-center gap-4">
-                <span>Categoría: <strong>{selectedProject.category}</strong></span>
-                <span>Estado: <strong>
-                  {selectedProject.status === 'published' ? 'Publicada' : selectedProject.status === 'development' ? 'En desarrollo' : 'Pendiente'}
-                </strong></span>
+              <div className="flex flex-wrap items-center gap-4">
+                <span>Categoría: <strong className={isDark ? 'text-slate-200' : 'text-slate-800'}>{selectedProject.category}</strong></span>
+                <span className="flex items-center gap-1.5">
+                  Estado: 
+                  {selectedProject.status === 'published' && (
+                    <span className="bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                      <CheckCircle2 className="w-3 h-3" /> Publicada
+                    </span>
+                  )}
+                  {selectedProject.status === 'future' && (
+                    <span className="bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                      <Clock className="w-3 h-3" /> Pendiente
+                    </span>
+                  )}
+                  {selectedProject.status === 'development' && (
+                    <span className="bg-amber-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                      <Wrench className="w-3 h-3" /> En desarrollo (UX/UI)
+                    </span>
+                  )}
+                </span>
+                <span className="hidden md:inline text-[11px] max-w-md truncate">
+                  Objetivo: <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>{selectedProject.objective}</span>
+                </span>
               </div>
+
               <a 
                 href={selectedProject.urlPath} 
                 target="_blank" 
                 rel="noreferrer" 
-                className="text-indigo-500 hover:underline flex items-center gap-1 font-semibold"
+                className="text-indigo-500 hover:text-indigo-400 font-bold flex items-center gap-1 transition"
               >
-                Abrir enlace en el navegador <ExternalLink className="w-3 h-3" />
+                <span>Abrir enlace en el navegador</span>
+                <ExternalLink className="w-3 h-3" />
               </a>
             </div>
 
