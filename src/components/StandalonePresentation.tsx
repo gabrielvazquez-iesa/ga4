@@ -226,7 +226,7 @@ const PROJECTS: ProjectItem[] = [
   // 1. EN DESARROLLO (DE PRIMERO)
   {
     id: 'checkout-refactor',
-    name: 'Refactorización Checkout de Productos',
+    name: 'Refactorización checkout de productos',
     urlPath: 'https://www.iesa.edu.ve/checkout',
     status: 'development',
     category: 'Innovación',
@@ -236,7 +236,7 @@ const PROJECTS: ProjectItem[] = [
   },
   {
     id: 'multi-idioma-acreditadoras',
-    name: 'Sitio Bilingüe Multi-idioma (Acreditadoras)',
+    name: 'Sitio bilingüe multi-idioma (acreditadoras)',
     urlPath: 'https://www.iesa.edu.ve/en',
     status: 'development',
     category: 'Internacional',
@@ -248,7 +248,7 @@ const PROJECTS: ProjectItem[] = [
   // 2. PÁGINAS ACTIVAS E INSTITUCIONALES PUBLICADAS
   {
     id: 'hub-posgrados',
-    name: 'Hub Central de Posgrados',
+    name: 'Hub central de posgrados',
     urlPath: 'https://www.iesa.edu.ve/postgrados',
     status: 'published',
     category: 'Postgrados',
@@ -258,7 +258,7 @@ const PROJECTS: ProjectItem[] = [
   },
   {
     id: 'especializacion-legal',
-    name: 'Especialización en Gerencia Legal Corporativa',
+    name: 'Especialización en gerencia legal corporativa',
     urlPath: 'https://www.iesa.edu.ve/especializacion-en-gerencia-legal-corporativa',
     status: 'published',
     category: 'Postgrados',
@@ -268,7 +268,7 @@ const PROJECTS: ProjectItem[] = [
   },
   {
     id: 'landing-legal',
-    name: 'Landing de Admisión Gerencia Legal',
+    name: 'Landing de admisión gerencia legal',
     urlPath: 'https://www.iesa.edu.ve/admisiones/gerencia-legal',
     status: 'published',
     category: 'Postgrados',
@@ -278,7 +278,7 @@ const PROJECTS: ProjectItem[] = [
   },
   {
     id: 'electivas',
-    name: 'Portal de Electivas IESA',
+    name: 'Portal de electivas IESA',
     urlPath: 'https://electivas.iesa.edu.ve',
     status: 'published',
     category: 'Estudiantil',
@@ -288,23 +288,13 @@ const PROJECTS: ProjectItem[] = [
   },
   {
     id: 'faq',
-    name: 'Centro de Preguntas Frecuentes (FAQ)',
+    name: 'Centro de preguntas frecuentes (FAQ)',
     urlPath: 'https://www.iesa.edu.ve/preguntas-frecuentes',
     status: 'published',
     category: 'Institucional',
     image: '/img/paginas-nuevas/faq.png',
     description: 'Banco estructurado de respuestas para dudas sobre admisiones, pagos y modalidades de clase.',
     objective: 'Atención continua al usuario y alimentación directa para motores de IA (GEO).'
-  },
-  {
-    id: 'club-gerencia',
-    name: 'Club de Gerencia IESA',
-    urlPath: 'https://www.iesa.edu.ve/club-de-gerencia',
-    status: 'published',
-    category: 'Estudiantil',
-    image: '/img/paginas-nuevas/club-gerencia.png',
-    description: 'Comunidad directiva, encuentros profesionales y foros empresariales exclusivos.',
-    objective: 'Fortalecer el networking y la vida comunitaria estudiantil.'
   },
   {
     id: 'emprende-tech',
@@ -327,18 +317,8 @@ const PROJECTS: ProjectItem[] = [
     objective: 'Elevar la empleabilidad y relación estratégica con empleadores.'
   },
   {
-    id: 'internacionalizacion',
-    name: 'Portal de Internacionalización',
-    urlPath: 'https://www.iesa.edu.ve/internacionalizacion',
-    status: 'published',
-    category: 'Institucional',
-    image: '/img/paginas-nuevas/internacionalizacion.png',
-    description: 'Directorio de convenios académicos internacionales, alianzas y dobles titulaciones.',
-    objective: 'Visibilizar la proyección global y movilidad académica del IESA.'
-  },
-  {
     id: 'sostenibilidad',
-    name: 'Sostenibilidad en Acción',
+    name: 'Sostenibilidad en acción',
     urlPath: 'https://www.iesa.edu.ve/sostenibilidad',
     status: 'published',
     category: 'Innovación',
@@ -347,10 +327,20 @@ const PROJECTS: ProjectItem[] = [
     objective: 'Comunicar el compromiso institucional con el desarrollo sostenible.'
   },
 
-  // 3. PIPELINE DE LANZAMIENTO
+  // 3. LOS CLUBES JUNTOS EN EL ORDEN (GERENCIA Y POLÍTICAS PÚBLICAS)
+  {
+    id: 'club-gerencia',
+    name: 'Club de gerencia IESA',
+    urlPath: 'https://www.iesa.edu.ve/club-de-gerencia',
+    status: 'published',
+    category: 'Estudiantil',
+    image: '/img/paginas-nuevas/club-gerencia.png',
+    description: 'Comunidad directiva, encuentros profesionales y foros empresariales exclusivos.',
+    objective: 'Fortalecer el networking y la vida comunitaria estudiantil.'
+  },
   {
     id: 'club-politicas',
-    name: 'Club de Políticas y Asuntos Públicos',
+    name: 'Club de políticas y asuntos públicos',
     urlPath: 'https://www.iesa.edu.ve/club-politicas-publicas',
     status: 'future',
     category: 'Estudiantil',
@@ -359,10 +349,22 @@ const PROJECTS: ProjectItem[] = [
     objective: 'Fomentar el debate riguroso entre estudiantes y expertos.'
   },
 
-  // 4. AL FINAL DEL LISTADO: LAS TRES MAESTRÍAS
+  // 4. INICIATIVA PENDIENTE ADICIONAL (INTERNACIONALIZACIÓN)
+  {
+    id: 'internacionalizacion',
+    name: 'Portal de internacionalización',
+    urlPath: 'https://www.iesa.edu.ve/internacionalizacion',
+    status: 'future',
+    category: 'Institucional',
+    image: '/img/paginas-nuevas/internacionalizacion.png',
+    description: 'Directorio de convenios académicos internacionales, alianzas y dobles titulaciones.',
+    objective: 'Visibilizar la proyección global y movilidad académica del IESA.'
+  },
+
+  // 5. AL FINAL DEL LISTADO: LAS TRES MAESTRÍAS
   {
     id: 'mba',
-    name: 'Maestría en Administración (MBA)',
+    name: 'Maestría en administración (MBA)',
     urlPath: 'https://www.iesa.edu.ve/postgrados/maestria-en-administracion-mba',
     status: 'published',
     category: 'Postgrados',
@@ -372,7 +374,7 @@ const PROJECTS: ProjectItem[] = [
   },
   {
     id: 'finanzas',
-    name: 'Maestría en Finanzas',
+    name: 'Maestría en finanzas',
     urlPath: 'https://www.iesa.edu.ve/postgrados/maestria-en-finanzas',
     status: 'published',
     category: 'Postgrados',
@@ -382,7 +384,7 @@ const PROJECTS: ProjectItem[] = [
   },
   {
     id: 'gerencia-publica',
-    name: 'Maestría en Gerencia Pública',
+    name: 'Maestría en gerencia pública',
     urlPath: 'https://www.iesa.edu.ve/postgrados/maestria-en-gerencia-publica',
     status: 'published',
     category: 'Postgrados',
@@ -671,7 +673,7 @@ export default function StandalonePresentation() {
             <div className={`h-5 w-px hidden sm:block ${isDark ? 'bg-slate-800' : 'bg-slate-300'}`} />
             <div className="hidden sm:block">
               <p className={`text-[11px] font-bold tracking-wider uppercase leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Presentación Ejecutiva
+                Presentación ejecutiva
               </p>
               <p className={`text-[10px] mt-0.5 leading-none ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                 Gabriel Vázquez · Webmaster
@@ -687,7 +689,7 @@ export default function StandalonePresentation() {
                 isDark ? 'text-slate-300 hover:text-white hover:bg-slate-900' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              1. Ecosistema Actual
+              1. Ecosistema actual
             </button>
             <button
               onClick={() => scrollToSection('paginas-nuevas')}
@@ -695,7 +697,7 @@ export default function StandalonePresentation() {
                 isDark ? 'text-slate-300 hover:text-white hover:bg-slate-900' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              2. 16 Proyectos Web
+              2. 16 proyectos web
             </button>
             <button
               onClick={() => scrollToSection('metricas-estrategias')}
@@ -703,7 +705,7 @@ export default function StandalonePresentation() {
                 isDark ? 'text-slate-300 hover:text-white hover:bg-slate-900' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              3. UX, SEO & GEO
+              3. UX, SEO y GEO
             </button>
           </nav>
 
@@ -787,7 +789,7 @@ export default function StandalonePresentation() {
 
             <div className="space-y-4">
               <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.15]">
-                Evolución y Rendimiento del Ecosistema Digital IESA
+                Evolución y rendimiento del ecosistema digital IESA
               </h1>
 
               <p className={`text-base sm:text-lg max-w-2xl mx-auto leading-relaxed ${
@@ -819,7 +821,7 @@ export default function StandalonePresentation() {
                 onClick={() => scrollToSection('ecosistema')}
                 className="px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/25 transition-all flex items-center gap-2 cursor-pointer"
               >
-                <span>1. Ecosistema Actual</span>
+                <span>1. Ecosistema actual</span>
                 <ArrowDown className="w-4 h-4" />
               </button>
               <button
@@ -830,7 +832,7 @@ export default function StandalonePresentation() {
                     : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-200 shadow-xs'
                 }`}
               >
-                <span>2. 16 Proyectos Web</span>
+                <span>2. 16 proyectos web</span>
                 <ArrowDown className="w-4 h-4" />
               </button>
               <button
@@ -841,7 +843,7 @@ export default function StandalonePresentation() {
                     : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-200 shadow-xs'
                 }`}
               >
-                <span>3. UX, SEO & GEO</span>
+                <span>3. UX, SEO y GEO</span>
                 <ArrowDown className="w-4 h-4" />
               </button>
             </div>
@@ -861,10 +863,10 @@ export default function StandalonePresentation() {
           
           <div className="max-w-3xl space-y-3">
             <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest">
-              Punto 1 de la Presentación
+              Punto 1 de la presentación
             </p>
             <h2 className={`text-3xl sm:text-4xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              El Ecosistema Digital Actual
+              El ecosistema digital actual
             </h2>
             <p className={`text-base leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               Comportamiento del tráfico, usuarios y sesiones en los dominios del IESA. El portal principal concentra las admisiones académicas, mientras Debates IESA aporta difusión de contenido y liderazgo de opinión.
@@ -888,7 +890,7 @@ export default function StandalonePresentation() {
                   </a>
                 </div>
                 <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
-                  Portal Central
+                  Portal central
                 </span>
               </div>
 
@@ -926,7 +928,7 @@ export default function StandalonePresentation() {
                   </a>
                 </div>
                 <span className="text-xs font-bold px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">
-                  Medio Editorial
+                  Medio editorial
                 </span>
               </div>
 
@@ -960,7 +962,7 @@ export default function StandalonePresentation() {
             }`}>
               <div className="space-y-1 mb-6">
                 <h4 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Comparativa de Usuarios por Portal (2025 vs 2026)
+                  Comparativa de usuarios por portal (2025 vs 2026)
                 </h4>
                 <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   Volumen anual auditado de usuarios en los principales dominios institucionales.
@@ -1042,7 +1044,7 @@ export default function StandalonePresentation() {
             }`}>
               <div className="space-y-1 mb-6">
                 <h4 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Distribución de Canales de Adquisición
+                  Distribución de canales de adquisición
                 </h4>
                 <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   Origen de las visitas: el 64% de los usuarios llega a través de búsquedas en Google.
@@ -1081,7 +1083,7 @@ export default function StandalonePresentation() {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <h3 className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Inventario Completo de Dominios y Portales Periféricos
+                  Inventario completo de dominios y portales periféricos
                 </h3>
                 <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   Comparativa de usuarios con indicador de tendencia (Verde = Aumento · Rojo = Disminución)
@@ -1099,7 +1101,7 @@ export default function StandalonePresentation() {
                         : isDark ? 'bg-slate-900 text-slate-400 hover:text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900'
                     }`}
                   >
-                    {cat === 'all' ? 'Todos los Dominios' : cat}
+                    {cat === 'all' ? 'Todos los dominios' : cat}
                   </button>
                 ))}
               </div>
@@ -1114,8 +1116,8 @@ export default function StandalonePresentation() {
                     isDark ? 'bg-slate-950/60 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-700'
                   }`}>
                     <tr>
-                      <th className="py-4 px-6">Dominio / Portal</th>
-                      <th className="py-4 px-6">Rol Estratégico</th>
+                      <th className="py-4 px-6">Dominio / portal</th>
+                      <th className="py-4 px-6">Rol estratégico</th>
                       <th className="py-4 px-6 text-right">Usuarios 2025</th>
                       <th className="py-4 px-6 text-right">Usuarios 2026</th>
                       <th className="py-4 px-6 text-center">Variación</th>
@@ -1186,13 +1188,13 @@ export default function StandalonePresentation() {
           }`}>
             <div className="max-w-2xl space-y-3">
               <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest">
-                Punto 2 de la Presentación
+                Punto 2 de la presentación
               </p>
               <h2 className={`text-3xl sm:text-4xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Nuevas Páginas Incorporadas & Proyectos Futuros
+                Nuevas páginas incorporadas y proyectos futuros
               </h2>
               <p className={`text-base leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                Catálogo de 16 proyectos web trabajados durante el año fiscal: 13 páginas publicadas en producción, 1 en pipeline (Club de Políticas Públicas) y 2 proyectos estratégicos en desarrollo (Refactorización del Checkout y Sitio Bilingüe Multi-idioma de 109 páginas para Acreditadoras).
+                Catálogo de 16 proyectos web trabajados durante el año fiscal: 12 páginas publicadas en producción, 2 pendientes (Club de políticas y asuntos públicos, Portal de internacionalización) y 2 proyectos estratégicos en desarrollo (Refactorización del checkout y Sitio bilingüe multi-idioma de 109 páginas para acreditadoras).
               </p>
             </div>
 
@@ -1208,7 +1210,7 @@ export default function StandalonePresentation() {
                     : isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                Todas (16)
+                Todas ({PROJECTS.length})
               </button>
               <button
                 onClick={() => setStatusFilter('published')}
@@ -1218,7 +1220,7 @@ export default function StandalonePresentation() {
                     : isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                Publicadas (13)
+                Publicadas ({PROJECTS.filter(p => p.status === 'published').length})
               </button>
               <button
                 onClick={() => setStatusFilter('future')}
@@ -1228,7 +1230,7 @@ export default function StandalonePresentation() {
                     : isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                Pipeline (1)
+                Pendientes ({PROJECTS.filter(p => p.status === 'future').length})
               </button>
               <button
                 onClick={() => setStatusFilter('development')}
@@ -1238,7 +1240,7 @@ export default function StandalonePresentation() {
                     : isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                En Desarrollo (2)
+                En desarrollo ({PROJECTS.filter(p => p.status === 'development').length})
               </button>
             </div>
           </div>
@@ -1299,7 +1301,7 @@ export default function StandalonePresentation() {
 
                   <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                     <span className="bg-indigo-600/90 backdrop-blur-md text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg flex items-center gap-1.5">
-                      <Maximize2 className="w-4 h-4" /> Ver Estructura Completa
+                      <Maximize2 className="w-4 h-4" /> Ver estructura completa
                     </span>
                   </div>
 
@@ -1312,12 +1314,12 @@ export default function StandalonePresentation() {
                     )}
                     {project.status === 'future' && (
                       <span className="bg-indigo-600 text-white text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                        <Clock className="w-3 h-3" /> Próxima a Publicarse
+                        <Clock className="w-3 h-3" /> Pendiente
                       </span>
                     )}
                     {project.status === 'development' && (
                       <span className="bg-amber-600 text-white text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                        <Wrench className="w-3 h-3" /> En Desarrollo (UX/UI)
+                        <Wrench className="w-3 h-3" /> En desarrollo (UX/UI)
                       </span>
                     )}
                   </div>
@@ -1365,10 +1367,10 @@ export default function StandalonePresentation() {
           
           <div className="max-w-3xl space-y-3">
             <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest">
-              Punto 3 de la Presentación
+              Punto 3 de la presentación
             </p>
             <h2 className={`text-3xl sm:text-4xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Métricas de Páginas Nuevas & Plan Estratégico
+              Métricas de páginas nuevas y plan estratégico
             </h2>
             <p className={`text-base leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               Rendimiento de los programas de postgrado en Google Analytics 4 y plan de acción estructurado en tres pilares sencillos: Experiencia de Usuario (UX/UI), Posicionamiento en Buscadores (SEO) y Optimización para Inteligencia Artificial (GEO).
@@ -1381,7 +1383,7 @@ export default function StandalonePresentation() {
           }`}>
             <div className="space-y-1 mb-8">
               <h4 className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Demanda y Vistas por Programa de Postgrado (2026)
+                Demanda y vistas por programa de postgrado (2026)
               </h4>
               <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                 Visualizaciones de página en Google Analytics 4 de las landings de postgrado.
@@ -1480,7 +1482,7 @@ export default function StandalonePresentation() {
           <div className="space-y-8 pt-8">
             <div className="space-y-2">
               <h3 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Plan Estratégico: Tres Pilares para Impulsar Conversión y Relevancia
+                Plan estratégico: tres pilares para impulsar conversión y relevancia
               </h3>
               <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                 Estrategias claras y sin tecnicismos para consolidar la presencia digital del IESA.
@@ -1500,7 +1502,7 @@ export default function StandalonePresentation() {
                   <div>
                     <span className="text-[11px] font-bold text-indigo-500 uppercase tracking-widest">Pilar 1</span>
                     <h4 className={`text-xl font-black mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      UX & UI: Experiencia del Aspirante
+                      UX & UI: experiencia del aspirante
                     </h4>
                   </div>
                   <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
@@ -1537,7 +1539,7 @@ export default function StandalonePresentation() {
                   <div>
                     <span className="text-[11px] font-bold text-cyan-500 uppercase tracking-widest">Pilar 2</span>
                     <h4 className={`text-xl font-black mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      SEO: Posicionamiento en Google
+                      SEO: posicionamiento en Google
                     </h4>
                   </div>
                   <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
@@ -1574,7 +1576,7 @@ export default function StandalonePresentation() {
                   <div>
                     <span className="text-[11px] font-bold text-purple-500 uppercase tracking-widest">Pilar 3</span>
                     <h4 className={`text-xl font-black mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      GEO: Presencia en Motores de IA
+                      GEO: presencia en motores de IA
                     </h4>
                   </div>
                   <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
@@ -1674,7 +1676,7 @@ export default function StandalonePresentation() {
               <div className="flex items-center gap-4">
                 <span>Categoría: <strong>{selectedProject.category}</strong></span>
                 <span>Estado: <strong>
-                  {selectedProject.status === 'published' ? 'Publicada' : selectedProject.status === 'development' ? 'En Desarrollo' : 'Próxima a Publicarse'}
+                  {selectedProject.status === 'published' ? 'Publicada' : selectedProject.status === 'development' ? 'En desarrollo' : 'Pendiente'}
                 </strong></span>
               </div>
               <a 
@@ -1683,7 +1685,7 @@ export default function StandalonePresentation() {
                 rel="noreferrer" 
                 className="text-indigo-500 hover:underline flex items-center gap-1 font-semibold"
               >
-                Abrir URL en navegador <ExternalLink className="w-3 h-3" />
+                Abrir enlace en el navegador <ExternalLink className="w-3 h-3" />
               </a>
             </div>
 
@@ -1700,10 +1702,10 @@ export default function StandalonePresentation() {
               ? 'bg-slate-900/95 hover:bg-slate-800 border-slate-700 text-amber-400 shadow-indigo-950/40'
               : 'bg-white/95 hover:bg-slate-50 border-slate-300 text-indigo-600 shadow-slate-300/60'
           }`}
-          title={isDark ? "Cambiar a Modo Claro" : "Cambiar a Modo Oscuro"}
+          title={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
         >
           {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          <span>{isDark ? "Modo Claro" : "Modo Oscuro"}</span>
+          <span>{isDark ? "Modo claro" : "Modo oscuro"}</span>
         </button>
       </div>
 
