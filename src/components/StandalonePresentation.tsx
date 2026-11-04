@@ -1484,7 +1484,7 @@ export default function StandalonePresentation() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               
               {/* PILAR 1: UX & UI */}
-              <div className={`p-8 rounded-3xl border space-y-5 flex flex-col justify-between ${
+              <div className={`p-8 rounded-3xl border flex flex-col transition-all ${
                 isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
               }`}>
                 <div className="space-y-4">
@@ -1502,7 +1502,7 @@ export default function StandalonePresentation() {
                   </p>
                 </div>
 
-                <ul className={`space-y-3 text-xs pt-4 border-t ${
+                <ul className={`mt-6 pt-5 border-t space-y-3.5 text-xs ${
                   isDark ? 'border-slate-800 text-slate-300' : 'border-slate-100 text-slate-600'
                 }`}>
                   <li className="flex items-start gap-2">
@@ -1521,7 +1521,7 @@ export default function StandalonePresentation() {
               </div>
 
               {/* PILAR 2: SEO */}
-              <div className={`p-8 rounded-3xl border space-y-5 flex flex-col justify-between ${
+              <div className={`p-8 rounded-3xl border flex flex-col transition-all ${
                 isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
               }`}>
                 <div className="space-y-4">
@@ -1539,7 +1539,7 @@ export default function StandalonePresentation() {
                   </p>
                 </div>
 
-                <ul className={`space-y-3 text-xs pt-4 border-t ${
+                <ul className={`mt-6 pt-5 border-t space-y-3.5 text-xs ${
                   isDark ? 'border-slate-800 text-slate-300' : 'border-slate-100 text-slate-600'
                 }`}>
                   <li className="flex items-start gap-2">
@@ -1558,7 +1558,7 @@ export default function StandalonePresentation() {
               </div>
 
               {/* PILAR 3: GEO */}
-              <div className={`p-8 rounded-3xl border space-y-5 flex flex-col justify-between ${
+              <div className={`p-8 rounded-3xl border flex flex-col transition-all ${
                 isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
               }`}>
                 <div className="space-y-4">
@@ -1576,7 +1576,7 @@ export default function StandalonePresentation() {
                   </p>
                 </div>
 
-                <ul className={`space-y-3 text-xs pt-4 border-t ${
+                <ul className={`mt-6 pt-5 border-t space-y-3.5 text-xs ${
                   isDark ? 'border-slate-800 text-slate-300' : 'border-slate-100 text-slate-600'
                 }`}>
                   <li className="flex items-start gap-2">
