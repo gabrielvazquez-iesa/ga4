@@ -62,33 +62,35 @@
 
 > *"Durante este año fiscal hemos trabajado un total de 16 proyectos web estructurados para dinamizar la oferta del instituto: 13 páginas ya publicadas en producción, 1 en pipeline de lanzamiento y 2 proyectos estratégicos en desarrollo."*
 
-#### A. Páginas Publicadas (13 Plataformas Activas)
+#### A. Proyectos Estratégicos en Desarrollo (Prioritarios al inicio de la grilla)
+1. **Refactorización Checkout de Productos (Step-by-Step):**
+   - *Objetivo Comercial:* Rediseño del flujo de checkout y postulación mediante un formulario guiado paso a paso (*step-by-step*).
+   - *Impacto:* Elimina cuellos de botella y reduce la fricción en la compra y postulación de programas ejecutivos y postgrados.
+
+2. **Sitio Bilingüe Multi-idioma para Acreditadoras Internacionales (109 Páginas):**
+   - *Objetivo Institucional y Regulatorio:* Despliegue de 109 páginas bilingües estructuradas (Español e Inglés) para las auditorías de las cuatro agencias acreditadoras internacionales (**AACSB, AMBA, NASPAA y EFMD**).
+   - *Alcance:* Abarca las páginas institucionales centrales y el directorio completo de perfiles académicos, publicaciones indexadas, citas y hojas de vida del cuerpo de profesores e investigadores del IESA.
+
+#### B. Nuevas Plataformas e Iniciativas Institucionales Publicadas (10 Plataformas Activas)
 *(Los títulos de los mockups en formato Mac son enlaces directos para abrir cada página en vivo)*
-1. **Hub Central de Posgrados (`/postgrados`):** Portal consolidador de la oferta formativa.
-2. **Maestría en Administración (MBA):** Landing renovada del programa insignia con acreditaciones internacionales (AACSB, AMBA, EFMD).
-3. **Maestría en Finanzas:** Presentación enfocada en banca, tesorería y analistas de inversión.
-4. **Maestría en Gerencia Pública:** Orientada a servidores públicos y directores de ONGs.
-5. **Especialización en Gerencia Legal Corporativa:** Articulación del derecho societario con la gestión empresarial.
-6. **Landing de Admisión Gerencia Legal:** Página de aterrizaje de alta conversión para captación directa.
-7. **Portal de Electivas IESA (`electivas.iesa.edu.ve`):** Consulta y selección de materias trimestrales.
-8. **Centro de Preguntas Frecuentes (FAQ):** Banco estructurado de respuestas para admisiones, pagos y modalidades.
-9. **Club de Gerencia IESA:** Red de comunidad directiva y foros ejecutivos.
-10. **Emprende Tech IESA:** Plataforma para el impulso de startups, innovación y vinculación con inversionistas.
-11. **Expo Empleo IESA:** Feria virtual de talento corporativo para graduandos.
-12. **Portal de Internacionalización:** Directorio de convenios globales y dobles titulaciones.
-13. **Sostenibilidad en Acción:** Plataforma institucional dedicada a la agenda social, ambiental y de gobernanza (ESG).
+3. **Hub Central de Posgrados (`/postgrados`):** Portal consolidador de la oferta formativa.
+4. **Especialización en Gerencia Legal Corporativa:** Articulación del derecho societario con la gestión empresarial.
+5. **Landing de Admisión Gerencia Legal:** Página de aterrizaje de alta conversión para captación directa.
+6. **Portal de Electivas IESA (`electivas.iesa.edu.ve`):** Consulta y selección de materias trimestrales.
+7. **Centro de Preguntas Frecuentes (FAQ):** Banco estructurado de respuestas para admisiones, pagos y modalidades.
+8. **Club de Gerencia IESA:** Red de comunidad directiva y foros ejecutivos.
+9. **Emprende Tech IESA:** Plataforma para el impulso de startups, innovación y vinculación con inversionistas.
+10. **Expo Empleo IESA:** Feria virtual de talento corporativo para graduandos.
+11. **Portal de Internacionalización:** Directorio de convenios globales y dobles titulaciones.
+12. **Sostenibilidad en Acción:** Plataforma institucional dedicada a la agenda social, ambiental y de gobernanza (ESG).
 
-#### B. Próxima a Publicarse (1 Pipeline)
-14. **Club de Políticas y Asuntos Públicos:** Espacio de debate sobre institucionalidad, entorno económico y sociedad.
+#### C. Próxima a Publicarse (1 Pipeline)
+13. **Club de Políticas y Asuntos Públicos:** Espacio de debate sobre institucionalidad, entorno económico y sociedad.
 
-#### C. Proyectos Estratégicos en Desarrollo (2 Proyectos Clave)
-15. **Refactorización Checkout de Productos (Step-by-Step):**
-    - *Objetivo Comercial:* Rediseño del flujo de checkout y postulación mediante un formulario guiado paso a paso (*step-by-step*).
-    - *Impacto:* Elimina cuellos de botella y reduce la fricción en la compra y postulación de programas ejecutivos y postgrados.
-
-16. **Sitio Bilingüe Multi-idioma para Acreditadoras Internacionales (109 Páginas):**
-    - *Objetivo Institucional y Regulatorio:* Despliegue de 109 páginas bilingües estructuradas (Español e Inglés) para las auditorías de las cuatro agencias acreditadoras internacionales (**AACSB, AMBA, NASPAA y EFMD**).
-    - *Alcance:* Abarca las páginas institucionales centrales y el directorio completo de perfiles académicos, publicaciones indexadas, citas y hojas de vida del cuerpo de profesores e investigadores del IESA.
+#### D. Maestrías Insignia (Al final del catálogo)
+14. **Maestría en Administración (MBA):** Landing renovada del programa insignia con acreditaciones internacionales (AACSB, AMBA, EFMD).
+15. **Maestría en Finanzas:** Presentación enfocada en banca, tesorería y analistas de inversión.
+16. **Maestría en Gerencia Pública:** Orientada a servidores públicos y directores de ONGs.
 
 ---
 

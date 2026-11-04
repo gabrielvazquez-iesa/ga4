@@ -223,7 +223,29 @@ export interface ProjectItem {
 }
 
 const PROJECTS: ProjectItem[] = [
-  // 13 PUBLICADAS
+  // 1. EN DESARROLLO (DE PRIMERO)
+  {
+    id: 'checkout-refactor',
+    name: 'Refactorización Checkout de Productos',
+    urlPath: 'https://www.iesa.edu.ve/checkout',
+    status: 'development',
+    category: 'Innovación',
+    image: '/img/paginas-nuevas/checkout-step-by-step.svg',
+    description: 'Rediseño del flujo de checkout y postulación mediante un asistente paso a paso (step-by-step) para eliminar cuellos de botella y reducir la fricción de conversión.',
+    objective: 'Maximizar la tasa de conversión y agilizar los pagos y admisiones sin fricción.'
+  },
+  {
+    id: 'multi-idioma-acreditadoras',
+    name: 'Sitio Bilingüe Multi-idioma (Acreditadoras)',
+    urlPath: 'https://www.iesa.edu.ve/en',
+    status: 'development',
+    category: 'Internacional',
+    image: '/img/paginas-nuevas/multi-idioma-acreditadoras.svg',
+    description: 'Despliegue de 109 páginas bilingües (Español / Inglés) estructuradas para auditorías de las cuatro agencias acreditadoras internacionales (AACSB, AMBA, NASPAA, EFMD), abarcando los pilares institucionales y el directorio completo de perfiles de profesores e investigadores.',
+    objective: 'Cumplimiento de estándares de acreditación internacional y proyección académica global de la facultad docente.'
+  },
+
+  // 2. PÁGINAS ACTIVAS E INSTITUCIONALES PUBLICADAS
   {
     id: 'hub-posgrados',
     name: 'Hub Central de Posgrados',
@@ -233,36 +255,6 @@ const PROJECTS: ProjectItem[] = [
     image: '/img/paginas-nuevas/hub-posgrados.png',
     description: 'Portal consolidador de la oferta académica integral de maestrías y especializaciones.',
     objective: 'Facilitar la navegación del aspirante entre todas las opciones formativas.'
-  },
-  {
-    id: 'mba',
-    name: 'Maestría en Administración (MBA)',
-    urlPath: 'https://www.iesa.edu.ve/postgrados/maestria-en-administracion-mba',
-    status: 'published',
-    category: 'Postgrados',
-    image: '/img/paginas-nuevas/maestria-administracion-mba.png',
-    description: 'Landing optimizada del programa insignia con acreditaciones internacionales (AACSB, AMBA, EFMD).',
-    objective: 'Presentar el claustro, plan de estudios y agilizar la postulación de aspirantes.'
-  },
-  {
-    id: 'finanzas',
-    name: 'Maestría en Finanzas',
-    urlPath: 'https://www.iesa.edu.ve/postgrados/maestria-en-finanzas',
-    status: 'published',
-    category: 'Postgrados',
-    image: '/img/paginas-nuevas/maestria-finanzas.png',
-    description: 'Programa para profesionales del sector financiero, bancario y tesorería corporativa.',
-    objective: 'Dar visibilidad al perfil de egreso y requisitos de ingreso.'
-  },
-  {
-    id: 'gerencia-publica',
-    name: 'Maestría en Gerencia Pública',
-    urlPath: 'https://www.iesa.edu.ve/postgrados/maestria-en-gerencia-publica',
-    status: 'published',
-    category: 'Postgrados',
-    image: '/img/paginas-nuevas/maestria-gerencia-publica.png',
-    description: 'Programa para servidores públicos, líderes de ONGs y consultores en desarrollo.',
-    objective: 'Formar en gestión pública ética y formulación de políticas sostenibles.'
   },
   {
     id: 'especializacion-legal',
@@ -355,7 +347,7 @@ const PROJECTS: ProjectItem[] = [
     objective: 'Comunicar el compromiso institucional con el desarrollo sostenible.'
   },
 
-  // 1 NO PUBLICADA (EN PIPELINE)
+  // 3. PIPELINE DE LANZAMIENTO
   {
     id: 'club-politicas',
     name: 'Club de Políticas y Asuntos Públicos',
@@ -367,26 +359,36 @@ const PROJECTS: ProjectItem[] = [
     objective: 'Fomentar el debate riguroso entre estudiantes y expertos.'
   },
 
-  // 2 EN DESARROLLO (REFACTORIZACIÓN CHECKOUT & SITIO MULTI-IDIOMA)
+  // 4. AL FINAL DEL LISTADO: LAS TRES MAESTRÍAS
   {
-    id: 'checkout-refactor',
-    name: 'Refactorización Checkout de Productos',
-    urlPath: 'https://www.iesa.edu.ve/checkout',
-    status: 'development',
-    category: 'Innovación',
-    image: '/img/paginas-nuevas/checkout-step-by-step.svg',
-    description: 'Rediseño del flujo de checkout y postulación mediante un asistente paso a paso (step-by-step) para eliminar cuellos de botella y reducir la fricción de conversión.',
-    objective: 'Maximizar la tasa de conversión y agilizar los pagos y admisiones sin fricción.'
+    id: 'mba',
+    name: 'Maestría en Administración (MBA)',
+    urlPath: 'https://www.iesa.edu.ve/postgrados/maestria-en-administracion-mba',
+    status: 'published',
+    category: 'Postgrados',
+    image: '/img/paginas-nuevas/maestria-administracion-mba.png',
+    description: 'Landing optimizada del programa insignia con acreditaciones internacionales (AACSB, AMBA, EFMD).',
+    objective: 'Presentar el claustro, plan de estudios y agilizar la postulación de aspirantes.'
   },
   {
-    id: 'multi-idioma-acreditadoras',
-    name: 'Sitio Bilingüe Multi-idioma (Acreditadoras)',
-    urlPath: 'https://www.iesa.edu.ve/en',
-    status: 'development',
-    category: 'Internacional',
-    image: '/img/paginas-nuevas/multi-idioma-acreditadoras.svg',
-    description: 'Despliegue de 109 páginas bilingües (Español / Inglés) estructuradas para auditorías de las cuatro agencias acreditadoras internacionales (AACSB, AMBA, NASPAA, EFMD), abarcando los pilares institucionales y el directorio completo de perfiles de profesores e investigadores.',
-    objective: 'Cumplimiento de estándares de acreditación internacional y proyección académica global de la facultad docente.'
+    id: 'finanzas',
+    name: 'Maestría en Finanzas',
+    urlPath: 'https://www.iesa.edu.ve/postgrados/maestria-en-finanzas',
+    status: 'published',
+    category: 'Postgrados',
+    image: '/img/paginas-nuevas/maestria-finanzas.png',
+    description: 'Programa para profesionales del sector financiero, bancario y tesorería corporativa.',
+    objective: 'Dar visibilidad al perfil de egreso y requisitos de ingreso.'
+  },
+  {
+    id: 'gerencia-publica',
+    name: 'Maestría en Gerencia Pública',
+    urlPath: 'https://www.iesa.edu.ve/postgrados/maestria-en-gerencia-publica',
+    status: 'published',
+    category: 'Postgrados',
+    image: '/img/paginas-nuevas/maestria-gerencia-publica.png',
+    description: 'Programa para servidores públicos, líderes de ONGs y consultores en desarrollo.',
+    objective: 'Formar en gestión pública ética y formulación de políticas sostenibles.'
   }
 ];
 
