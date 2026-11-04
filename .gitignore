@@ -23,3 +23,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# scratch and local query files
+query_all_ga4.mjs
+real_ga4_ecosystem_up_to_today.json

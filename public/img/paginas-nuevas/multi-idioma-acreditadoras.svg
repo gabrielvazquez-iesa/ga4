@@ -1,0 +1,224 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e1b4b" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="facultyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="50%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#bg)" />
+
+  <!-- Subtle Grid Lines -->
+  <g opacity="0.06" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="120" x2="1200" y2="120" />
+    <line x1="0" y1="240" x2="1200" y2="240" />
+    <line x1="0" y1="360" x2="1200" y2="360" />
+    <line x1="0" y1="480" x2="1200" y2="480" />
+    <line x1="0" y1="600" x2="1200" y2="600" />
+    <line x1="200" y1="0" x2="200" y2="800" />
+    <line x1="400" y1="0" x2="400" y2="800" />
+    <line x1="600" y1="0" x2="600" y2="800" />
+    <line x1="800" y1="0" x2="800" y2="800" />
+    <line x1="1000" y1="0" x2="1000" y2="800" />
+  </g>
+
+  <!-- Top Global Navigation Bar -->
+  <rect x="0" y="0" width="1200" height="74" fill="#080c14" />
+  <line x1="0" y1="74" x2="1200" y2="74" stroke="#1e293b" stroke-width="1" />
+  
+  <!-- Logo & Title -->
+  <text x="60" y="46" fill="#ffffff" font-family="system-ui, sans-serif" font-size="22" font-weight="900" letter-spacing="1.5">IESA</text>
+  <rect x="130" y="27" width="2" height="24" fill="#334155" />
+  <text x="148" y="44" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">Faculty &amp; International Accreditation Portal</text>
+
+  <!-- Language Switcher Selector (ES / EN) -->
+  <rect x="740" y="20" width="125" height="34" rx="17" fill="#1e293b" stroke="#475569" stroke-width="1.5" />
+  <rect x="801" y="22" width="60" height="30" rx="15" fill="#4f46e5" />
+  <text x="770" y="42" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">ES</text>
+  <text x="831" y="42" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">EN 🇬🇧</text>
+
+  <!-- International Accreditations Badge in Header -->
+  <rect x="880" y="20" width="270" height="34" rx="17" fill="#064e3b" stroke="#059669" stroke-width="1.5" />
+  <text x="1015" y="42" fill="#6ee7b7" font-family="system-ui, sans-serif" font-size="11" font-weight="extrabold" text-anchor="middle">AACSB · AMBA · NASPAA · EFMD</text>
+
+  <!-- Hero Banner Section -->
+  <g transform="translate(60, 100)">
+    <!-- Main Header Card -->
+    <rect x="0" y="0" width="1080" height="150" rx="20" fill="url(#cardGrad)" stroke="#334155" stroke-width="1.5" />
+    
+    <rect x="30" y="24" width="220" height="26" rx="13" fill="#4f46e5" fill-opacity="0.2" stroke="#6366f1" stroke-width="1" />
+    <text x="140" y="41" fill="#a5b4fc" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">🌐 109 BILINGUAL PAGES AUDITED</text>
+
+    <text x="30" y="85" fill="#ffffff" font-family="system-ui, sans-serif" font-size="26" font-weight="900">
+      Academic Faculty &amp; International Standards
+    </text>
+    <text x="30" y="115" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">
+      Full English &amp; Spanish structured inventory: institutional credentials, faculty CVs, syllabi and research impact.
+    </text>
+
+    <!-- International Accreditations Badges -->
+    <g transform="translate(695, 27)">
+      <rect x="0" y="0" width="82" height="95" rx="12" fill="#0f172a" stroke="#475569" stroke-width="1" />
+      <text x="41" y="38" fill="#fbbf24" font-family="system-ui, sans-serif" font-size="14" font-weight="black" text-anchor="middle">AACSB</text>
+      <text x="41" y="58" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">Accredited</text>
+      <text x="41" y="78" fill="#10b981" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">✓ Active</text>
+
+      <rect x="90" y="0" width="82" height="95" rx="12" fill="#0f172a" stroke="#475569" stroke-width="1" />
+      <text x="131" y="38" fill="#fbbf24" font-family="system-ui, sans-serif" font-size="14" font-weight="black" text-anchor="middle">AMBA</text>
+      <text x="131" y="58" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">Accredited</text>
+      <text x="131" y="78" fill="#10b981" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">✓ Active</text>
+
+      <rect x="180" y="0" width="82" height="95" rx="12" fill="#0f172a" stroke="#475569" stroke-width="1" />
+      <text x="221" y="38" fill="#fbbf24" font-family="system-ui, sans-serif" font-size="13" font-weight="black" text-anchor="middle">NASPAA</text>
+      <text x="221" y="58" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">Accredited</text>
+      <text x="221" y="78" fill="#10b981" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">✓ Active</text>
+
+      <rect x="270" y="0" width="82" height="95" rx="12" fill="#0f172a" stroke="#475569" stroke-width="1" />
+      <text x="311" y="38" fill="#fbbf24" font-family="system-ui, sans-serif" font-size="14" font-weight="black" text-anchor="middle">EFMD</text>
+      <text x="311" y="58" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">Accredited</text>
+      <text x="311" y="78" fill="#10b981" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">✓ Active</text>
+    </g>
+  </g>
+
+  <!-- Filter & Breadcrumbs Bar -->
+  <g transform="translate(60, 275)">
+    <rect x="0" y="0" width="1080" height="50" rx="12" fill="#111827" stroke="#1f2937" stroke-width="1" />
+    <text x="24" y="31" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">Directory Scope:</text>
+    <rect x="150" y="10" width="140" height="30" rx="8" fill="#4f46e5" />
+    <text x="220" y="30" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">All Faculty (84)</text>
+
+    <rect x="305" y="10" width="160" height="30" rx="8" fill="#1e293b" />
+    <text x="385" y="30" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">Finance &amp; Economics</text>
+
+    <rect x="480" y="10" width="160" height="30" rx="8" fill="#1e293b" />
+    <text x="560" y="30" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">Management &amp; Strategy</text>
+
+    <rect x="655" y="10" width="160" height="30" rx="8" fill="#1e293b" />
+    <text x="735" y="30" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">Public Policies (25)</text>
+
+    <!-- Search input simulation -->
+    <rect x="880" y="10" width="180" height="30" rx="8" fill="#1e293b" stroke="#374151" stroke-width="1" />
+    <text x="895" y="30" fill="#64748b" font-family="system-ui, sans-serif" font-size="12">🔍 Search Professor...</text>
+  </g>
+
+  <!-- 3 Professor Faculty Cards in Grid -->
+  <g transform="translate(60, 345)">
+    
+    <!-- Card 1 -->
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="340" height="370" rx="18" fill="url(#facultyGrad)" stroke="#334155" stroke-width="1.5" />
+      <!-- Avatar with badge -->
+      <circle cx="65" cy="65" r="35" fill="#312e81" stroke="#6366f1" stroke-width="2" />
+      <text x="65" y="73" fill="#c7d2fe" font-family="system-ui, sans-serif" font-size="20" font-weight="black" text-anchor="middle">CJ</text>
+      <rect x="120" y="40" width="190" height="18" rx="4" fill="#10b981" fill-opacity="0.15" />
+      <text x="128" y="53" fill="#34d399" font-family="system-ui, sans-serif" font-size="10" font-weight="bold">AACSB / AMBA ACCREDITED</text>
+      <text x="120" y="80" fill="#ffffff" font-family="system-ui, sans-serif" font-size="16" font-weight="bold">Dr. Carlos Jaramillo</text>
+      <text x="120" y="98" fill="#818cf8" font-family="system-ui, sans-serif" font-size="11">Ph.D. in Finance · Dean</text>
+
+      <line x1="25" y1="125" x2="315" y2="125" stroke="#334155" stroke-width="1" />
+
+      <!-- Metrics -->
+      <text x="25" y="155" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Area of Expertise:</text>
+      <text x="25" y="175" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="12" font-weight="bold">Corporate Valuation &amp; Capital Markets</text>
+
+      <text x="25" y="210" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Peer-Reviewed Papers:</text>
+      <text x="25" y="230" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="12" font-weight="bold">42 Indexed Publications · 1.8k Citations</text>
+
+      <text x="25" y="265" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Language Coverage:</text>
+      <rect x="25" y="275" width="80" height="22" rx="4" fill="#1e293b" />
+      <text x="65" y="290" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">Español (CV)</text>
+      <rect x="115" y="275" width="80" height="22" rx="4" fill="#312e81" />
+      <text x="155" y="290" fill="#a5b4fc" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">English (Syllabus)</text>
+
+      <rect x="25" y="315" width="290" height="38" rx="10" fill="#4f46e5" />
+      <text x="170" y="339" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">View Full Academic Dossier ↗</text>
+    </g>
+
+    <!-- Card 2 -->
+    <g transform="translate(370, 0)">
+      <rect x="0" y="0" width="340" height="370" rx="18" fill="url(#facultyGrad)" stroke="#334155" stroke-width="1.5" />
+      <!-- Avatar with badge -->
+      <circle cx="65" cy="65" r="35" fill="#065f46" stroke="#10b981" stroke-width="2" />
+      <text x="65" y="73" fill="#a7f3d0" font-family="system-ui, sans-serif" font-size="20" font-weight="black" text-anchor="middle">UG</text>
+      <rect x="120" y="40" width="190" height="18" rx="4" fill="#10b981" fill-opacity="0.15" />
+      <text x="128" y="53" fill="#34d399" font-family="system-ui, sans-serif" font-size="10" font-weight="bold">AMBA / EFMD ACCREDITED</text>
+      <text x="120" y="80" fill="#ffffff" font-family="system-ui, sans-serif" font-size="16" font-weight="bold">Prof. Urbi Garay</text>
+      <text x="120" y="98" fill="#34d399" font-family="system-ui, sans-serif" font-size="11">Ph.D. in Economics · Research Director</text>
+
+      <line x1="25" y1="125" x2="315" y2="125" stroke="#334155" stroke-width="1" />
+
+      <!-- Metrics -->
+      <text x="25" y="155" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Area of Expertise:</text>
+      <text x="25" y="175" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="12" font-weight="bold">Emerging Markets &amp; Alternative Assets</text>
+
+      <text x="25" y="210" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Peer-Reviewed Papers:</text>
+      <text x="25" y="230" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="12" font-weight="bold">56 Indexed Publications · 2.4k Citations</text>
+
+      <text x="25" y="265" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Language Coverage:</text>
+      <rect x="25" y="275" width="80" height="22" rx="4" fill="#1e293b" />
+      <text x="65" y="290" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">Español (CV)</text>
+      <rect x="115" y="275" width="80" height="22" rx="4" fill="#312e81" />
+      <text x="155" y="290" fill="#a5b4fc" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">English (Syllabus)</text>
+
+      <rect x="25" y="315" width="290" height="38" rx="10" fill="#059669" />
+      <text x="170" y="339" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">View Full Academic Dossier ↗</text>
+    </g>
+
+    <!-- Card 3 -->
+    <g transform="translate(740, 0)">
+      <rect x="0" y="0" width="340" height="370" rx="18" fill="url(#facultyGrad)" stroke="#334155" stroke-width="1.5" />
+      <!-- Avatar with badge -->
+      <circle cx="65" cy="65" r="35" fill="#831843" stroke="#f43f5e" stroke-width="2" />
+      <text x="65" y="73" fill="#fecdd3" font-family="system-ui, sans-serif" font-size="20" font-weight="black" text-anchor="middle">RG</text>
+      <rect x="120" y="40" width="190" height="18" rx="4" fill="#10b981" fill-opacity="0.15" />
+      <text x="128" y="53" fill="#34d399" font-family="system-ui, sans-serif" font-size="10" font-weight="bold">AACSB / NASPAA ACCREDITED</text>
+      <text x="120" y="80" fill="#ffffff" font-family="system-ui, sans-serif" font-size="16" font-weight="bold">Dr. Rosa A. González</text>
+      <text x="120" y="98" fill="#fb7185" font-family="system-ui, sans-serif" font-size="11">Ph.D. in Public Policy · Center Director</text>
+
+      <line x1="25" y1="125" x2="315" y2="125" stroke="#334155" stroke-width="1" />
+
+      <!-- Metrics -->
+      <text x="25" y="155" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Area of Expertise:</text>
+      <text x="25" y="175" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="12" font-weight="bold">Public Governance &amp; Social Impact</text>
+
+      <text x="25" y="210" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Peer-Reviewed Papers:</text>
+      <text x="25" y="230" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="12" font-weight="bold">38 Indexed Publications · 1.5k Citations</text>
+
+      <text x="25" y="265" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Language Coverage:</text>
+      <rect x="25" y="275" width="80" height="22" rx="4" fill="#1e293b" />
+      <text x="65" y="290" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">Español (CV)</text>
+      <rect x="115" y="275" width="80" height="22" rx="4" fill="#312e81" />
+      <text x="155" y="290" fill="#a5b4fc" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">English (Syllabus)</text>
+
+      <rect x="25" y="315" width="290" height="38" rx="10" fill="#e11d48" />
+      <text x="170" y="339" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">View Full Academic Dossier ↗</text>
+    </g>
+
+  </g>
+
+  <!-- Bottom Audit Watermark -->
+  <rect x="0" y="756" width="1200" height="44" fill="#080c14" />
+  <line x1="0" y1="756" x2="1200" y2="756" stroke="#1e293b" stroke-width="1" />
+  <text x="60" y="784" fill="#64748b" font-family="system-ui, sans-serif" font-size="12">Instituto de Estudios Superiores de Administración (IESA) · Sistema de Aseguramiento de Calidad y Acreditación Internacional</text>
+  <text x="1140" y="784" fill="#10b981" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="end">Status: 109 Pages in Staging &amp; Translation Review</text>
+</svg>
+

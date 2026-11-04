@@ -1,4 +1,4 @@
-import { LogOut, LayoutDashboard, BarChart3, KeyRound, User, Calendar, Instagram, ChevronLeft, ChevronRight, Bell, FileSpreadsheet, BookOpen, LayoutGrid, Layout, X, Globe } from 'lucide-react';
+import { LogOut, LayoutDashboard, BarChart3, KeyRound, User, Calendar, Instagram, ChevronLeft, ChevronRight, Bell, FileSpreadsheet, BookOpen, LayoutGrid, Layout, X, Globe, MonitorPlay } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';

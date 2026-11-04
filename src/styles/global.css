@@ -12,7 +12,15 @@
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 dark:bg-[#050B14] dark:text-slate-300 antialiased;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+html.dark body, body.dark {
+  background-color: #020617;
+  color: #f8fafc;
 }
 
 /* Custom Sutil Scrollbar - Adapts to Theme */
@@ -26,21 +34,21 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 10px;
   transition: all 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Firefox Support */
@@ -51,53 +59,16 @@ body {
 
 /* Rediseño de React Datepicker para Dark Mode Premium */
 .dark .react-datepicker {
-  @apply bg-[#0f172a] border border-white/10 shadow-2xl text-slate-300 font-sans rounded-xl overflow-hidden;
-}
-.dark .react-datepicker__header {
-  @apply bg-slate-900/80 border-b border-white/10 pt-4 pb-2;
-}
-.dark .react-datepicker__current-month,
-.dark .react-datepicker-time__header,
-.dark .react-datepicker-year-header {
-  @apply text-white font-extrabold text-sm mb-2;
-}
-.dark .react-datepicker__day-name {
-  @apply text-slate-500 font-bold;
-}
-.dark .react-datepicker__day {
-  @apply text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors outline-none w-8 h-8 leading-8 m-1;
-}
-.dark .react-datepicker__day--selected,
-.dark .react-datepicker__day--keyboard-selected {
-  @apply bg-blue-600 text-white font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-500;
-}
-.dark .react-datepicker__day--outside-month {
-  @apply text-slate-600;
-}
-.dark .react-datepicker__time-container {
-  @apply border-l border-white/10 bg-[#0f172a];
-}
-.dark .react-datepicker__time {
-  @apply bg-[#0f172a] text-slate-300;
-}
-.dark .react-datepicker__time-box,
-.dark .react-datepicker__time-list {
-  @apply !bg-[#0f172a];
-}
-.dark .react-datepicker__time-list-item {
-  @apply hover:bg-slate-800 transition-colors py-2 text-sm;
-}
-.dark .react-datepicker__time-list-item--selected {
-  @apply !bg-blue-600 text-white font-bold hover:!bg-blue-500;
-}
-.dark .react-datepicker__navigation-icon::before {
-  @apply border-slate-400;
-}
-.dark .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
-  @apply border-white;
+  background-color: #0f172a;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  color: #cbd5e1;
+  font-family: inherit;
+  border-radius: 0.75rem;
+  overflow: hidden;
 }
 
-/* --- Responsive Overrides --- */
+/* Responsive Overrides */
 @media (max-width: 640px) {
   .grid {
     gap: 1rem !important;
@@ -105,47 +76,9 @@ body {
 }
 
 @media (max-width: 450px) {
-  /* Ajustes para Tablas Responsivas */
-.overflow-x-auto {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
-  -webkit-overflow-scrolling: touch;
-}
-
-@media (max-width: 768px) {
-  /* Evitar que el contenido se salga de la pantalla */
-  main {
-    padding-bottom: 5rem !important; /* Espacio justo para no chocar con menús móviles si existen */
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-    max-width: 100vw !important;
-    overflow-x: hidden !important;
-  }
-
-  /* Forzar que las tablas no rompan el layout */
-  table {
-    display: block;
-    width: 100%;
-  }
-
-  /* Ajustar tarjetas para móviles */
-  .rounded-3xl {
-    border-radius: 1.25rem !important;
-  }
-}
-  /* Reducir tamaño de fuentes grandes en móvil */
-  .text-3xl, .text-4xl, .text-5xl {
-    font-size: 1.5rem !important;
-    line-height: 2rem !important;
-  }
-
-  /* Ajustar paddings de cards para ganar espacio */
-  .p-4, .p-6, .p-8 {
-    padding: 0.75rem !important;
-  }
-
-  /* El sidebar móvil no debe tener márgenes excesivos */
-  #main-content {
-    padding-left: 0 !important;
+  .overflow-x-auto {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+    -webkit-overflow-scrolling: touch;
   }
 }

@@ -250,6 +250,7 @@ const currentPath = Astro.url.pathname;
       import { supabase } from '../lib/supabase';
       
       document.addEventListener('astro:page-load', async () => {
+        if (window.location.pathname.includes('/presentacion')) return;
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
