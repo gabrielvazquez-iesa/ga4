@@ -37,13 +37,11 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     domainDisplay: 'www.iesa.edu.ve',
     category: 'core',
     users2025: 305517,
-    time2025: '4m 41s',
+    time2025: '1m 10s',
     organic2025: 155832,
     direct2025: 71705,
     users2026: 208009,
-    time2026: '3m 06s',
-    organic2026: 150667,
-    direct2026: 75373,
+    time2026: '1m 28s',
     role: 'Portal institucional principal, centro de admisiones y oferta académica integral.'
   },
   {
@@ -53,11 +51,11 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     domainDisplay: 'www.debatesiesa.com',
     category: 'core',
     users2025: 88705,
-    time2025: '3m 14s',
+    time2025: '1m 30s',
     organic2025: 87605,
     direct2025: 28289,
     users2026: 74796,
-    time2026: '2m 38s',
+    time2026: '1m 04s',
     organic2026: 53480,
     direct2026: 40485,
     role: 'Revista de divulgación gerencial, análisis económico y liderazgo de opinión.'
@@ -69,11 +67,11 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     domainDisplay: 'iesafoundation.org',
     category: 'comunidad',
     users2025: 15611,
-    time2025: '0m 55s',
+    time2025: '0m 06s',
     organic2025: 1139,
     direct2025: 15024,
     users2026: 342923,
-    time2026: '0m 04s',
+    time2026: '0m 01s',
     organic2026: 897,
     direct2026: 332977,
     role: 'Iniciativas filantrópicas, recaudación de fondos y becas estudiantiles.'
@@ -85,11 +83,11 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     domainDisplay: 'www.iesaalumni.org',
     category: 'comunidad',
     users2025: 21166,
-    time2025: '2m 12s',
+    time2025: '0m 56s',
     organic2025: 15166,
     direct2025: 15801,
     users2026: 11853,
-    time2026: '1m 50s',
+    time2026: '0m 31s',
     organic2026: 5457,
     direct2026: 8905,
     role: 'Red global de relacionamiento, networking y actualización para egresados.'
@@ -946,9 +944,9 @@ export default function StandalonePresentation() {
                   <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>272.404</p>
                 </div>
                 <div>
-                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Permanencia</p>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Interacción activa</p>
                   <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {sitesData.find(s => s.id === 'iesa-ve')?.time2026 || '3m 10s'}
+                    {sitesData.find(s => s.id === 'iesa-ve')?.time2026 || '1m 28s'}
                   </p>
                 </div>
               </div>
@@ -988,9 +986,9 @@ export default function StandalonePresentation() {
                   <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>85.695</p>
                 </div>
                 <div>
-                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Permanencia</p>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Interacción activa</p>
                   <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {sitesData.find(s => s.id === 'debates-iesa')?.time2026 || '2m 38s'}
+                    {sitesData.find(s => s.id === 'debates-iesa')?.time2026 || '1m 04s'}
                   </p>
                 </div>
               </div>
@@ -1175,7 +1173,10 @@ export default function StandalonePresentation() {
                         <span className="block text-[9px] font-normal lowercase tracking-normal opacity-75">oct 25 - sep 26</span>
                       </th>
                       <th className="py-4 px-6 text-center">Variación</th>
-                      <th className="py-4 px-6 text-right">Permanencia</th>
+                      <th className="py-4 px-6 text-right">
+                        <span>Interacción activa</span>
+                        <span className="block text-[9px] font-normal lowercase tracking-normal opacity-75">promedio por usuario</span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody className={`divide-y ${isDark ? 'divide-slate-800/60' : 'divide-slate-200/80'}`}>
@@ -1227,7 +1228,7 @@ export default function StandalonePresentation() {
             </div>
 
             <p className={`text-[11px] italic ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              * Nota metodológica: Para los datos de 2025 se consultan las métricas desde septiembre 2024 hasta octubre de 2025. Para los datos de 2026 se contemplan desde octubre de 2025 hasta septiembre de 2026. Portales como IESA Foundation y Debates IESA presentan un crecimiento sostenido a lo largo del período.
+              * Nota metodológica: Para los datos de 2025 se consultan las métricas desde septiembre 2024 hasta octubre de 2025. Para los datos de 2026 se contemplan desde octubre de 2025 hasta septiembre de 2026. La métrica de interacción activa corresponde al tiempo real con la pantalla activa y en primer plano (tiempo total de interacción activo dividido entre usuarios activos en GA4). Portales como IESA Foundation y Debates IESA presentan un crecimiento sostenido a lo largo del período.
             </p>
           </div>
         </section>

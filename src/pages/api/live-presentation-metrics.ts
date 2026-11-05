@@ -54,7 +54,7 @@ export const GET: APIRoute = async () => {
             { name: 'sessions' },
             { name: 'activeUsers' },
             { name: 'screenPageViews' },
-            { name: 'averageSessionDuration' }
+            { name: 'userEngagementDuration' }
           ]
         }));
 
@@ -80,7 +80,7 @@ export const GET: APIRoute = async () => {
             { name: 'sessions' },
             { name: 'activeUsers' },
             { name: 'screenPageViews' },
-            { name: 'averageSessionDuration' }
+            { name: 'userEngagementDuration' }
           ]
         }));
 
@@ -110,6 +110,14 @@ export const GET: APIRoute = async () => {
         const r25 = res2025.rows?.[0];
         const r26 = res2026.rows?.[0];
 
+        const users2025 = Number(r25?.metricValues?.[1]?.value || 0);
+        const engagementDuration2025 = Number(r25?.metricValues?.[3]?.value || 0);
+        const avgEngagement2025 = users2025 > 0 ? (engagementDuration2025 / users2025) : 0;
+
+        const users2026 = Number(r26?.metricValues?.[1]?.value || 0);
+        const engagementDuration2026 = Number(r26?.metricValues?.[3]?.value || 0);
+        const avgEngagement2026 = users2026 > 0 ? (engagementDuration2026 / users2026) : 0;
+
         return {
           id: prop.id,
           name: prop.name,
@@ -117,17 +125,17 @@ export const GET: APIRoute = async () => {
           isLive: true,
           y2025: {
             sessions: Number(r25?.metricValues?.[0]?.value || 0),
-            users: Number(r25?.metricValues?.[1]?.value || 0),
+            users: users2025,
             views: Number(r25?.metricValues?.[2]?.value || 0),
-            time: formatTime(Number(r25?.metricValues?.[3]?.value || 0)),
+            time: formatTime(avgEngagement2025),
             organic: organic2025,
             direct: direct2025
           },
           y2026: {
             sessions: Number(r26?.metricValues?.[0]?.value || 0),
-            users: Number(r26?.metricValues?.[1]?.value || 0),
+            users: users2026,
             views: Number(r26?.metricValues?.[2]?.value || 0),
-            time: formatTime(Number(r26?.metricValues?.[3]?.value || 0)),
+            time: formatTime(avgEngagement2026),
             organic: organic2026,
             direct: direct2026,
             referral: referral2026,
@@ -156,14 +164,15 @@ export const GET: APIRoute = async () => {
             { name: 'screenPageViews' },
             { name: 'activeUsers' },
             { name: 'sessions' },
-            { name: 'averageSessionDuration' }
+            { name: 'userEngagementDuration' }
           ]
         }));
 
         const views = Number(response.rows?.[0]?.metricValues?.[0]?.value || 0);
         const users = Number(response.rows?.[0]?.metricValues?.[1]?.value || 0);
         const sessions = Number(response.rows?.[0]?.metricValues?.[2]?.value || 0);
-        const avgDurationSecs = Number(response.rows?.[0]?.metricValues?.[3]?.value || 0);
+        const engagementSecs = Number(response.rows?.[0]?.metricValues?.[3]?.value || 0);
+        const avgDurationSecs = users > 0 ? (engagementSecs / users) : 0;
         const timeFormatted = `${Math.floor(avgDurationSecs / 60)}m ${Math.floor(avgDurationSecs % 60)}s`;
 
         return {
