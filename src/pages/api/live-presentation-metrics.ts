@@ -15,9 +15,9 @@ const POSTGRADUATE_PAGES = [
   { name: 'Maestría en Administración (MBA)', path: '/postgrados/maestria-en-administracion-mba', gscClicks: 1918, gscImp: 55042, gscCtr: '3.48%' },
   { name: 'Maestría en Finanzas', path: '/postgrados/maestria-en-finanzas', gscClicks: 1451, gscImp: 31971, gscCtr: '4.54%' },
   { name: 'Maestría en Mercadeo', path: '/postgrados/maestria-en-mercadeo', gscClicks: 714, gscImp: 12316, gscCtr: '5.80%' },
-  { name: 'Especialización en Gerencia de Operaciones', path: '/especializacion-en-gerencia-de-operaciones', gscClicks: 484, gscImp: 11274, gscCtr: '4.29%' },
+  { name: 'Especialización en gerencia de operaciones', path: '/especializacion-en-gerencia-de-operaciones', gscClicks: 484, gscImp: 11274, gscCtr: '4.29%' },
   { name: 'Maestría en Gerencia Pública', path: '/postgrados/maestria-en-gerencia-publica', gscClicks: 882, gscImp: 17772, gscCtr: '4.96%' },
-  { name: 'Especialización en Gerencia Legal Corporativa', path: '/especializacion-en-gerencia-legal-corporativa', gscClicks: 35, gscImp: 122, gscCtr: '28.69%' }
+  { name: 'Especialización Gerencia Legal', path: '/especializacion-en-gerencia-legal-corporativa', gscClicks: 35, gscImp: 122, gscCtr: '28.69%' }
 ];
 
 function withTimeout<T>(promise: Promise<T>, ms = 7000): Promise<T> {
@@ -34,7 +34,7 @@ export const GET: APIRoute = async () => {
     return new Response(JSON.stringify({ 
       isLive: false,
       message: 'Faltan credenciales GA4 en variables de entorno.',
-      updatedAt: '2026-11-03'
+      updatedAt: 'Período 2025-2026'
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
@@ -43,11 +43,13 @@ export const GET: APIRoute = async () => {
 
   try {
     // 1. Consultar métricas en vivo para las propiedades de GA4
+    // Período 2025: Septiembre 2024 hasta Octubre 2025
+    // Período 2026: Octubre 2025 hasta Septiembre 2026
     const propertyResults = await Promise.all(LIVE_PROPERTIES.map(async (prop) => {
       try {
         const [res2025] = await withTimeout(client.runReport({
           property: `properties/${prop.id}`,
-          dateRanges: [{ startDate: '2025-01-01', endDate: '2025-12-31' }],
+          dateRanges: [{ startDate: '2024-09-01', endDate: '2025-10-31' }],
           metrics: [
             { name: 'sessions' },
             { name: 'activeUsers' },
@@ -56,9 +58,24 @@ export const GET: APIRoute = async () => {
           ]
         }));
 
+        const [chRes2025] = await withTimeout(client.runReport({
+          property: `properties/${prop.id}`,
+          dateRanges: [{ startDate: '2024-09-01', endDate: '2025-10-31' }],
+          dimensions: [{ name: 'sessionDefaultChannelGroup' }],
+          metrics: [{ name: 'sessions' }]
+        }));
+
+        let organic2025 = 0, direct2025 = 0;
+        chRes2025.rows?.forEach(r => {
+          const ch = (r.dimensionValues?.[0]?.value || '').toLowerCase();
+          const sess = Number(r.metricValues?.[0]?.value || 0);
+          if (ch.includes('organic')) organic2025 += sess;
+          else if (ch.includes('direct')) direct2025 += sess;
+        });
+
         const [res2026] = await withTimeout(client.runReport({
           property: `properties/${prop.id}`,
-          dateRanges: [{ startDate: '2026-01-01', endDate: 'today' }],
+          dateRanges: [{ startDate: '2025-10-01', endDate: '2026-09-30' }],
           metrics: [
             { name: 'sessions' },
             { name: 'activeUsers' },
@@ -69,7 +86,7 @@ export const GET: APIRoute = async () => {
 
         const [chRes] = await withTimeout(client.runReport({
           property: `properties/${prop.id}`,
-          dateRanges: [{ startDate: '2026-01-01', endDate: 'today' }],
+          dateRanges: [{ startDate: '2025-10-01', endDate: '2026-09-30' }],
           dimensions: [{ name: 'sessionDefaultChannelGroup' }],
           metrics: [{ name: 'sessions' }]
         }));
@@ -102,7 +119,9 @@ export const GET: APIRoute = async () => {
             sessions: Number(r25?.metricValues?.[0]?.value || 0),
             users: Number(r25?.metricValues?.[1]?.value || 0),
             views: Number(r25?.metricValues?.[2]?.value || 0),
-            time: formatTime(Number(r25?.metricValues?.[3]?.value || 0))
+            time: formatTime(Number(r25?.metricValues?.[3]?.value || 0)),
+            organic: organic2025,
+            direct: direct2025
           },
           y2026: {
             sessions: Number(r26?.metricValues?.[0]?.value || 0),
@@ -121,12 +140,12 @@ export const GET: APIRoute = async () => {
       }
     }));
 
-    // 2. Consultar páginas de postgrado en IESA Principal (2026 acumulado a hoy, 3 de noviembre)
+    // 2. Consultar páginas de postgrado en IESA Principal (Período 2026: Octubre 2025 hasta Septiembre 2026)
     const postgradResults = await Promise.all(POSTGRADUATE_PAGES.map(async (p) => {
       try {
         const [response] = await withTimeout(client.runReport({
           property: `properties/306124053`,
-          dateRanges: [{ startDate: '2026-01-01', endDate: 'today' }],
+          dateRanges: [{ startDate: '2025-10-01', endDate: '2026-09-30' }],
           dimensionFilter: {
             filter: {
               fieldName: 'pagePath',
@@ -176,7 +195,11 @@ export const GET: APIRoute = async () => {
 
     return new Response(JSON.stringify({
       isLive: true,
-      updatedAt: '2026-11-03',
+      updatedAt: 'Período 2025-2026',
+      dateRanges: {
+        period2025: 'Septiembre 2024 - Octubre 2025',
+        period2026: 'Octubre 2025 - Septiembre 2026'
+      },
       properties: propertyResults,
       postgrades: postgradResults
     }), {

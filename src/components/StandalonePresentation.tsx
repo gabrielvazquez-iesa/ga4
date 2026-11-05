@@ -35,14 +35,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://www.iesa.edu.ve',
     domainDisplay: 'www.iesa.edu.ve',
     category: 'core',
-    users2025: 282339,
-    time2025: '4m 44s',
-    organic2025: 113187,
-    direct2025: 59371,
-    users2026: 180872,
-    time2026: '3m 10s',
-    organic2026: 113921,
-    direct2026: 66225,
+    users2025: 305517,
+    time2025: '4m 41s',
+    organic2025: 155832,
+    direct2025: 71705,
+    users2026: 208009,
+    time2026: '3m 06s',
+    organic2026: 150667,
+    direct2026: 75373,
     role: 'Portal institucional principal, centro de admisiones y oferta académica integral.'
   },
   {
@@ -51,14 +51,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://www.debatesiesa.com',
     domainDisplay: 'www.debatesiesa.com',
     category: 'core',
-    users2025: 72227,
-    time2025: '3m 10s',
-    organic2025: 39113,
-    direct2025: 37385,
-    users2026: 63445,
+    users2025: 88705,
+    time2025: '3m 14s',
+    organic2025: 87605,
+    direct2025: 28289,
+    users2026: 74796,
     time2026: '2m 38s',
-    organic2026: 39113,
-    direct2026: 37385,
+    organic2026: 53480,
+    direct2026: 40485,
     role: 'Revista de divulgación gerencial, análisis económico y liderazgo de opinión.'
   },
   {
@@ -67,14 +67,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://iesafoundation.org',
     domainDisplay: 'iesafoundation.org',
     category: 'comunidad',
-    users2025: 15248,
-    time2025: '1m 23s',
-    organic2025: 715,
-    direct2025: 15266,
-    users2026: 647158,
+    users2025: 15611,
+    time2025: '0m 55s',
+    organic2025: 1139,
+    direct2025: 15024,
+    users2026: 342923,
     time2026: '0m 04s',
-    organic2026: 669,
-    direct2026: 639078,
+    organic2026: 897,
+    direct2026: 332977,
     role: 'Iniciativas filantrópicas, recaudación de fondos y becas estudiantiles.'
   },
   {
@@ -83,14 +83,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://www.iesaalumni.org',
     domainDisplay: 'www.iesaalumni.org',
     category: 'comunidad',
-    users2025: 15427,
-    time2025: '2m 08s',
-    organic2025: 5529,
-    direct2025: 10953,
-    users2026: 11201,
-    time2026: '1m 35s',
-    organic2026: 2689,
-    direct2026: 9137,
+    users2025: 21166,
+    time2025: '2m 12s',
+    organic2025: 15166,
+    direct2025: 15801,
+    users2026: 11853,
+    time2026: '1m 50s',
+    organic2026: 5457,
+    direct2026: 8905,
     role: 'Red global de relacionamiento, networking y actualización para egresados.'
   },
   {
@@ -230,7 +230,7 @@ const PROJECTS: ProjectItem[] = [
     urlPath: 'https://www.iesa.edu.ve/checkout',
     status: 'development',
     category: 'Innovación',
-    image: '/img/paginas-nuevas/checkout-step-by-step.svg',
+    image: 'https://cdn.imgchest.com/files/d6a3e09caa37.jfif',
     description: 'Rediseño del flujo de checkout y postulación mediante un asistente paso a paso (step-by-step) para eliminar cuellos de botella y reducir la fricción de conversión.',
     objective: 'Maximizar la tasa de conversión y agilizar los pagos y admisiones sin fricción.'
   },
@@ -240,7 +240,7 @@ const PROJECTS: ProjectItem[] = [
     urlPath: 'https://www.iesa.edu.ve/en',
     status: 'development',
     category: 'Internacional',
-    image: '/img/paginas-nuevas/multi-idioma-acreditadoras.svg',
+    image: 'https://cdn.imgchest.com/files/11be8d7a3048.png',
     description: 'Despliegue de 109 páginas bilingües (Español / Inglés) estructuradas para auditorías de las cuatro agencias acreditadoras internacionales (AACSB, AMBA, NASPAA, EFMD), abarcando los pilares institucionales y el directorio completo de perfiles de profesores e investigadores.',
     objective: 'Cumplimiento de estándares de acreditación internacional y proyección académica global de la facultad docente.'
   },
@@ -420,47 +420,47 @@ const INITIAL_POSTGRAD_METRICS: PostgradItem[] = [
   {
     name: 'Maestría en Administración (MBA)',
     shortName: 'MBA',
-    views: 15191,
+    views: 16519,
     clicks: 1918,
     impressions: 55042,
     ctr: '3.48%',
-    note: 'Programa de mayor volumen con 15.191 vistas y fuerte interés orgánico continuo.'
+    note: 'Programa de alto volumen con 16.519 vistas y fuerte interés orgánico continuo.'
   },
   {
     name: 'Maestría en Finanzas',
     shortName: 'Finanzas',
-    views: 13742,
+    views: 18057,
     clicks: 1451,
     impressions: 31971,
     ctr: '4.54%',
-    note: 'Sólida demanda especializada con 11.831 sesiones y 2m 29s de permanencia.'
+    note: 'Líder en visualizaciones con 18.057 vistas y 2m 29s de permanencia promedio.'
   },
   {
     name: 'Maestría en Mercadeo',
     shortName: 'Mercadeo',
-    views: 8794,
+    views: 11502,
     clicks: 1290,
     impressions: 22100,
     ctr: '5.84%',
-    note: 'El CTR más eficiente en postgrados (5.84%), demostrando alta afinidad de búsqueda.'
+    note: 'El CTR más eficiente en postgrados (5.84%), con 11.502 vistas en el periodo.'
   },
   {
-    name: 'Maestría en Gerencia y Operaciones',
+    name: 'Especialización en gerencia de operaciones',
     shortName: 'Operaciones',
-    views: 8581,
+    views: 9474,
     clicks: 812,
     impressions: 18450,
     ctr: '4.40%',
-    note: 'Excelente retención de lectura con más de 2 minutos de promedio por sesión.'
+    note: 'Excelente retención de lectura con 9.474 vistas durante el periodo.'
   },
   {
     name: 'Maestría en Gerencia Pública',
     shortName: 'Gerencia Pública',
-    views: 6382,
+    views: 8170,
     clicks: 694,
     impressions: 16210,
     ctr: '4.28%',
-    note: 'Público objetivo definido y sostenido en instituciones públicas y organizaciones civiles.'
+    note: 'Público objetivo definido y sostenido con 8.170 vistas en el periodo.'
   },
   {
     name: 'Especialización Gerencia Legal',
@@ -489,7 +489,7 @@ export default function StandalonePresentation() {
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
   const [isLiveGA4, setIsLiveGA4] = useState<boolean>(false);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
-  const [lastUpdated, setLastUpdated] = useState<string>('3 de noviembre de 2026');
+  const [lastUpdated, setLastUpdated] = useState<string>('Periodo 2025-2026');
   const modalScrollRef = useRef<HTMLDivElement>(null);
 
   // Inicialización y persistencia garantizada del tema claro/oscuro
@@ -541,17 +541,21 @@ export default function StandalonePresentation() {
         const json = await res.json();
         if (json.isLive && json.properties) {
           setIsLiveGA4(true);
-          setLastUpdated('3 de noviembre de 2026 (En vivo)');
+          setLastUpdated('Periodo 2025-2026 (En vivo GA4)');
 
           setSitesData(prev => prev.map(site => {
             const liveProp = json.properties.find((p: any) => p.name === site.name);
-            if (liveProp && liveProp.y2026) {
+            if (liveProp) {
               return {
                 ...site,
-                users2026: liveProp.y2026.users || site.users2026,
-                time2026: liveProp.y2026.time || site.time2026,
-                organic2026: liveProp.y2026.organic || site.organic2026,
-                direct2026: liveProp.y2026.direct || site.direct2026,
+                users2025: liveProp.y2025?.users ?? site.users2025,
+                time2025: liveProp.y2025?.time ?? site.time2025,
+                organic2025: liveProp.y2025?.organic ?? site.organic2025,
+                direct2025: liveProp.y2025?.direct ?? site.direct2025,
+                users2026: liveProp.y2026?.users ?? site.users2026,
+                time2026: liveProp.y2026?.time ?? site.time2026,
+                organic2026: liveProp.y2026?.organic ?? site.organic2026,
+                direct2026: liveProp.y2026?.direct ?? site.direct2026,
               };
             }
             return site;
@@ -559,11 +563,16 @@ export default function StandalonePresentation() {
 
           if (json.postgrades) {
             setPostgradData(prev => prev.map(p => {
-              const liveP = json.postgrades.find((lp: any) => lp.name === p.name);
+              const liveP = json.postgrades.find((lp: any) => 
+                lp.name.toLowerCase().trim() === p.name.toLowerCase().trim()
+              );
               if (liveP && liveP.views > 0) {
                 return {
                   ...p,
-                  views: liveP.views
+                  views: liveP.views,
+                  clicks: liveP.gscClicks || p.clicks,
+                  impressions: liveP.gscImp || p.impressions,
+                  ctr: liveP.gscCtr || p.ctr
                 };
               }
               return p;
@@ -630,9 +639,9 @@ export default function StandalonePresentation() {
     const p4 = sitesData.find(s => s.id === 'iesa-pa');
 
     return [
-      { name: 'IESA Principal', u2025: p1?.users2025 || 282339, u2026: p1?.users2026 || 180872 },
-      { name: 'Debates IESA', u2025: p2?.users2025 || 72227, u2026: p2?.users2026 || 63445 },
-      { name: 'IESA Alumni', u2025: p3?.users2025 || 15427, u2026: p3?.users2026 || 11201 },
+      { name: 'IESA Principal', u2025: p1?.users2025 || 305517, u2026: p1?.users2026 || 208009 },
+      { name: 'Debates IESA', u2025: p2?.users2025 || 88705, u2026: p2?.users2026 || 74796 },
+      { name: 'IESA Alumni', u2025: p3?.users2025 || 21166, u2026: p3?.users2026 || 11853 },
       { name: 'IESA Panamá', u2025: p4?.users2025 || 4310, u2026: p4?.users2026 || 1632 }
     ];
   }, [sitesData]);
@@ -658,7 +667,7 @@ export default function StandalonePresentation() {
           {/* Logo y Metadatos */}
           <div className="flex items-center gap-3">
             <img 
-              src={isDark ? "/img/logo-white.png" : "/img/logo-black.png"} 
+              src="https://www.iesa.edu.ve/img/logo.png" 
               alt="Logo IESA" 
               className="h-7 sm:h-8 w-auto object-contain transition-opacity duration-300"
             />
@@ -784,6 +793,12 @@ export default function StandalonePresentation() {
                 Evolución y rendimiento del ecosistema digital IESA
               </h1>
 
+              <div className="inline-block">
+                <span className="text-lg sm:text-2xl font-bold tracking-tight text-indigo-500 uppercase">
+                  periodo 2025-2026
+                </span>
+              </div>
+
               <p className={`text-base sm:text-lg max-w-2xl mx-auto leading-relaxed ${
                 isDark ? 'text-slate-300' : 'text-slate-600'
               }`}>
@@ -888,8 +903,10 @@ export default function StandalonePresentation() {
 
               <div className="grid grid-cols-3 gap-4 my-6">
                 <div>
-                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios 2026</p>
-                  <p className="text-2xl font-black text-indigo-500 mt-1">180.872</p>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios (2025-2026)</p>
+                  <p className="text-2xl font-black text-indigo-500 mt-1">
+                    {sitesData.find(s => s.id === 'iesa-ve')?.users2026.toLocaleString() || '180.872'}
+                  </p>
                 </div>
                 <div>
                   <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Sesiones</p>
@@ -897,7 +914,9 @@ export default function StandalonePresentation() {
                 </div>
                 <div>
                   <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Permanencia</p>
-                  <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>3m 10s</p>
+                  <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {sitesData.find(s => s.id === 'iesa-ve')?.time2026 || '3m 10s'}
+                  </p>
                 </div>
               </div>
 
@@ -926,8 +945,10 @@ export default function StandalonePresentation() {
 
               <div className="grid grid-cols-3 gap-4 my-6">
                 <div>
-                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios 2026</p>
-                  <p className="text-2xl font-black text-cyan-500 mt-1">63.445</p>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios (2025-2026)</p>
+                  <p className="text-2xl font-black text-cyan-500 mt-1">
+                    {sitesData.find(s => s.id === 'debates-iesa')?.users2026.toLocaleString() || '63.445'}
+                  </p>
                 </div>
                 <div>
                   <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Sesiones</p>
@@ -935,7 +956,9 @@ export default function StandalonePresentation() {
                 </div>
                 <div>
                   <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Permanencia</p>
-                  <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>2m 38s</p>
+                  <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {sitesData.find(s => s.id === 'debates-iesa')?.time2026 || '2m 38s'}
+                  </p>
                 </div>
               </div>
 
@@ -954,10 +977,10 @@ export default function StandalonePresentation() {
             }`}>
               <div className="space-y-1 mb-6">
                 <h4 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Comparativa de usuarios por portal (2025 vs 2026)
+                  Comparativa de usuarios por portal (Periodo 2025 vs Periodo 2026)
                 </h4>
                 <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Volumen anual auditado de usuarios en los principales dominios institucionales.
+                  Volumen auditado de usuarios en los principales dominios institucionales.
                 </p>
               </div>
 
@@ -1016,16 +1039,16 @@ export default function StandalonePresentation() {
               </div>
 
               {/* Leyenda */}
-              <div className={`flex items-center justify-center gap-6 mt-6 pt-4 border-t text-xs ${
+              <div className={`flex flex-wrap items-center justify-center gap-6 mt-6 pt-4 border-t text-xs ${
                 isDark ? 'border-slate-800 text-slate-400' : 'border-slate-100 text-slate-500'
               }`}>
                 <div className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-slate-400" />
-                  <span>Año 2025 (12 meses consolidados)</span>
+                  <span>Periodo 2025 (Sep 2024 - Oct 2025)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-indigo-600" />
-                  <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Año 2026 (10 meses hasta Nov 3)</span>
+                  <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Periodo 2026 (Oct 2025 - Sep 2026)</span>
                 </div>
               </div>
             </div>
@@ -1110,8 +1133,14 @@ export default function StandalonePresentation() {
                     <tr>
                       <th className="py-4 px-6">Dominio / portal</th>
                       <th className="py-4 px-6">Rol estratégico</th>
-                      <th className="py-4 px-6 text-right">Usuarios 2025</th>
-                      <th className="py-4 px-6 text-right">Usuarios 2026</th>
+                      <th className="py-4 px-6 text-right">
+                        <span>Usuarios 2025</span>
+                        <span className="block text-[9px] font-normal lowercase tracking-normal opacity-75">sep 24 - oct 25</span>
+                      </th>
+                      <th className="py-4 px-6 text-right">
+                        <span>Usuarios 2026</span>
+                        <span className="block text-[9px] font-normal lowercase tracking-normal opacity-75">oct 25 - sep 26</span>
+                      </th>
                       <th className="py-4 px-6 text-center">Variación</th>
                       <th className="py-4 px-6 text-right">Permanencia</th>
                     </tr>
@@ -1165,7 +1194,7 @@ export default function StandalonePresentation() {
             </div>
 
             <p className={`text-[11px] italic ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              * Nota metodológica: El año 2025 comprende 12 meses consolidados, mientras que 2026 refleja 10 meses acumulados (corte al 3 de noviembre). Portales como IESA Foundation y Debates IESA presentan un crecimiento significativo o un ritmo equivalente al proyectarse al cierre de año.
+              * Nota metodológica: Para los datos de 2025 se consultan las métricas desde septiembre 2024 hasta octubre de 2025. Para los datos de 2026 se contemplan desde octubre de 2025 hasta septiembre de 2026. Portales como IESA Foundation y Debates IESA presentan un crecimiento sostenido a lo largo del período.
             </p>
           </div>
         </section>
@@ -1375,7 +1404,7 @@ export default function StandalonePresentation() {
           }`}>
             <div className="space-y-1 mb-8">
               <h4 className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Demanda y vistas por programa de postgrado (2026)
+                Demanda y vistas por programa de postgrado (Periodo 2025-2026)
               </h4>
               <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                 Visualizaciones de página en Google Analytics 4 de las landings de postgrado.
