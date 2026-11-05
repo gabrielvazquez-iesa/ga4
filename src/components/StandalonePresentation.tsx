@@ -3,8 +3,9 @@ import {
   Globe, TrendingUp, TrendingDown, ExternalLink, CheckCircle2, 
   Clock, Maximize2, X, ChevronRight, RefreshCw,
   Sun, Moon, ArrowDown, Sparkles, Search, 
-  Bot, Palette, Check, Wrench
+  Bot, Palette, Check, Wrench, QrCode, Share2, Copy, Download
 } from 'lucide-react';
+import QRCode from 'qrcode';
 import TiltedGridHero from './ui/tilted-grid-hero';
 
 // =================================================================
@@ -487,10 +488,41 @@ export default function StandalonePresentation() {
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'core' | 'internacional' | 'comunidad'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'future' | 'development'>('all');
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+  const [showShareModal, setShowShareModal] = useState<boolean>(false);
+  const [qrDataUrl, setQrDataUrl] = useState<string>('');
+  const [copied, setCopied] = useState<boolean>(false);
+  const [shareUrl, setShareUrl] = useState<string>('');
   const [isLiveGA4, setIsLiveGA4] = useState<boolean>(false);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<string>('Periodo 2025-2026');
   const modalScrollRef = useRef<HTMLDivElement>(null);
+
+  // Inicialización de la URL y generación del código QR para compartir
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const url = window.location.href;
+      setShareUrl(url);
+      QRCode.toDataURL(url, {
+        width: 320,
+        margin: 2,
+        color: {
+          dark: '#0f172a',
+          light: '#ffffff'
+        }
+      }).then(dataUrl => {
+        setQrDataUrl(dataUrl);
+      }).catch(err => {
+        console.error('Error generando QR:', err);
+      });
+    }
+  }, []);
+
+  const handleCopyLink = () => {
+    if (!shareUrl) return;
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
 
   // Inicialización y persistencia garantizada del tema claro/oscuro
   useEffect(() => {
@@ -591,15 +623,16 @@ export default function StandalonePresentation() {
     fetchLiveMetrics();
   }, []);
 
-  // Cerrar modal con la tecla Escape y resetear scroll al abrir
+  // Cerrar modales con la tecla Escape y resetear scroll al abrir
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setSelectedProject(null);
+        setShowShareModal(false);
       }
     };
 
-    if (selectedProject) {
+    if (selectedProject || showShareModal) {
       window.addEventListener('keydown', handleKeyDown);
       if (modalScrollRef.current) {
         modalScrollRef.current.scrollTop = 0;
@@ -609,7 +642,7 @@ export default function StandalonePresentation() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selectedProject]);
+  }, [selectedProject, showShareModal]);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -1627,6 +1660,41 @@ export default function StandalonePresentation() {
           </div>
         </section>
 
+        {/* =============================================================
+            BLOQUE FINAL: COMPARTIR PRESENTACIÓN CON CÓDIGO QR
+            ============================================================= */}
+        <section className={`p-8 sm:p-12 rounded-3xl border text-center space-y-6 transition-all ${
+          isDark 
+            ? 'bg-gradient-to-b from-slate-900/90 to-slate-950 border-slate-800 shadow-2xl shadow-indigo-950/25' 
+            : 'bg-gradient-to-b from-indigo-50/60 to-white border-indigo-100 shadow-xl shadow-slate-200/50'
+        }`}>
+          <div className="max-w-2xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-semibold backdrop-blur-md bg-indigo-500/10 text-indigo-500 border-indigo-500/20">
+              <QrCode className="w-3.5 h-3.5" />
+              <span>Difusión ejecutiva</span>
+            </div>
+            
+            <h3 className={`text-2xl sm:text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              Comparte o accede a esta presentación en tu móvil
+            </h3>
+
+            <p className={`text-sm sm:text-base leading-relaxed max-w-xl mx-auto ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+              Escanea el código QR interactivo para explorar los datos reales de Google Analytics 4 y el catálogo de proyectos directamente desde tu smartphone.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl font-bold text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <Share2 className="w-4 h-4" />
+              <span>Compartir presentación (Código QR)</span>
+              <QrCode className="w-4 h-4 opacity-80" />
+            </button>
+          </div>
+        </section>
+
       </main>
 
       {/* =================================================================
@@ -1756,6 +1824,109 @@ export default function StandalonePresentation() {
               </a>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================
+          MODAL DE CÓDIGO QR PARA COMPARTIR LA PRESENTACIÓN
+          ================================================================= */}
+      {showShareModal && (
+        <div 
+          onClick={() => setShowShareModal(false)}
+          className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-pointer"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className={`w-full max-w-md rounded-3xl border shadow-2xl p-6 sm:p-8 flex flex-col items-center text-center space-y-6 cursor-default transition-all ${
+              isDark ? 'bg-slate-900 border-slate-800 text-slate-100 shadow-indigo-950/40' : 'bg-white border-slate-200 text-slate-900 shadow-slate-300/80'
+            }`}
+          >
+            {/* Cabecera del modal */}
+            <div className="w-full flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
+                  <QrCode className="w-5 h-5" />
+                </div>
+                <div className="text-left">
+                  <h3 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    Escanear presentación
+                  </h3>
+                  <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Versión interactiva en vivo
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowShareModal(false)}
+                className={`p-2 rounded-xl border transition cursor-pointer ${
+                  isDark 
+                    ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300 hover:text-white' 
+                    : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-600 hover:text-slate-900'
+                }`}
+                title="Cerrar (Esc)"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Código QR con marco blanco para máximo contraste y legibilidad */}
+            <div className="relative p-5 bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col items-center justify-center">
+              {qrDataUrl ? (
+                <img 
+                  src={qrDataUrl} 
+                  alt="Código QR de la presentación" 
+                  className="w-56 h-56 sm:w-64 sm:h-64 object-contain"
+                />
+              ) : (
+                <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center text-slate-400 text-xs">
+                  Generando código QR...
+                </div>
+              )}
+              
+              <div className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-slate-700">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Apunta con la cámara de tu smartphone</span>
+              </div>
+            </div>
+
+            {/* URL y botón de copiar enlace */}
+            <div className="w-full space-y-2.5">
+              <div className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 text-xs font-mono truncate ${
+                isDark ? 'bg-slate-950 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
+              }`}>
+                <span className="truncate text-[11px]">{shareUrl || 'Cargando enlace...'}</span>
+                <button
+                  onClick={handleCopyLink}
+                  className={`shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-bold font-sans flex items-center gap-1.5 transition-all cursor-pointer ${
+                    copied 
+                      ? 'bg-emerald-600 text-white shadow-xs' 
+                      : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-xs'
+                  }`}
+                  title="Copiar enlace al portapapeles"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? '¡Copiado!' : 'Copiar'}</span>
+                </button>
+              </div>
+
+              {/* Botón para descargar imagen del QR */}
+              {qrDataUrl && (
+                <a
+                  href={qrDataUrl}
+                  download="QR-Presentacion-IESA.png"
+                  className={`w-full py-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                    isDark 
+                      ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200' 
+                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700 shadow-2xs'
+                  }`}
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Descargar imagen QR</span>
+                </a>
+              )}
+            </div>
           </div>
         </div>
       )}
