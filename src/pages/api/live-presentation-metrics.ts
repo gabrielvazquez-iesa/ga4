@@ -34,7 +34,7 @@ export const GET: APIRoute = async () => {
     return new Response(JSON.stringify({ 
       isLive: false,
       message: 'Faltan credenciales GA4 en variables de entorno.',
-      updatedAt: 'Período 2025-2026'
+      updatedAt: 'Año Fiscal 2025-2026'
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
@@ -43,13 +43,13 @@ export const GET: APIRoute = async () => {
 
   try {
     // 1. Consultar métricas en vivo para las propiedades de GA4
-    // Período 2025: Septiembre 2024 hasta Octubre 2025
-    // Período 2026: Octubre 2025 hasta Septiembre 2026
+    // Año Fiscal 2024-2025: Octubre 2024 hasta Septiembre 2025
+    // Año Fiscal 2025-2026: Octubre 2025 hasta Septiembre 2026
     const propertyResults = await Promise.all(LIVE_PROPERTIES.map(async (prop) => {
       try {
         const [res2025] = await withTimeout(client.runReport({
           property: `properties/${prop.id}`,
-          dateRanges: [{ startDate: '2024-09-01', endDate: '2025-10-31' }],
+          dateRanges: [{ startDate: '2024-10-01', endDate: '2025-09-30' }],
           metrics: [
             { name: 'sessions' },
             { name: 'activeUsers' },
@@ -60,7 +60,7 @@ export const GET: APIRoute = async () => {
 
         const [chRes2025] = await withTimeout(client.runReport({
           property: `properties/${prop.id}`,
-          dateRanges: [{ startDate: '2024-09-01', endDate: '2025-10-31' }],
+          dateRanges: [{ startDate: '2024-10-01', endDate: '2025-09-30' }],
           dimensions: [{ name: 'sessionDefaultChannelGroup' }],
           metrics: [{ name: 'sessions' }]
         }));
@@ -204,10 +204,10 @@ export const GET: APIRoute = async () => {
 
     return new Response(JSON.stringify({
       isLive: true,
-      updatedAt: 'Período 2025-2026',
+      updatedAt: 'Año Fiscal 2025-2026',
       dateRanges: {
-        period2025: 'Septiembre 2024 - Octubre 2025',
-        period2026: 'Octubre 2025 - Septiembre 2026'
+        period2025: 'Año Fiscal 2024-2025 (Oct 2024 - Sep 2025)',
+        period2026: 'Año Fiscal 2025-2026 (Oct 2025 - Sep 2026)'
       },
       properties: propertyResults,
       postgrades: postgradResults

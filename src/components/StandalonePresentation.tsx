@@ -36,12 +36,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://www.iesa.edu.ve',
     domainDisplay: 'www.iesa.edu.ve',
     category: 'core',
-    users2025: 305517,
-    time2025: '1m 10s',
-    organic2025: 155832,
-    direct2025: 71705,
+    users2025: 278843,
+    time2025: '1m 06s',
+    organic2025: 131510,
+    direct2025: 60990,
     users2026: 208009,
     time2026: '1m 28s',
+    organic2026: 150667,
+    direct2026: 75373,
     role: 'Portal institucional principal, centro de admisiones y oferta académica integral.'
   },
   {
@@ -50,10 +52,10 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://www.debatesiesa.com',
     domainDisplay: 'www.debatesiesa.com',
     category: 'core',
-    users2025: 88705,
-    time2025: '1m 30s',
-    organic2025: 87605,
-    direct2025: 28289,
+    users2025: 76755,
+    time2025: '1m 31s',
+    organic2025: 76959,
+    direct2025: 24658,
     users2026: 74796,
     time2026: '1m 04s',
     organic2026: 53480,
@@ -66,10 +68,10 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://iesafoundation.org',
     domainDisplay: 'iesafoundation.org',
     category: 'comunidad',
-    users2025: 15611,
-    time2025: '0m 06s',
-    organic2025: 1139,
-    direct2025: 15024,
+    users2025: 14726,
+    time2025: '0m 05s',
+    organic2025: 900,
+    direct2025: 14444,
     users2026: 342923,
     time2026: '0m 01s',
     organic2026: 897,
@@ -82,10 +84,10 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://www.iesaalumni.org',
     domainDisplay: 'www.iesaalumni.org',
     category: 'comunidad',
-    users2025: 21166,
-    time2025: '0m 56s',
-    organic2025: 15166,
-    direct2025: 15801,
+    users2025: 19067,
+    time2025: '0m 54s',
+    organic2025: 13500,
+    direct2025: 14279,
     users2026: 11853,
     time2026: '0m 31s',
     organic2026: 5457,
@@ -98,14 +100,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://www.iesa.edu.pa',
     domainDisplay: 'www.iesa.edu.pa',
     category: 'internacional',
-    users2025: 4310,
-    time2025: '0m 52s',
-    organic2025: 3278,
-    direct2025: 1209,
-    users2026: 1632,
-    time2026: '1m 49s',
-    organic2026: 1039,
-    direct2026: 760,
+    users2025: 4824,
+    time2025: '0m 31s',
+    organic2025: 3683,
+    direct2025: 1320,
+    users2026: 4013,
+    time2026: '0m 29s',
+    organic2026: 2881,
+    direct2026: 1735,
     role: 'Sede en Ciudad del Saber para atención y formación del mercado centroamericano.'
   },
   {
@@ -114,14 +116,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://consultoria.iesa.edu.pa',
     domainDisplay: 'consultoria.iesa.edu.pa',
     category: 'internacional',
-    users2025: 1613,
-    time2025: '1m 05s',
-    organic2025: 243,
-    direct2025: 1471,
-    users2026: 955,
-    time2026: '0m 44s',
-    organic2026: 79,
-    direct2026: 811,
+    users2025: 1834,
+    time2025: '0m 35s',
+    organic2025: 371,
+    direct2025: 1665,
+    users2026: 2065,
+    time2026: '0m 32s',
+    organic2026: 411,
+    direct2026: 1750,
     role: 'Servicios de asesoría estratégica empresarial in-company.'
   },
   {
@@ -130,14 +132,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://www.iesa.edu.pa/internationalfaculty',
     domainDisplay: 'www.iesa.edu.pa/internationalfaculty',
     category: 'internacional',
-    users2025: 1618,
-    time2025: '2m 10s',
-    organic2025: 1473,
-    direct2025: 393,
-    users2026: 780,
-    time2026: '1m 03s',
-    organic2026: 529,
-    direct2026: 330,
+    users2025: 1437,
+    time2025: '0m 40s',
+    organic2025: 1371,
+    direct2025: 309,
+    users2026: 1877,
+    time2026: '0m 31s',
+    organic2026: 1390,
+    direct2026: 702,
     role: 'Directorio y portal de vinculación del cuerpo docente internacional.'
   },
   {
@@ -146,14 +148,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://aol.iesa.edu.ve',
     domainDisplay: 'aol.iesa.edu.ve',
     category: 'comunidad',
-    users2025: 826,
-    time2025: '1m 10s',
-    organic2025: 351,
-    direct2025: 604,
-    users2026: 681,
-    time2026: '2m 32s',
-    organic2026: 59,
-    direct2026: 635,
+    users2025: 489,
+    time2025: '0m 44s',
+    organic2025: 426,
+    direct2025: 260,
+    users2026: 1950,
+    time2026: '0m 05s',
+    organic2026: 191,
+    direct2026: 1817,
     role: 'Plataforma educativa y entorno de clases virtuales para la comunidad activa.'
   },
   {
@@ -162,14 +164,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://www.iesa.edu.do',
     domainDisplay: 'www.iesa.edu.do',
     category: 'internacional',
-    users2025: 937,
-    time2025: '0m 57s',
-    organic2025: 275,
-    direct2025: 748,
-    users2026: 714,
-    time2026: '0m 50s',
-    organic2026: 158,
-    direct2026: 587,
+    users2025: 1096,
+    time2025: '0m 19s',
+    organic2025: 320,
+    direct2025: 874,
+    users2026: 809,
+    time2026: '0m 20s',
+    organic2026: 191,
+    direct2026: 662,
     role: 'Formación ejecutiva y extensión académica en República Dominicana.'
   },
   {
@@ -178,14 +180,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://www.iesa.edu.pa/cslr/',
     domainDisplay: 'www.iesa.edu.pa/cslr',
     category: 'comunidad',
-    users2025: 651,
-    time2025: '2m 38s',
-    organic2025: 342,
-    direct2025: 174,
-    users2026: 275,
-    time2026: '2m 30s',
-    organic2026: 71,
-    direct2026: 156,
+    users2025: 710,
+    time2025: '0m 49s',
+    organic2025: 628,
+    direct2025: 143,
+    users2026: 566,
+    time2026: '0m 48s',
+    organic2026: 305,
+    direct2026: 289,
     role: 'Investigación en gobernanza corporativa y liderazgo sostenible.'
   },
   {
@@ -194,14 +196,14 @@ const INITIAL_SITES_DATA: SiteMetric[] = [
     url: 'https://ciea.iesa.edu.pa',
     domainDisplay: 'ciea.iesa.edu.pa',
     category: 'comunidad',
-    users2025: 423,
-    time2025: '2m 34s',
-    organic2025: 204,
-    direct2025: 127,
-    users2026: 439,
-    time2026: '2m 40s',
-    organic2026: 109,
-    direct2026: 171,
+    users2025: 485,
+    time2025: '0m 54s',
+    organic2025: 244,
+    direct2025: 156,
+    users2026: 495,
+    time2026: '0m 43s',
+    organic2026: 184,
+    direct2026: 198,
     role: 'Centro de Innovación y aceleración de iniciativas de negocio.'
   }
 ];
@@ -441,7 +443,7 @@ const INITIAL_POSTGRAD_METRICS: PostgradItem[] = [
     clicks: 1290,
     impressions: 22100,
     ctr: '5.84%',
-    note: 'El CTR más eficiente en postgrados (5.84%), con 11.502 vistas en el periodo.'
+    note: 'El CTR más eficiente en postgrados (5.84%), con 11.502 vistas en el año fiscal.'
   },
   {
     name: 'Especialización en gerencia de operaciones',
@@ -450,7 +452,7 @@ const INITIAL_POSTGRAD_METRICS: PostgradItem[] = [
     clicks: 812,
     impressions: 18450,
     ctr: '4.40%',
-    note: 'Excelente retención de lectura con 9.474 vistas durante el periodo.'
+    note: 'Excelente retención de lectura con 9.474 vistas durante el año fiscal.'
   },
   {
     name: 'Maestría en Gerencia Pública',
@@ -459,7 +461,7 @@ const INITIAL_POSTGRAD_METRICS: PostgradItem[] = [
     clicks: 694,
     impressions: 16210,
     ctr: '4.28%',
-    note: 'Público objetivo definido y sostenido con 8.170 vistas en el periodo.'
+    note: 'Público objetivo definido y sostenido con 8.170 vistas en el año fiscal.'
   },
   {
     name: 'Especialización Gerencia Legal',
@@ -492,7 +494,7 @@ export default function StandalonePresentation() {
   const [shareUrl, setShareUrl] = useState<string>('');
   const [isLiveGA4, setIsLiveGA4] = useState<boolean>(false);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
-  const [lastUpdated, setLastUpdated] = useState<string>('Periodo 2025-2026');
+  const [lastUpdated, setLastUpdated] = useState<string>('Año Fiscal 2025-2026');
   const modalScrollRef = useRef<HTMLDivElement>(null);
 
   // Inicialización de la URL y generación del código QR para compartir
@@ -571,7 +573,7 @@ export default function StandalonePresentation() {
         const json = await res.json();
         if (json.isLive && json.properties) {
           setIsLiveGA4(true);
-          setLastUpdated('Periodo 2025-2026 (En vivo GA4)');
+          setLastUpdated('Año Fiscal 2025-2026 (En vivo GA4)');
 
           setSitesData(prev => prev.map(site => {
             const liveProp = json.properties.find((p: any) => p.name === site.name);
@@ -670,10 +672,10 @@ export default function StandalonePresentation() {
     const p4 = sitesData.find(s => s.id === 'iesa-pa');
 
     return [
-      { name: 'IESA Principal', u2025: p1?.users2025 || 305517, u2026: p1?.users2026 || 208009 },
-      { name: 'Debates IESA', u2025: p2?.users2025 || 88705, u2026: p2?.users2026 || 74796 },
-      { name: 'IESA Alumni', u2025: p3?.users2025 || 21166, u2026: p3?.users2026 || 11853 },
-      { name: 'IESA Panamá', u2025: p4?.users2025 || 4310, u2026: p4?.users2026 || 1632 }
+      { name: 'IESA Principal', u2025: p1?.users2025 || 278843, u2026: p1?.users2026 || 208009 },
+      { name: 'Debates IESA', u2025: p2?.users2025 || 76755, u2026: p2?.users2026 || 74796 },
+      { name: 'IESA Alumni', u2025: p3?.users2025 || 19067, u2026: p3?.users2026 || 11853 },
+      { name: 'IESA Panamá', u2025: p4?.users2025 || 4824, u2026: p4?.users2026 || 4013 }
     ];
   }, [sitesData]);
 
@@ -826,7 +828,7 @@ export default function StandalonePresentation() {
 
               <div className="inline-block">
                 <span className="text-lg sm:text-2xl font-bold tracking-tight text-indigo-500 uppercase">
-                  periodo 2025-2026
+                  año fiscal 2025-2026
                 </span>
               </div>
 
@@ -934,9 +936,9 @@ export default function StandalonePresentation() {
 
               <div className="grid grid-cols-3 gap-4 my-6">
                 <div>
-                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios (2025-2026)</p>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios (Año Fiscal 2025-2026)</p>
                   <p className="text-2xl font-black text-indigo-500 mt-1">
-                    {sitesData.find(s => s.id === 'iesa-ve')?.users2026.toLocaleString() || '180.872'}
+                    {sitesData.find(s => s.id === 'iesa-ve')?.users2026.toLocaleString() || '208.009'}
                   </p>
                 </div>
                 <div>
@@ -976,9 +978,9 @@ export default function StandalonePresentation() {
 
               <div className="grid grid-cols-3 gap-4 my-6">
                 <div>
-                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios (2025-2026)</p>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios (Año Fiscal 2025-2026)</p>
                   <p className="text-2xl font-black text-cyan-500 mt-1">
-                    {sitesData.find(s => s.id === 'debates-iesa')?.users2026.toLocaleString() || '63.445'}
+                    {sitesData.find(s => s.id === 'debates-iesa')?.users2026.toLocaleString() || '74.796'}
                   </p>
                 </div>
                 <div>
@@ -1008,7 +1010,7 @@ export default function StandalonePresentation() {
             }`}>
               <div className="space-y-1 mb-6">
                 <h4 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Comparativa de usuarios por portal (Periodo 2025 vs Periodo 2026)
+                  Comparativa de usuarios por portal (Año Fiscal 2024-2025 vs 2025-2026)
                 </h4>
                 <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   Volumen auditado de usuarios en los principales dominios institucionales.
@@ -1026,7 +1028,7 @@ export default function StandalonePresentation() {
                       <div className="flex justify-between items-center text-xs font-bold">
                         <span className={isDark ? 'text-slate-200' : 'text-slate-800'}>{site.name}</span>
                         <span className={`text-[11px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                          {site.u2026.toLocaleString()} (2026) vs {site.u2025.toLocaleString()} (2025)
+                          {site.u2026.toLocaleString()} (FY 25-26) vs {site.u2025.toLocaleString()} (FY 24-25)
                         </span>
                       </div>
 
@@ -1034,7 +1036,7 @@ export default function StandalonePresentation() {
                       <div className="space-y-1.5">
                         {/* Barra 2025 */}
                         <div className="flex items-center gap-3">
-                          <span className={`text-[10px] font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'} w-12`}>2025</span>
+                          <span className={`text-[10px] font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'} w-14`}>FY 24-25</span>
                           <div className={`flex-1 h-3 rounded-full overflow-hidden ${
                             isDark ? 'bg-slate-800' : 'bg-slate-100'
                           }`}>
@@ -1050,7 +1052,7 @@ export default function StandalonePresentation() {
 
                         {/* Barra 2026 */}
                         <div className="flex items-center gap-3">
-                          <span className="text-[10px] font-bold text-indigo-500 w-12">2026</span>
+                          <span className="text-[10px] font-bold text-indigo-500 w-14">FY 25-26</span>
                           <div className={`flex-1 h-3.5 rounded-full overflow-hidden ${
                             isDark ? 'bg-slate-800' : 'bg-slate-100'
                           }`}>
@@ -1075,11 +1077,11 @@ export default function StandalonePresentation() {
               }`}>
                 <div className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-slate-400" />
-                  <span>Periodo 2025 (Sep 2024 - Oct 2025)</span>
+                  <span>Año Fiscal 2024-2025 (Oct 2024 - Sep 2025)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-indigo-600" />
-                  <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Periodo 2026 (Oct 2025 - Sep 2026)</span>
+                  <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Año Fiscal 2025-2026 (Oct 2025 - Sep 2026)</span>
                 </div>
               </div>
             </div>
@@ -1165,12 +1167,12 @@ export default function StandalonePresentation() {
                       <th className="py-4 px-6">Dominio / portal</th>
                       <th className="py-4 px-6">Rol estratégico</th>
                       <th className="py-4 px-6 text-right">
-                        <span>Usuarios 2025</span>
-                        <span className="block text-[9px] font-normal lowercase tracking-normal opacity-75">sep 24 - oct 25</span>
+                        <span>Año Fiscal 24-25</span>
+                        <span className="block text-[9px] font-normal lowercase tracking-normal opacity-75">oct 2024 - sep 2025</span>
                       </th>
                       <th className="py-4 px-6 text-right">
-                        <span>Usuarios 2026</span>
-                        <span className="block text-[9px] font-normal lowercase tracking-normal opacity-75">oct 25 - sep 26</span>
+                        <span>Año Fiscal 25-26</span>
+                        <span className="block text-[9px] font-normal lowercase tracking-normal opacity-75">oct 2025 - sep 2026</span>
                       </th>
                       <th className="py-4 px-6 text-center">Variación</th>
                       <th className="py-4 px-6 text-right">
@@ -1228,7 +1230,7 @@ export default function StandalonePresentation() {
             </div>
 
             <p className={`text-[11px] italic ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              * Nota metodológica: Para los datos de 2025 se consultan las métricas desde septiembre 2024 hasta octubre de 2025. Para los datos de 2026 se contemplan desde octubre de 2025 hasta septiembre de 2026. La métrica de interacción activa corresponde al tiempo real con la pantalla activa y en primer plano (tiempo total de interacción activo dividido entre usuarios activos en GA4). Portales como IESA Foundation y Debates IESA presentan un crecimiento sostenido a lo largo del período.
+              * Nota metodológica: Las métricas corresponden al Año Fiscal institucional del IESA, comprendido desde el 1 de octubre hasta el 30 de septiembre. Se compara el Año Fiscal 2024-2025 (1 de octubre de 2024 al 30 de septiembre de 2025) frente al Año Fiscal 2025-2026 (1 de octubre de 2025 al 30 de septiembre de 2026). La métrica de interacción activa corresponde al tiempo real con la pantalla activa y en primer plano (tiempo total de interacción activo dividido entre usuarios activos en GA4). Portales como IESA Foundation y Debates IESA presentan un crecimiento sostenido a lo largo del período.
             </p>
           </div>
         </section>
@@ -1438,7 +1440,7 @@ export default function StandalonePresentation() {
           }`}>
             <div className="space-y-1 mb-8">
               <h4 className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Demanda y vistas por programa de postgrado (Periodo 2025-2026)
+                Demanda y vistas por programa de postgrado (Año Fiscal 2025-2026)
               </h4>
               <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                 Visualizaciones de página en Google Analytics 4 de las landings de postgrado.
