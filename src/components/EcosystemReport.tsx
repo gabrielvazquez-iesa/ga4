@@ -157,7 +157,7 @@ export default function EcosystemReport() {
       ["REPORTE COMPARATIVO ECOSISTEMA DIGITAL - IESA"],
       ["Generado el:", new Date().toLocaleDateString()],
       [],
-      ["", "", "PERÍODO 2025", "", "", "", "", "PERÍODO 2026 (ACTUAL)", "", "", "", ""],
+      ["", "", "AÑO FISCAL 2024-2025 (OCT 24 - SEP 25)", "", "", "", "", "AÑO FISCAL 2025-2026 (OCT 25 - SEP 26)", "", "", "", ""],
       ["SITIO / DOMINIO", "PROPIEDAD GA4", "USUARIOS", "T. PROMEDIO", "ORGÁNICO", "DIRECTO", "REFERIDOS", "USUARIOS", "T. PROMEDIO", "ORGÁNICO", "DIRECTO", "REFERIDOS"]
     ];
 
@@ -200,8 +200,8 @@ export default function EcosystemReport() {
         <tr style="background-color: #1e293b; color: white; font-weight: bold;">
           <th rowspan="2" style="padding: 10px;">Sitio / Domino</th>
           <th rowspan="2" style="padding: 10px;">Propiedad</th>
-          <th colspan="5" style="padding: 5px; background-color: #312e81; text-align: center;">Período 2025</th>
-          <th colspan="5" style="padding: 5px; background-color: #064e3b; text-align: center;">Período 2026</th>
+          <th colspan="5" style="padding: 5px; background-color: #312e81; text-align: center;">Año Fiscal 2024-2025 (Oct 24 - Sep 25)</th>
+          <th colspan="5" style="padding: 5px; background-color: #064e3b; text-align: center;">Año Fiscal 2025-2026 (Oct 25 - Sep 26)</th>
         </tr>
         <tr style="background-color: #334155; color: white; font-weight: bold;">
           <th style="padding: 5px;">Users</th><th style="padding: 5px;">Time</th><th style="padding: 5px;">Org</th><th style="padding: 5px;">Dir</th><th style="padding: 5px;">Ref</th>
@@ -264,7 +264,7 @@ export default function EcosystemReport() {
             <div>
               <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white leading-none mb-2">Ecosistema Digital</h1>
               <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2">
-                 <Calendar className="w-4 h-4" /> Comparativa Histórica 2025 vs 2026
+                 <Calendar className="w-4 h-4" /> Comparativa Año Fiscal (Octubre 2025 – Septiembre 2026 vs Período Previo)
               </p>
             </div>
           </div>
@@ -382,8 +382,8 @@ export default function EcosystemReport() {
                 <tr className="bg-slate-50 dark:bg-slate-950/80 border-b border-slate-200 dark:border-white/5">
                   <th rowSpan={2} className="w-14 px-7 py-5"></th>
                   <th rowSpan={2} className="px-7 py-5 font-black text-slate-900 dark:text-white uppercase tracking-widest border-r border-slate-200 dark:border-white/5 sticky left-0 z-20 bg-inherit shadow-[4px_0_10px_rgba(0,0,0,0.05)]">Sitio / Propiedad</th>
-                  <th colSpan={5} className="px-7 py-4 font-black text-center text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.2em] border-r border-slate-200 dark:border-white/5 bg-indigo-500/5">Rendimiento Anual 2025</th>
-                  <th colSpan={5} className="px-7 py-4 font-black text-center text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em] bg-emerald-500/5">Rendimiento Actual 2026</th>
+                  <th colSpan={5} className="px-7 py-4 font-black text-center text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.2em] border-r border-slate-200 dark:border-white/5 bg-indigo-500/5">Año Fiscal 2024-2025 (Oct 24 - Sep 25)</th>
+                  <th colSpan={5} className="px-7 py-4 font-black text-center text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em] bg-emerald-500/5">Año Fiscal 2025-2026 (Oct 25 - Sep 26)</th>
                 </tr>
                 <tr className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-white/10">
                   <th className="px-4 py-3 font-black text-slate-400 text-right border-r border-slate-200 dark:border-white/5">Users</th>

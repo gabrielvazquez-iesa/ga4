@@ -494,7 +494,7 @@ export default function StandalonePresentation() {
   const [shareUrl, setShareUrl] = useState<string>('');
   const [isLiveGA4, setIsLiveGA4] = useState<boolean>(false);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
-  const [lastUpdated, setLastUpdated] = useState<string>('Año Fiscal 2025-2026');
+  const [lastUpdated, setLastUpdated] = useState<string>('Año Fiscal 2025-2026 (Octubre 2025 – Septiembre 2026)');
   const modalScrollRef = useRef<HTMLDivElement>(null);
 
   // Inicialización de la URL y generación del código QR para compartir
@@ -573,7 +573,7 @@ export default function StandalonePresentation() {
         const json = await res.json();
         if (json.isLive && json.properties) {
           setIsLiveGA4(true);
-          setLastUpdated('Año Fiscal 2025-2026 (En vivo GA4)');
+          setLastUpdated('Año Fiscal 2025-2026 (Octubre 2025 – Septiembre 2026 · En vivo GA4)');
 
           setSitesData(prev => prev.map(site => {
             const liveProp = json.properties.find((p: any) => p.name === site.name);
@@ -826,9 +826,12 @@ export default function StandalonePresentation() {
                 Evolución y rendimiento del ecosistema digital IESA
               </h1>
 
-              <div className="inline-block">
-                <span className="text-lg sm:text-2xl font-bold tracking-tight text-indigo-500 uppercase">
-                  año fiscal 2025-2026
+              <div className="inline-block space-y-1.5">
+                <span className="text-lg sm:text-2xl font-bold tracking-tight text-indigo-500 uppercase block">
+                  Año Fiscal 2025-2026
+                </span>
+                <span className={`text-xs sm:text-sm font-semibold tracking-wider uppercase block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  (Octubre 2025 – Septiembre 2026)
                 </span>
               </div>
 
@@ -909,7 +912,7 @@ export default function StandalonePresentation() {
               El ecosistema digital actual
             </h2>
             <p className={`text-base leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-              Comportamiento del tráfico, usuarios y sesiones en los dominios del IESA. El portal principal concentra las admisiones académicas, mientras Debates IESA aporta difusión de contenido y liderazgo de opinión.
+              Comportamiento del tráfico, usuarios y sesiones en los dominios del IESA durante el Año Fiscal 2025-2026 (Octubre 2025 – Septiembre 2026) en comparación con el Año Fiscal 2024-2025 (Octubre 2024 – Septiembre 2025). El portal principal concentra las admisiones académicas, mientras Debates IESA aporta difusión de contenido y liderazgo de opinión.
             </p>
           </div>
 
@@ -936,14 +939,14 @@ export default function StandalonePresentation() {
 
               <div className="grid grid-cols-3 gap-4 my-6">
                 <div>
-                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios (Año Fiscal 2025-2026)</p>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios (Oct 25 - Sep 26)</p>
                   <p className="text-2xl font-black text-indigo-500 mt-1">
                     {sitesData.find(s => s.id === 'iesa-ve')?.users2026.toLocaleString() || '208.009'}
                   </p>
                 </div>
                 <div>
                   <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Sesiones</p>
-                  <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>272.404</p>
+                  <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>274.795</p>
                 </div>
                 <div>
                   <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Interacción activa</p>
@@ -978,14 +981,14 @@ export default function StandalonePresentation() {
 
               <div className="grid grid-cols-3 gap-4 my-6">
                 <div>
-                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios (Año Fiscal 2025-2026)</p>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Usuarios (Oct 25 - Sep 26)</p>
                   <p className="text-2xl font-black text-cyan-500 mt-1">
                     {sitesData.find(s => s.id === 'debates-iesa')?.users2026.toLocaleString() || '74.796'}
                   </p>
                 </div>
                 <div>
                   <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Sesiones</p>
-                  <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>85.695</p>
+                  <p className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>86.590</p>
                 </div>
                 <div>
                   <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Interacción activa</p>
@@ -1013,7 +1016,7 @@ export default function StandalonePresentation() {
                   Comparativa de usuarios por portal (Año Fiscal 2024-2025 vs 2025-2026)
                 </h4>
                 <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Volumen auditado de usuarios en los principales dominios institucionales.
+                  Volumen auditado de usuarios en los principales dominios institucionales (Octubre 2024 – Septiembre 2025 vs Octubre 2025 – Septiembre 2026).
                 </p>
               </div>
 
@@ -1028,7 +1031,7 @@ export default function StandalonePresentation() {
                       <div className="flex justify-between items-center text-xs font-bold">
                         <span className={isDark ? 'text-slate-200' : 'text-slate-800'}>{site.name}</span>
                         <span className={`text-[11px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                          {site.u2026.toLocaleString()} (FY 25-26) vs {site.u2025.toLocaleString()} (FY 24-25)
+                          {site.u2026.toLocaleString()} (Oct 25 - Sep 26) vs {site.u2025.toLocaleString()} (Oct 24 - Sep 25)
                         </span>
                       </div>
 
@@ -1036,7 +1039,7 @@ export default function StandalonePresentation() {
                       <div className="space-y-1.5">
                         {/* Barra 2025 */}
                         <div className="flex items-center gap-3">
-                          <span className={`text-[10px] font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'} w-14`}>FY 24-25</span>
+                          <span className={`text-[10px] font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'} w-24`}>Oct 24 - Sep 25</span>
                           <div className={`flex-1 h-3 rounded-full overflow-hidden ${
                             isDark ? 'bg-slate-800' : 'bg-slate-100'
                           }`}>
@@ -1052,7 +1055,7 @@ export default function StandalonePresentation() {
 
                         {/* Barra 2026 */}
                         <div className="flex items-center gap-3">
-                          <span className="text-[10px] font-bold text-indigo-500 w-14">FY 25-26</span>
+                          <span className="text-[10px] font-bold text-indigo-500 w-24">Oct 25 - Sep 26</span>
                           <div className={`flex-1 h-3.5 rounded-full overflow-hidden ${
                             isDark ? 'bg-slate-800' : 'bg-slate-100'
                           }`}>
@@ -1230,7 +1233,7 @@ export default function StandalonePresentation() {
             </div>
 
             <p className={`text-[11px] italic ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              * Nota metodológica: Las métricas corresponden al Año Fiscal institucional del IESA, comprendido desde el 1 de octubre hasta el 30 de septiembre. Se compara el Año Fiscal 2024-2025 (1 de octubre de 2024 al 30 de septiembre de 2025) frente al Año Fiscal 2025-2026 (1 de octubre de 2025 al 30 de septiembre de 2026). La métrica de interacción activa corresponde al tiempo real con la pantalla activa y en primer plano (tiempo total de interacción activo dividido entre usuarios activos en GA4). Portales como IESA Foundation y Debates IESA presentan un crecimiento sostenido a lo largo del período.
+              * Nota metodológica: Las métricas corresponden al Año Fiscal institucional del IESA, comprendido desde el 1 de octubre hasta el 30 de septiembre. Se compara el Año Fiscal 2024-2025 (1 de octubre de 2024 al 30 de septiembre de 2025) frente al Año Fiscal 2025-2026 (1 de octubre de 2025 al 30 de septiembre de 2026). La métrica de interacción activa corresponde al tiempo real con la pantalla activa y en primer plano (tiempo total de interacción activo dividido entre usuarios activos en GA4). Portales como IESA Foundation y Debates IESA presentan un crecimiento sostenido a lo largo del año fiscal evaluado.
             </p>
           </div>
         </section>
@@ -1251,7 +1254,7 @@ export default function StandalonePresentation() {
                 Nuevas páginas incorporadas y proyectos futuros
               </h2>
               <p className={`text-base leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                Catálogo de 16 proyectos web trabajados durante el año fiscal: 12 páginas publicadas en producción, 2 pendientes (Club de políticas y asuntos públicos, Portal de internacionalización) y 2 proyectos estratégicos en desarrollo (Refactorización del checkout y Sitio bilingüe multi-idioma de 109 páginas para acreditadoras).
+                Catálogo de 16 proyectos web trabajados durante el año fiscal 2025-2026 (octubre 2025 a septiembre 2026): 12 páginas publicadas en producción, 2 pendientes (Club de políticas y asuntos públicos, Portal de internacionalización) y 2 proyectos estratégicos en desarrollo (Refactorización del checkout y Sitio bilingüe multi-idioma de 109 páginas para acreditadoras).
               </p>
             </div>
 
@@ -1443,7 +1446,7 @@ export default function StandalonePresentation() {
                 Demanda y vistas por programa de postgrado (Año Fiscal 2025-2026)
               </h4>
               <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Visualizaciones de página en Google Analytics 4 de las landings de postgrado.
+                Visualizaciones de página en Google Analytics 4 de las landings de postgrado durante el período de octubre 2025 a septiembre 2026.
               </p>
             </div>
 
